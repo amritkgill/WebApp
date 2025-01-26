@@ -54,7 +54,7 @@ const VoterPositionEntryAndDisplay = (props) => {
     setVoterPhotoUrlMedium(voter.voter_photo_url_medium);
     setVoterName(voter.full_name || 'Anonymous');
   };
-  const [selectedOpinion, setSelectedOpinion] = useState('Neutral');
+  const [selectedOpinion, setSelectedOpinion] = useState('');
 
   const handleOpinionChange = (event) => {
     setSelectedOpinion(event.target.value);
