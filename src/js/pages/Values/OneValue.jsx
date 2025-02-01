@@ -260,7 +260,7 @@ class OneValue extends Component {
             {' '}
             {issue.issue_name}
           </Title>
-          {voterGuidesForValueLength > 0 && (
+          {organizationsForValueLength > 0 && (
             <FilterChoices>
               <Chip
                 key="forThisElectionKey"
