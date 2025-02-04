@@ -56,12 +56,30 @@ class SearchBar2024 extends Component {
     }
   }
 
-  handleKeyPress () {
-    if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      this.props.searchFunction(this.state.searchString);
-    }, this.props.searchUpdateDelayTime);
+  
+ handleKeyPress = () => {
+  if (this.timer) {
+    clearTimeout(this.timer);
   }
+  this.timer = setTimeout(() => {
+    const { searchString } = this.state;
+    if (searchString.length === 0) {
+      return;
+    }
+    this.props.searchFunction(searchString);
+    if(this.props.trackSearch){
+    const dataLayerObject = {
+      event: 'KeyWord Search',
+      search_keyword: searchString,
+      voterWeVoteId: VoterStore.getVoterWeVoteId(),
+    };
+    //console.log(dataLayerObject)
+    TagManager.dataLayer({dataLayer: dataLayerObject});
+  }
+  }, 3000);
+  const { searchString } = this.state;
+  this.props.searchFunction(searchString);
+};
 
   clearQuery () {
     this.props.clearFunction();
