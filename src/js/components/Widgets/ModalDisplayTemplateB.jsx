@@ -353,24 +353,26 @@ export const OpinionButton = styled(Button)`
   }
 `;
 export const OptionBlockWrapper = styled.div`
-margin-bottom: 10px;
-padding: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
 `;
 export const CommentContainer = styled.div`
-  align-items: center;
+  flex-grow: 1;
   background-color: ${DesignTokenColors.whiteUI};
   border: 1px solid ${DesignTokenColors.neutralUI300};
   border-radius: 16px;
-  display: flex;
   padding: 8px 12px;
-`;
-export const InputBox = styled.input`
-border: none;
-color: ${DesignTokenColors.neutral900};
-flex-grow: 1;
-font-size: 14px;
-outline: none;
-padding: 5px;
+  display: flex;
+  align-items: center;
 `;
 
+export const InputBox = styled.input`
+  border: none;
+  color: ${DesignTokenColors.neutral900};
+  font-size: 16px;
+  outline: none;
+  flex-grow: 1;
+`;
 export default withTheme(withStyles(templateBStyles)(ModalDisplayTemplateB));

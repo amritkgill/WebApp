@@ -114,17 +114,17 @@ const VoterPositionEntryAndDisplay = (props) => {
   };
   const OpinionBlock = ({ onClick }) => (
     <OptionBlockWrapper>
+      <UserInfoWrapper>
+        <VoterAvatarImg
+          alt=""
+          src={voterPhotoUrlMedium || avatarGeneric()}
+        />
+        <EditIcon
+          onClick={handleEditModalOpen}
+          className={classes.styledEditIcon}
+        />
+      </UserInfoWrapper>
       <CommentContainer>
-        <UserInfoWrapper>
-          <VoterAvatarImg
-            alt=""
-            src={voterPhotoUrlMedium || avatarGeneric()}
-          />
-          <EditIcon
-            onClick={handleEditModalOpen}
-            className={classes.styledEditIcon}
-          />
-        </UserInfoWrapper>
         {/* Open modal when input is clicked */}
         <InputBox
           type="text"
