@@ -7,13 +7,14 @@ import PropTypes from 'prop-types';
 
 const JoinChallengeButton = React.lazy(() => import(/* webpackChunkName: 'JoinChallengeButton' */ '../../components/Challenge/JoinChallengeButton'));
 
-const JoinChallengeAndLearnMoreButtons = ({ challengeWeVoteId, classes }) => {
+const JoinChallengeAndLearnMoreButtons = ({ challengeWeVoteId, classes, inChallengeList }) => {
   return (
     <JoinChallengeButtonWrapper>
       <Suspense fallback={<></>}>
         <JoinChallengeButton
           // challengeSEOFriendlyPath={challengeSEOFriendlyPathForDisplay}
           challengeWeVoteId={challengeWeVoteId}
+          inChallengeList={inChallengeList}
         />
       </Suspense>
       <Button
@@ -59,12 +60,14 @@ const styles = () => ({
 const JoinChallengeButtonWrapper = styled('div')`
   display: flex;
   align-items: center;
-  justify-content: flex;
+  justify-content: space-around;
+  width: 250px;
 `;
 
 JoinChallengeAndLearnMoreButtons.propTypes = {
   challengeWeVoteId: PropTypes.string,
   classes: PropTypes.object.isRequired,
+  inChallengeList: PropTypes.bool,
 };
 
 export default withStyles(styles)(JoinChallengeAndLearnMoreButtons);

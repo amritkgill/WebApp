@@ -169,6 +169,7 @@ class ChallengeCardList extends Component {
     }
     let numberDisplayed = 0;
     const pigsCanFly = true;
+    const inChallengeList = true;
     return (
       <Wrapper>
         <ListWrapper useVerticalCard={useVerticalCard}>
@@ -201,7 +202,9 @@ class ChallengeCardList extends Component {
                 {pigsCanFly && (
                   <JoinedButtonsOuterWrapper>
                     <JoinedButtonsInnerWrapper>
-                      <JoinChallengeAndLearnMoreButtons />
+                      <JoinChallengeAndLearnMoreButtons
+                        inChallengeList={inChallengeList}
+                      />
                     </JoinedButtonsInnerWrapper>
                   </JoinedButtonsOuterWrapper>
                 )}
@@ -316,6 +319,7 @@ const JoinedButtonsInnerWrapper = styled('div')`
 const JoinedButtonsOuterWrapper = styled('div')`
   bottom: 0;
   display: flex;
+  justify-content: space-between;
   position: absolute;
   width: 250px;
 `;

@@ -260,7 +260,7 @@ const JoinedDaysLeftOverlayMobile = styled('div')`
 
 const JoinedDaysLeftOverlayDesktop = styled('div')`
   position: absolute;
-  top: 175px;
+  top: 135px;
   left: 10px;
 `;
 

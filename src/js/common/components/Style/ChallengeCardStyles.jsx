@@ -41,10 +41,11 @@ export const ChallengeImageDesktopPlaceholder = styled('div', {
   ${useVerticalCard ? `border: 1px solid ${DesignTokenColors.neutralUI100};` : ''}
   ${useVerticalCard ? 'border-radius: 12px;' : ''}
   display: flex;
-  ${limitCardWidth ? 'height: 157px;' : `${useVerticalCard ? 'height: 200px;' : 'height: 117px;'}`}
-  ${limitCardWidth ? 'min-height: 157px;' : `${useVerticalCard ? 'min-height: 200px;' : 'min-height: 117px;'}`}
+  justify-content: flex-start;
+  ${limitCardWidth ? 'height: 157px;' : `${useVerticalCard ? 'height: 157px;' : 'height: 117px;'}`}
+  ${limitCardWidth ? 'min-height: 157px;' : `${useVerticalCard ? 'min-height: 157px;' : 'min-height: 117px;'}`}
   justify-content: center;
-  ${limitCardWidth ? 'width: 250px;' : `${useVerticalCard ? 'width: 250px;' : 'width: 224px;'}`}
+  ${limitCardWidth ? 'width: 250px;' : `${useVerticalCard ? 'width: 320px;' : 'width: 250px;'}`}
   ${ChallengeImageDesktopSharedStyles}
 `));
 
@@ -138,7 +139,7 @@ export const OneChallengePhotoDesktopColumn = styled('div', {
   ${useVerticalCard ? 'border-radius: 12px;' : ''}
   display: flex;
   ${limitCardWidth ? 'height: 157px;' : `${useVerticalCard ? 'height: 200px;' : 'height: 117px;'}`}
-  justify-content: center;
+  // justify-content: center;
   ${useVerticalCard ? '' : 'margin-left: 15px;'}
   ${useVerticalCard ? `${hideCardMargins ? 'margin: 0 0 6px 0;' : 'margin: 10px 10px 6px 10px;'}` : 'margin-bottom: 0; margin-top: 0;'}
   ${limitCardWidth ? 'width: 276px;' : `${useVerticalCard ? '' : 'width: 224px;'}`}
