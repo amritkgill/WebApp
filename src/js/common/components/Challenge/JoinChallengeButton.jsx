@@ -131,10 +131,13 @@ class JoinChallengeButton extends React.Component {
       dataLayer: {
         event: 'inviteFriendsToChallenge',
         user: {
+          // isSignedIn: VoterStore.getVoterIsSignedIn(),
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
         },
         challengeWeVoteId,
-        pageDestination: 'joinChallenge',
+        destinationPageName: 'joinChallenge',
+        destinationPageType: 'challenge',
+        destinationPathName: '',
         pageType: 'challenge',
         pageName: '', // Populate from URL pathname
         pathName: currentPathname,
