@@ -629,6 +629,7 @@ class ChallengeHomePage extends Component {
                   titleLinkOff
                   useVerticalCard
                   voterWeVoteId={voterWeVoteId}
+                  limitCardWidth={false}
                 />
                 <ChallengeAbout challengeWeVoteId={challengeWeVoteIdForDisplay} showDaysLeft />
                 <JoinChallengeButtonWrapper>
@@ -787,7 +788,7 @@ const CenteredDiv = styled('div')`
 const ColumnOneThird = styled('div')`
   flex: 1;
   flex-direction: column;
-  flex-basis: 40%;
+  flex-basis: 30%;
 `;
 
 const ColumnsWrapper = styled('div')`
@@ -801,7 +802,7 @@ const ColumnsWrapper = styled('div')`
 const ColumnTwoThirds = styled('div')`
   flex: 2;
   flex-direction: column;
-  flex-basis: 60%;
+  flex-basis: 70%;
   margin: 0 0 0 25px;
 `;
 
@@ -878,7 +879,7 @@ const NoInformationProvided = styled('div')`
 `;
 
 const JoinChallengeButtonWrapper = styled('div')`
-  display: flex;
+  // display: flex;
   height: 50px;
   justify-content: center;
   margin-top: 30px;
