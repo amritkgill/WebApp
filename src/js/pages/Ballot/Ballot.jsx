@@ -1457,12 +1457,13 @@ class Ballot extends Component {
                                     { showFilterTabs && (
                                       <div
                                         className="ballot_filter_btns"
-                                        id="ballotBadgeMobileAndDesktop-All"
-                                        key="filterTypeAll"                                      >
+                                        key="filterTypeAll"
+                                      >
                                         <Chip variant="outlined"
                                           color={(raceLevelFilterType === 'All' && !isSearching) ? 'primary' : 'default'}
                                           className="btn_ballot_filter"
                                           classes={{ root: classes.chipRootAll, label: classes.chipLabel, outlinedPrimary: (raceLevelFilterType === 'All' && !isSearching) ? classes.chipOutlined : null }}
+                                          id="ballotBadgeMobileAndDesktop-All"
                                           label="All"
                                           style={widthOverride}
                                           onClick={() => this.setBallotItemFilterType('All', ballotWithItemsFromCompletionFilterType.length)}
@@ -1499,7 +1500,7 @@ class Ballot extends Component {
                                             />
                                           );
                                           return (
-                                            <div id={`BallotButtonOuterWrapper-${window.performance.now()}`} key={oneTypeOfBallotItem + window.performance.now()}   >
+                                            <div id={`BallotButtonOuterWrapper-${window.performance.now()}`} key={oneTypeOfBallotItem + window.performance.now()}>
                                               <div className="u-show-mobile">
                                                 <div
                                                   className="ballot_filter_btns"
