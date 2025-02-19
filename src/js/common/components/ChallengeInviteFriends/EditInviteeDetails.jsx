@@ -3,18 +3,21 @@ import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { DialogTitle, Button } from '@mui/material';
+import { DialogTitle, Button, TextField } from '@mui/material';
 import DesignTokenColors from '../Style/DesignTokenColors';
-import ModalDisplayTemplateA, { templateAStyles, TextFieldWrapper } from '../../../components/Widgets/ModalDisplayTemplateA';
+import ModalDisplayTemplateA, { templateAStyles } from '../../../components/Widgets/ModalDisplayTemplateA';
 import ChallengeInviteeStore from '../../stores/ChallengeInviteeStore';
 
 const EditInviteeDetails = ({ inviteeId, show, setShow, setAnchorEl }) => {
   const [inviteeData, setInviteeData] = useState(null);
   const [editedName, setEditedName] = useState('');
   const [editedMessage, setEditedMessage] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [messageError, setMessageError] = useState('');
 
   useEffect(() => {
     const fetchInviteeData = async () => {
+      // need to do the same for the inviter
       const data = await ChallengeInviteeStore.getChallengeInviteeById(inviteeId);
       setInviteeData(data);
       setEditedName(data?.invitee_name || '');
@@ -30,6 +33,26 @@ const EditInviteeDetails = ({ inviteeId, show, setShow, setAnchorEl }) => {
     setAnchorEl(null);
   };
 
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setEditedName(value);
+    if (value === '') {
+      setNameError('Please enter your friend\'s name');
+    } else {
+      setNameError('');
+    }
+  };
+
+  const handleMessageChange = (e) => {
+    const value = e.target.value;
+    setEditedMessage(value);
+    if (value === '') {
+      setMessageError('Please enter a message');
+    } else {
+      setMessageError('');
+    }
+  };
+
   const handleSave = () => {
     console.log('Saving edited details:', { name: editedName, message: editedMessage });
     // Add save logic here
@@ -42,23 +65,28 @@ const EditInviteeDetails = ({ inviteeId, show, setShow, setAnchorEl }) => {
     <FormContent>
       <FormSection>
         <FormFieldContainer>
-          <Label>Your friend's name</Label>
-          <StyledInput
-            type="text"
+          <TextField
+            fullWidth
+            label="Your friend's name"
             value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
+            onChange={handleNameChange}
+            error={!!nameError}
+            helperText={nameError}
+            variant="outlined"
+            size="small"
           />
         </FormFieldContainer>
         <FormFieldContainer>
-          <Label>
-            Message to
-            {' '}
-            {editedName || 'your friend'}
-          </Label>
-          <StyledTextarea
-            rows="4"
+          <TextField
+            fullWidth
+            label={`Message to ${editedName || 'your friend'}`}
+            multiline
+            rows={4}
             value={editedMessage}
-            onChange={(e) => setEditedMessage(e.target.value)}
+            onChange={handleMessageChange}
+            error={!!messageError}
+            helperText={messageError}
+            variant="outlined"
           />
         </FormFieldContainer>
         <UniqueLink>
@@ -119,36 +147,6 @@ const ButtonContainer = styled('div')`
   width: 100%;
   display: flex;
   justify-content: space-between;
-`;
-
-const Label = styled('label')`
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: block;
-  color: ${DesignTokenColors.neutral900};
-`;
-
-const StyledInput = styled('input')`
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid ${DesignTokenColors.neutral300};
-  border-radius: 4px;
-  font-size: 14px;
-  color: ${DesignTokenColors.neutral900};
-  box-sizing: border-box;
-`;
-
-const StyledTextarea = styled('textarea')`
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid ${DesignTokenColors.neutral300};
-  border-radius: 4px;
-  font-size: 14px;
-  color: ${DesignTokenColors.neutral900};
-  box-sizing: border-box;
 `;
 
 export default withTheme(withStyles(templateAStyles)(EditInviteeDetails));
