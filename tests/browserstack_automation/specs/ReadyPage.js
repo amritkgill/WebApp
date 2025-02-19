@@ -160,7 +160,7 @@ it('check Alert msgs - Unfollow Popular Topics', async () => {
 it('Verify Text and links -> we vote helps you - Be ready to vote', async () => {
  console.log('Tcs : Ready_023');
  await ReadyPage.load();
- //await driver.pause(waitTime);
+ await driver.pause(waitTime);
  await ReadyPage.weVoteHelpsYouMenuItem1.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.weVoteHelpsYouMenuItem1Text.getText();
@@ -169,41 +169,40 @@ it('Verify Text and links -> we vote helps you - Be ready to vote', async () => 
  {
  const links = await ReadyPage.weVoteHelpsYouMenuItem1Text.$$("a");
 
-
        // Extract the href attributes of all links
        const hrefs = [];
        for (const link of links) {
          //await ReadyPage.weVoteHelpsYouMenuItem1.click();
+          //console.log('Link :', link);
            const href = await link.getAttribute("href");
            hrefs.push(href);
-           //console.log(`Link Text: ${text}, Href: ${href}`);
-
-
+           console.log(`Link Text: ${text}, Href: ${href}`);
+           await browser.execute(() => window.scrollBy(0, 700));
+           await browser.pause(waitTime);
            // Click the link
            await link.click();
            await browser.pause(waitTime);
-
 
            // Wait for navigation and verify the new URL
            const currentUrl = await browser.getUrl();
            console.log(`Navigated to: ${currentUrl}`);
            expect(currentUrl).toContain(href); // Or specific validation
 
-
            // Navigate back if needed
            await browser.back();
+           await browser.pause(waitTime);
+           await browser.execute(() => window.scrollBy(0, 300));
            await ReadyPage.weVoteHelpsYouMenuItem1.click();
        }
-
 
        // Print the links
        console.log("Extracted Links:", hrefs);
        expect(hrefs.length).toBeGreaterThan(0); // Ensure links exist
 
-
        //check for 'Enter Your Address' link
        await ReadyPage.enterYourAddressLink.click();
        const headerText= await ReadyPage.enterYourAddressWindowHeader.getText();
+       expect(headerText).toEqual('Enter Your Address');
        console.log('header text:'+ headerText);
  }
  else{
@@ -217,13 +216,14 @@ it('Verify Text and links -> we vote helps you - Be ready to vote', async () => 
 it('Verify Text and links -> we vote helps you - Be confident in your choices', async () => {
  console.log('Tcs : Ready_024');
  await ReadyPage.load();
- //await driver.pause(waitTime);
+ await driver.pause(waitTime);
  await ReadyPage.weVoteHelpsYouMenuItem2.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.weVoteHelpsYouMenuItem2Text.getText();
  console.log("menu item1 text: "+text);
  if(text!="")
  {
+        await browser.execute(() => window.scrollBy(0, 700));
        //check for 'twitter signin ' link
        await ReadyPage.linkToTwitterAcct.click();
        await browser.pause(waitTime);
@@ -248,6 +248,8 @@ it('Verify Text and links -> we vote helps you - Be confident in your choices', 
 it('Verify Text and links -> we vote helps you - Help friends & amplify your impact', async () => {
  console.log('Tcs : Ready_025');
  await ReadyPage.load();
+ await driver.pause(waitTime);
+ await browser.execute(() => window.scrollBy(0, 700));
  //await driver.pause(waitTime);
  await ReadyPage.weVoteHelpsYouMenuItem3.click();
  await driver.pause(waitTime);
@@ -266,7 +268,8 @@ it('Verify Text and links -> we vote helps you - Help friends & amplify your imp
            hrefs.push(href);
            //console.log(`Link Text: ${text}, Href: ${href}`);
 
-
+           await browser.execute(() => window.scrollBy(0, 300));
+           await browser.pause(waitTime);
            // Click the link
            await link.click();
            await browser.pause(waitTime);
@@ -280,7 +283,10 @@ it('Verify Text and links -> we vote helps you - Help friends & amplify your imp
 
            // Navigate back
            await browser.back();
+           await driver.pause(waitTime);
+           await browser.execute(() => window.scrollBy(0, 600));
            await ReadyPage.weVoteHelpsYouMenuItem3.click();
+           await driver.pause(waitTime);
        }
  }
  else{
@@ -294,7 +300,8 @@ it('Verify Text and links -> we vote helps you - Help friends & amplify your imp
 it('Verify Text and links -> The fine print: You cannot cast your vote electronically', async () => {
  console.log('Tcs : Ready_026');
  await ReadyPage.load();
- //await driver.pause(waitTime);
+ await driver.pause(waitTime);
+ await browser.execute(() => window.scrollBy(0, 600));
  await ReadyPage.finePrintMenuItema.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.readyFinePrintStepTexta.getText();
@@ -315,7 +322,8 @@ it('Verify Text and links -> The fine print: You cannot cast your vote electroni
 it('Verify Text and links -> The fine print: WeVote does not represent a government entity', async () => {
  console.log('Tcs : Ready_027');
  await ReadyPage.load();
- //await driver.pause(waitTime);
+ await driver.pause(waitTime);
+ await browser.execute(() => window.scrollBy(0, 600));
  await ReadyPage.finePrintMenuItemb.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.readyFinePrintStepTextb.getText();
@@ -337,6 +345,7 @@ it('Verify Text and links -> The fine print: - Please make sure you are register
  console.log('Tcs : Ready_028');
  await ReadyPage.load();
  //await driver.pause(waitTime);
+ await browser.execute(() => window.scrollBy(0, 600));
  await ReadyPage.finePrintMenuItemc.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.readyFinePrintStepTextc.getText();
@@ -357,7 +366,8 @@ it('Verify Text and links -> The fine print: - Please make sure you are register
 it('Verify Text and links -> The fine print:- How your data is used & protected ', async () => {
  console.log('Tcs : Ready_029');
  await ReadyPage.load();
- //await driver.pause(waitTime);
+ await driver.pause(waitTime);
+ await browser.execute(() => window.scrollBy(0, 600));
  await ReadyPage.finePrintMenuItemd.click();
  await driver.pause(waitTime);
  const text = await ReadyPage.readyFinePrintStepTextd.getText();
@@ -375,7 +385,8 @@ it('Verify Text and links -> The fine print:- How your data is used & protected 
            hrefs.push(href);
            //console.log(`Link Text: ${text}, Href: ${href}`);
 
-
+           await browser.execute(() => window.scrollBy(0, 600));
+           await driver.pause(waitTime);
            // Click the link
            await link.click();
            await browser.pause(waitTime);
@@ -389,6 +400,8 @@ it('Verify Text and links -> The fine print:- How your data is used & protected 
 
            // Navigate back
            await browser.back();
+           await browser.execute(() => window.scrollBy(0, 600));
+           await driver.pause(waitTime);
            await ReadyPage.finePrintMenuItemd.click();
        }
  }
