@@ -46,6 +46,8 @@ import normalizedImagePath from '../../utils/normalizedImagePath';
 import { getPoliticianValuesFromIdentifiers, retrievePoliticianFromIdentifiersIfNeeded } from '../../utils/politicianUtils';
 import returnFirstXWords from '../../utils/returnFirstXWords';
 import saveCampaignSupportAndGoToNextPage from '../../utils/saveCampaignSupportAndGoToNextPage';
+import TagManager from 'react-gtm-module';
+import VoterStore from '../../../stores/VoterStore';
 
 const CampaignRetrieveController = React.lazy(() => import(/* webpackChunkName: 'CampaignRetrieveController' */ '../../components/Campaign/CampaignRetrieveController'));
 const CampaignSupportThermometer = React.lazy(() => import(/* webpackChunkName: 'CampaignSupportThermometer' */ '../../components/CampaignSupport/CampaignSupportThermometer'));
@@ -158,6 +160,7 @@ class PoliticianDetailsPage extends Component {
       wikipediaUrl: '',
       politicianStateParsedFromURLBeforeLoad: '',
       politicianNameParsedFromURLBeforeLoad: '',
+      dataLayerSent: false, // instance flag for GTM
       // youtubeUrl: '',
     };
     // this.onScroll = this.onScroll.bind(this);
@@ -334,6 +337,37 @@ class PoliticianDetailsPage extends Component {
     if (triggerFreshRetrieve || triggerSEOPathRedirect) {
       // Take the "calculated" identifiers and retrieve if missing
       window.scrollTo(0, 0);
+    }
+    // --------Zubin - TAGMANAGER DATA LAYER LOGIC---------
+    if (!this.state.dataLayerSent) {
+      // console.log("TagManager code executing...");
+      // console.log("Politician ID id exists? ", politician);
+      if (politician && politician.politician_we_vote_id) {
+        // console.log('Politician Details retrieved, Adding DataLayer...');
+        const voterWeVoteId = VoterStore.getVoterWeVoteId();
+        const politicianState = politician.state_code || 'na';
+        const dataLayerObj = {
+          event: 'politicianLoadingPage',
+          userDetails: {
+            voterWeVoteId,
+          },
+          politicianDetails: {
+            politicianWeVoteId: politician.politician_we_vote_id,
+            politicianName: politician.politician_name,
+            politicianState,
+          },
+          pageDetails: {
+            pageType: 'politician', // in which page we are currently
+            pageName: this.constructor.name, // name of page from constructor itself
+            pathName: window.location.pathname, // location of the current window contains pathName
+          },
+        };
+        TagManager.dataLayer({ dataLayer: dataLayerObj });
+        // Set the flag to true so that it runs just once
+        this.setState({
+          dataLayerSent: true,
+        });
+      }
     }
   }
 
