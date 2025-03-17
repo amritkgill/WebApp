@@ -12,6 +12,7 @@ import ChallengeParticipantActions from '../../actions/ChallengeParticipantActio
 import ReadyStore from '../../../stores/ReadyStore';
 import VoterStore from '../../../stores/VoterStore';
 import { getChallengeValuesFromIdentifiers } from '../../utils/challengeUtils';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class JoinChallengeButton extends React.Component {
   constructor (props) {
@@ -127,6 +128,8 @@ class JoinChallengeButton extends React.Component {
     // console.log('goToInviteFriends currentPathname: ', currentPathname);
 
     // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPage = lookupPageNameAndPageTypeDict(inviteFriendsPath);
     TagManager.dataLayer({
       dataLayer: {
         event: 'inviteFriendsToChallenge',
@@ -137,13 +140,13 @@ class JoinChallengeButton extends React.Component {
           challengeWeVoteId,
         },
         pageDetails: {
-          pageType: "challenge",
-          pageName: window.location.href,
+          pageType: page.pageType,
+          pageName: page.pageName,
           pathName: currentPathname,
         },
         destinationDetails: {
-          destinationPageType: "challenge",
-          destinationPageName: `${window.location.origin}${inviteFriendsPath}`,
+          destinationPageType: destinationPage.pageType,
+          destinationPageName: destinationPage.pageName,
           destinationPathName: inviteFriendsPath,
         },
       },
@@ -174,6 +177,8 @@ class JoinChallengeButton extends React.Component {
       AppObservableStore.setSetUpAccountEntryPath(joinChallengeNextStepPath);
       // console.log('goToJoinChallenge currentPathname: ', currentPathname);
       // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
+      const page = lookupPageNameAndPageTypeDict(currentPathname);
+      const destinationPage = lookupPageNameAndPageTypeDict(joinChallengeNextStepPath);
       TagManager.dataLayer({
         dataLayer: {
           event: 'joinChallenge',
@@ -184,13 +189,13 @@ class JoinChallengeButton extends React.Component {
             challengeWeVoteId,
           },
           pageDetails: {
-            pageType: "challenge",
-            pageName: window.location.href,
+            pageType: page.pageType,
+            pageName: page.pageName,
             pathName: currentPathname,
           },
           destinationDetails: {
-            destinationPageType: 'challenge',
-            destinationPageName: `${window.location.origin}${joinChallengeNextStepPath}`,
+            destinationPageType: destinationPage.pageType,
+            destinationPageName: destinationPage.pageName,
             destinationPathName: joinChallengeNextStepPath,
           },
         },

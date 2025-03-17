@@ -16,6 +16,10 @@ const pageNameAndTypeSimpleDict = {
     pageName: 'Email',
     pageType: 'settings',
   },
+  '/challenges': {
+    pageName: 'ChallengesHomeLoader',
+    pageType: 'challenge',
+  },
 };
 
 function calculatePageNameAndPageTypeDict (path) {
@@ -25,7 +29,17 @@ function calculatePageNameAndPageTypeDict (path) {
   if (isChallengeSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
     settingsPageType = 'challenge';
-    settingsPageName = 'ChallengeHomePage';
+    if (path.endsWith('join-challenge')) {
+      settingsPageName = 'ChallengeInviteFriendsJoin';
+    } else if (path.endsWith('customize-message')) {
+      settingsPageName = 'ChallengeInviteCustomizeMessage';
+    } else if (path.endsWith('invite-friends')) {
+      settingsPageName = 'ChallengeInviteFriends';
+    } else if (path.endsWith('edit')) {
+      settingsPageName = 'ChallengeStartEditAll';
+    } else {
+      settingsPageName = 'ChallengeHomePage';
+    }
   } else if (isPoliticianSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
     settingsPageType = 'politician';
