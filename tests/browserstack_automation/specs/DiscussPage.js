@@ -35,8 +35,8 @@ describe('Discuss Page', () => {
     const imageElementSizeHeight = 40;
     const imageElementSizeWidth = 40;
 
-    let currentSininTitle = await (await DiscussPage.signInTitle).getText();
-    let currentsignInSubtitle = await (await DiscussPage.signInSubtitle).getText();
+    let currentSignInTitle = await (await DiscussPage.signInTitle).getText();
+    let currentSignInSubtitle = await (await DiscussPage.signInSubtitle).getText();
     let currentTestAuthor =  await (await DiscussPage.testImoniaAuthor).getText();
     // Safari adds non-breaking space at the end vs Chrome adds regular space.
     // Trim to make sure we get expected results.
@@ -47,8 +47,8 @@ describe('Discuss Page', () => {
     let imageElement = await DiscussPage.avatarCard;
     const { height: currentSizeHeight, width: currentSizeWidth } = await imageElement.getSize();
 
-    await expect (currentSininTitle).toBe(signInTitle);
-    await expect (currentsignInSubtitle).toBe(signInSubtitle);
+    await expect (currentSignInTitle).toBe(signInTitle);
+    await expect (currentSignInSubtitle).toBe(signInSubtitle);
     await expect (currentTestAuthor).toBe(testAuthor);
     await expect (currentTextTestAuthor).toBe(textTestAuthor);
     await expect (currentTermsWrapperText).toBe(termsWrapper);
