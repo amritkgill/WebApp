@@ -12,12 +12,12 @@ class DiscussPage extends Page {
     // await super.rerender();
   }
 
-  get singInTitile () {
-    return $('#pleaseSingInTitle');
+  get signInTitle () {
+    return $('#pleaseSignInTitle');
   }
 
-  get singInSubtitle () {
-    return $('#singInSubtitle');
+  get signInSubtitle () {
+    return $('#signInSubtitle');
   }
 
   get textTestAuthor () {

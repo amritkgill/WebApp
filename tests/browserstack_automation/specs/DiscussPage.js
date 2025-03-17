@@ -19,11 +19,11 @@ describe('Discuss Page', () => {
   });
 
   //Discuss_002
-  it('verifyDiscussPageSpellingSingIn', async () => {
+  it('verifyDiscussPageSpellingSignIn', async () => {
     await DiscussPage.load();
     await driver.switchWindow(`${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}/news`);
-    const singInTitle = 'Sign In to Join the Discussion';
-    const singInSubTitile = 'WeVote is a community of friends who care about voting and democracy.';
+    const signInTitle = 'Sign In to Join the Discussion';
+    const signInSubtitle = 'WeVote is a community of friends who care about voting and democracy.';
     const testAuthor = 'Alissa B., Oakland, California';
     const textTestAuthor = 'Great way to sort through my ballot! My husband and I used WeVote during ' +
     'the last election to learn more about our ballots and make some tough choices. ' +
@@ -34,9 +34,9 @@ describe('Discuss Page', () => {
     const privacyPolicyLink = `${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}/privacy`;
     const imageElementSizeHeight = 40;
     const imageElementSizeWidth = 40;
-    
-    let currentSininTitle = await (await DiscussPage.singInTitile).getText();
-    let currentSingInSubTitle = await (await DiscussPage.singInSubtitle).getText();
+
+    let currentSininTitle = await (await DiscussPage.signInTitle).getText();
+    let currentsignInSubtitle = await (await DiscussPage.signInSubtitle).getText();
     let currentTestAuthor =  await (await DiscussPage.testImoniaAuthor).getText();
     // Safari adds non-breaking space at the end vs Chrome adds regular space.
     // Trim to make sure we get expected results.
@@ -47,8 +47,8 @@ describe('Discuss Page', () => {
     let imageElement = await DiscussPage.avatarCard;
     const { height: currentSizeHeight, width: currentSizeWidth } = await imageElement.getSize();
 
-    await expect (currentSininTitle).toBe(singInTitle);
-    await expect (currentSingInSubTitle).toBe(singInSubTitile);
+    await expect (currentSininTitle).toBe(signInTitle);
+    await expect (currentsignInSubtitle).toBe(signInSubtitle);
     await expect (currentTestAuthor).toBe(testAuthor);
     await expect (currentTextTestAuthor).toBe(textTestAuthor);
     await expect (currentTermsWrapperText).toBe(termsWrapper);
@@ -90,17 +90,17 @@ describe('Discuss Page', () => {
     await expect(placeholderText).toBe('Type email here...');
     console.log(placeholderText); // Output the placeholder text
   });
-  
+
   // Discuss_006
   it('verifyEmailButtons', async () => {
     await DiscussPage.load();
-   await driver.switchWindow(`${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}/news`);
+    await driver.switchWindow(`${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}/news`);
     const enterVoterEmailAddressTextBoxElement = await DiscussPage.enterVoterEmailAddressTextBox;
     await enterVoterEmailAddressTextBoxElement.click();
     await driver.pause(waitTime);
     const emailCancelElement = await DiscussPage.cancelEmailButton;
     const emailVerificationElement = await DiscussPage.voterEmailAddressVerificationButton;
-    
+
     await expect(emailCancelElement).toBeDisplayed();
     await expect(emailVerificationElement).toBeDisplayed();
   });
@@ -136,9 +136,9 @@ describe('Discuss Page', () => {
     } else {
       throw new Error('Element with ID ' + elementId + ' not found or not reachable while selectig with Tab.');
     }
-    
+
     await expect(DiscussPage.cancelEmailButton).toBeClickable();
-    
+
     const elementCancelButton = await DiscussPage.cancelEmailButton;
     const elementCancelButtonId = await elementCancelButton.getAttribute('id');
     const cancelButton = await DiscussPage.tabToSelectElement(driver, elementCancelButtonId);
@@ -190,7 +190,7 @@ describe('Discuss Page', () => {
     const colorElementAddressHelperText = 'rgb(211,47,47)';
     await DiscussPage.load();
     await driver.switchWindow(`${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}/news`);
-    
+
     await expect(DiscussPage.voterEmailAddressVerificationButton).not.toBeClickable();
     await expect(DiscussPage.voterEmailAddressHelperText).not.toBeDisplayed();
 
@@ -199,7 +199,7 @@ describe('Discuss Page', () => {
     await driver.pause(waitTime);
     let currentColorElementAddressHelperText = (await (await DiscussPage.voterEmailAddressHelperText).getCSSProperty('color')).value;
     currentColorElementAddressHelperText = currentColorElementAddressHelperText.replace(/rgba?\((\d+,\d+,\d+)(,\d+)?\)/, 'rgb($1)');
-    
+
     await expect(DiscussPage.voterEmailAddressVerificationButton).not.toBeClickable();
     await expect(DiscussPage.voterEmailAddressHelperText).toBeDisplayed();
     await expect(await (await DiscussPage.voterEmailAddressHelperText)
@@ -227,7 +227,7 @@ describe('Discuss Page', () => {
     currentColorElementAddressLabel = currentColorElementAddressLabel.replace(/rgba?\((\d+,\d+,\d+)(,\d+)?\)/, 'rgb($1)');
     let currentEmailAdderssLabelText = await (await DiscussPage.voterEmailAddressLabel).getText();
 
-    await expect(currentEmailAdderssLabelText).toBe(emailAddressLableText); 
+    await expect(currentEmailAdderssLabelText).toBe(emailAddressLableText);
     await expect(currentColorElementAddressHelperText).toBe(elementColor);
     await expect(currentColorElementAddressLabel).toBe(elementColor);
     await expect(DiscussPage.voterEmailAddressVerificationButton).not.toBeClickable();
@@ -250,7 +250,7 @@ describe('Discuss Page', () => {
     await expect(DiscussPage.voterEmailAddressVerificationButton).toBeClickable();
     await expect(DiscussPage.voterEmailAddressHelperText).not.toBeDisplayed();
   });
-  
+
   // Discuss_017
   it('numberEmailVerification', async () => {
     await DiscussPage.load();
@@ -337,7 +337,7 @@ describe('Discuss Page', () => {
     let elementAddressHelperText = await DiscussPage.voterEmailAddressHelperText;
 
     await expect(await elementAddressHelperText.getText()).toEqual(errorMessage);
-    await expect(currentEmailAdderssLabelText).toBe(emailAddressLableText); 
+    await expect(currentEmailAdderssLabelText).toBe(emailAddressLableText);
     await expect(currentColorElementAddressHelperText).toBe(elementColor);
     await expect(currentColorElementAddressLabel).toBe(elementColor);
     await expect(DiscussPage.voterEmailAddressVerificationButton).not.toBeClickable();
@@ -391,7 +391,7 @@ describe('Discuss Page', () => {
     await driver.pause(waitTime);
     //Chrome checks for whitespace in email input and prevents entry. Safari does not enforce this restriction.
     if (browserName == 'Safari') {
-      await expect(await (await DiscussPage.enterVoterEmailAddressTextBox).getValue()).toBe(email); 
+      await expect(await (await DiscussPage.enterVoterEmailAddressTextBox).getValue()).toBe(email);
       await expect(DiscussPage.voterEmailAddressVerificationButton).not.toBeClickable();
     } else {
       await expect(await (await DiscussPage.enterVoterEmailAddressTextBox).getValue()).toBe(emailWithoutSpaces);

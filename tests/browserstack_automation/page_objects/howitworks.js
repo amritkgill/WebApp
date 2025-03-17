@@ -87,8 +87,8 @@ class HowItWorks extends Page {
     return $('#signIn');
   }
 
-  get signInSubtitle (){
-    return $('#pleaseSingInTitle')
+  get signInSubtitle () {
+    return $('#pleaseSignInTitle');
   }
 
   get getStartedButton () {
