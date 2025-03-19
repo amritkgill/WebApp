@@ -68,6 +68,11 @@ export default function lookupPageNameAndPageTypeDict (path) {
       pageName: 'About',
       pageType: 'about',
     };
+  } else if (path.endsWith('/cs/')) {
+    return {
+      pageName: 'CampaignesHomeLoader',
+      pageType: 'candidate',
+    };
   } else {
     return calculatePageNameAndPageTypeDict(path);
   }

@@ -6,6 +6,7 @@ import { renderLog } from '../../utils/logging';
 import SearchBase from './SearchBase';
 import VoterStore from '../../../stores/VoterStore';
 import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 /* eslint-disable jsx-a11y/control-has-associated-label  */
 class SearchBar2024 extends Component {
@@ -16,7 +17,7 @@ class SearchBar2024 extends Component {
       searchString: '',
     };
 
-    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleSearchBarKeyPress = this.handleSearchBarKeyPress.bind(this);
     this.updateResults = this.updateResults.bind(this);
     this.clearQuery = this.clearQuery.bind(this);
   }
@@ -58,8 +59,10 @@ class SearchBar2024 extends Component {
     }
   }
 
-  
- handleKeyPress = () => {
+ handleSearchBarKeyPress = () => {
+  const { location: { pathname: currentPathname } } = window;
+  const page = lookupPageNameAndPageTypeDict(currentPathname);
+
   if (this.timer) {
     clearTimeout(this.timer);
   }
@@ -69,17 +72,22 @@ class SearchBar2024 extends Component {
       return;
     }
     this.props.searchFunction(searchString);
-    if(this.props.trackSearch){
+    // if(this.props.trackSearch){
     const dataLayerObject = {
       event: 'searchKeyword',
-      searchKeyword: searchString,
-      user:{
-        voterWeVoteId: VoterStore.getVoterWeVoteId()
-      }
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathName: currentPathname,
+        },
+        searchString:searchString,
     };
     //console.log(dataLayerObject)
     TagManager.dataLayer({dataLayer: dataLayerObject});
-  }
+  
   }, 3000);
   const { searchString } = this.state;
   this.props.searchFunction(searchString);
@@ -108,7 +116,7 @@ class SearchBar2024 extends Component {
           id="search_input"
           placeholder={placeholder}
           value={searchString}
-          onKeyDown={this.handleKeyPress}
+          onKeyDown={this.handleSearchBarKeyPress}
           onChange={this.updateResults}
           onFocus={() => focusTextFieldAndroid('SearchBar2024')}
           onBlur={blurTextFieldAndroid}
