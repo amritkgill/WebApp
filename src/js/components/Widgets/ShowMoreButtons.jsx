@@ -10,6 +10,7 @@ import TagManager from 'react-gtm-module';
 import VoterStore from '../../stores/VoterStore';
 
 class ShowMoreButtons extends React.Component {
+  
   constructor(props) {
     super(props);
     this.handleShowMoreClick = this.handleShowMoreClick.bind(this);
@@ -17,10 +18,8 @@ class ShowMoreButtons extends React.Component {
   }
 
   handleShowMoreClick = () => {
-
     const { showMoreId, showMoreButtonWasClicked, trackInGTM, showMoreButtonsLink } = this.props;
     const { location: { pathname: currentPathname } } = window; // Get path here
-
     //if (trackInGTM) {
       //console.log('click');
       const eventName = showMoreButtonWasClicked ? 'showLessButtonClick' : 'showMoreButtonClick';
@@ -45,7 +44,7 @@ class ShowMoreButtons extends React.Component {
         weVoteVoterId: VoterStore.getVoterWeVoteId(),
       },
     };
-    console.log(currentPathname);
+    //console.log(currentPathname);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
 
