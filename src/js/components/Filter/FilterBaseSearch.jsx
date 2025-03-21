@@ -241,7 +241,7 @@ class FilterBaseSearch extends Component {
     }
     // console.log('FilterBaseSearch render');
     return (
-      <BigAndroidClickableTarget onClick={() => this.bigAndroidClick(isSearching, alwaysOpen)}>
+      <BigAndroidClickableTarget id="androidClickableTarget" onClick={() => this.bigAndroidClick(isSearching, alwaysOpen)}>
         <SearchWrapper
           brandBlue={theme.palette.primary.main}
           isSearching={isSearching}
@@ -250,26 +250,32 @@ class FilterBaseSearch extends Component {
         >
           <IconButton
             classes={{ root: classes.iconButtonRoot }}
+            id="searchIcon"
             onClick={(!isAndroid() && !alwaysOpen) ? this.toggleSearch : undefined}
             size="large"
             aria-label="Search Button"
+            tabIndex={0}
           >
             <Search classes={{ root: searchIconClasses }} />
           </IconButton>
           <Separator isSearching={isSearching} alwaysOpen={alwaysOpen} />
           <InputBase
             classes={{ input: inputBaseInputClasses, root: inputBaseRootClasses }}
+            id="searchInput"
             inputRef={(input) => { this.searchInput = input; }}
             onChange={this.handleSearch}
             value={searchText}
             onFocus={() => focusTextFieldAndroid('FilterBaseSearch')}
             onBlur={blurTextFieldAndroid}
             placeholder="Search"
+            tabIndex={isSearching ? 0 : -1}
           />
           <Closer
+            id="searchCloseButton"
             isSearching={isSearching}
             onClick={(isSearching || !alwaysOpen) ? this.toggleSearch : undefined}
             showCloser={isSearching}
+            tabIndex={isSearching ? 0 : -1}
           >
             <IconButton classes={{ root: classes.iconButtonRoot }} size="large">
               <Close classes={{ root: classes.closeIconRoot }} />
