@@ -37,6 +37,7 @@ class BallotTitleHeader extends Component {
   }
 
   componentDidMount () {
+    this._mounted = true;
     this.onBallotStoreChange();
     this.onVoterStoreChange();
     this.ballotStoreListener = BallotStore.addListener(this.onBallotStoreChange.bind(this));
@@ -44,6 +45,7 @@ class BallotTitleHeader extends Component {
   }
 
   componentWillUnmount () {
+    this._mounted = false;
     this.ballotStoreListener.remove();
     this.voterStoreListener.remove();
   }
@@ -60,9 +62,12 @@ class BallotTitleHeader extends Component {
       const nextNationalElectionDayMDYSlash = moment(nextNationalElectionDayText, 'YYYY-MM-DD').format('MM/DD/YYYY');
       const nextNationalElectionDate = new Date(nextNationalElectionDayMDYSlash);
       const nextNationalElectionDateMDY = formatDateToMonthDayYear(nextNationalElectionDate);
-      this.setState({
-        nextNationalElectionDateMDY,
-      });
+      if (this._mounted) {
+        // Only set the state if the component is still mounted to avoid "Can't perform a React state update on an unmounted component"
+        this.setState({
+          nextNationalElectionDateMDY,
+        });
+      }
     });
     this.setState({
       ballotCaveat: BallotStore.getBallotCaveat(),

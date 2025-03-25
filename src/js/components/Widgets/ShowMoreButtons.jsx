@@ -5,12 +5,52 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
-
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import TagManager from 'react-gtm-module';
+import VoterStore from '../../stores/VoterStore';
 
 class ShowMoreButtons extends React.Component {
-  render () {
-    renderLog('ShowMoreButtons');  // Set LOG_RENDER_EVENTS to log all renders
-    const { classes, showLessCustomText, showMoreButtonsLink, showMoreButtonWasClicked, showMoreCustomText, showMoreId } = this.props;
+  
+  constructor(props) {
+    super(props);
+    this.handleShowMoreClick = this.handleShowMoreClick.bind(this);
+    this.pushDataLayer = this.pushDataLayer.bind(this);
+  }
+
+  handleShowMoreClick = () => {
+    const { showMoreId, showMoreButtonWasClicked, trackInGTM, showMoreButtonsLink } = this.props;
+    const { location: { pathname: currentPathname } } = window; // Get path here
+    //if (trackInGTM) {
+      //console.log('click');
+      const eventName = showMoreButtonWasClicked ? 'showLessButtonClick' : 'showMoreButtonClick';
+      this.pushDataLayer(eventName, showMoreId, currentPathname); // Use currentPathname
+    //} else {
+      //console.log('Show More/Less clicked (not tracked):', showMoreId);
+    //}
+    showMoreButtonsLink();
+  };
+
+  pushDataLayer = (eventName, showMoreId, currentPathname) => { 
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname); 
+    const dataLayerObject = {
+      event: eventName,
+      element_id: showMoreId,
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathName: currentPathname, 
+      },
+      userDetails: {
+        weVoteVoterId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+    //console.log(currentPathname);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+  };
+
+  render() {
+    renderLog('ShowMoreButtons');
+    const { classes, showLessCustomText, showMoreButtonWasClicked, showMoreCustomText, showMoreId } = this.props;
     let showMoreText;
 
     if (showMoreButtonWasClicked) {
@@ -20,24 +60,21 @@ class ShowMoreButtons extends React.Component {
     }
 
     return (
-      <ShowMoreButtonsStyled className="card-child" id={`toggleContentButton-${showMoreId}`} onClick={showMoreButtonsLink}>
+      <ShowMoreButtonsStyled className="card-child" id={`toggleContentButton-${showMoreId}`} onClick={this.handleShowMoreClick}>
         <ShowMoreButtonsText id="showMoreLink">
-          { showMoreText }
+          {showMoreText}
           {' '}
           {showMoreButtonWasClicked ? (
-            <ArrowDropUp
-              classes={{ root: classes.cardFooterIconRoot }}
-            />
+            <ArrowDropUp classes={{ root: classes.cardFooterIconRoot }} />
           ) : (
-            <ArrowDropDown
-              classes={{ root: classes.cardFooterIconRoot }}
-            />
+            <ArrowDropDown classes={{ root: classes.cardFooterIconRoot }} />
           )}
         </ShowMoreButtonsText>
       </ShowMoreButtonsStyled>
     );
   }
 }
+
 ShowMoreButtons.propTypes = {
   classes: PropTypes.object,
   showLessCustomText: PropTypes.string,
@@ -63,7 +100,6 @@ const ShowMoreButtonsStyled = styled('button')(({ theme }) => (`
   cursor: pointer;
   display: block !important;
   background: #fff !important;
-  // font-size: 18px;
   margin-bottom: 0 !important;
   margin-top: 0 !important;
   padding: 0 !important;
@@ -92,6 +128,3 @@ const ShowMoreButtonsText = styled('div')`
 `;
 
 export default withTheme(withStyles(styles)(ShowMoreButtons));
-
-
-

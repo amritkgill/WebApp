@@ -20,6 +20,10 @@ const pageNameAndTypeSimpleDict = {
     pageName: 'ChallengesHomeLoader',
     pageType: 'challenge',
   },
+  '/': {
+    pageName: 'Ready',
+    pageType: 'homepage',
+  },
 };
 
 function calculatePageNameAndPageTypeDict (path) {
@@ -52,8 +56,23 @@ function calculatePageNameAndPageTypeDict (path) {
 }
 
 export default function lookupPageNameAndPageTypeDict (path) {
-  if (path in pageNameAndTypeSimpleDict) {
+  if (pageNameAndTypeSimpleDict[path]) {
     return pageNameAndTypeSimpleDict[path];
+  } else if (path.includes('/ballot')) {
+    return {
+      pageName: 'Ballot',
+      pageType: 'ballot',
+    };
+  } else if (path.includes('/about')) {
+    return {
+      pageName: 'About',
+      pageType: 'about',
+    };
+  } else if (path.endsWith('/cs/')) {
+    return {
+      pageName: 'CampaignesHomeLoader',
+      pageType: 'candidate',
+    };
   } else {
     return calculatePageNameAndPageTypeDict(path);
   }
