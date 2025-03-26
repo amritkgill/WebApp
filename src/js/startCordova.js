@@ -106,7 +106,7 @@ export function initializationForCordova (startReact) {
     //   window.pbakondyScreenSize = result;
     if (isIPad()) {
       document.querySelector('body').style.height = getCordovaScreenHeight();
-      console.log('Cordova: Initial "body" height for iPad = calcualation disabled '); // , result.height / result.scale);
+      console.log('Cordova: Initial "body" height for iPad = calculation disabled '); // , result.height / result.scale);
     }
     initializejQuery(() => {
       const { $ } = window;
