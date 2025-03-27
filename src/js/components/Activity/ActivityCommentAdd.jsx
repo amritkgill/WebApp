@@ -72,6 +72,14 @@ class ActivityCommentAdd extends Component {
     this.setState({
       statementText: '',
     });
+    ActivityActions.activityListRetrieve(activityTidbitWeVoteId);
+
+    if (this.props.addChildSavedFunction && parentCommentWeVoteId) {
+      this.props.addChildSavedFunction(parentCommentWeVoteId);
+    }
+    if (this.props.commentEditSavedFunction) {
+      this.props.commentEditSavedFunction();
+    }
     if (this.props.addChildSavedFunction && parentCommentWeVoteId) {
       this.props.addChildSavedFunction(parentCommentWeVoteId);
     }
