@@ -29,6 +29,8 @@ import VoterStore from '../../../stores/VoterStore';
 import PositionPublicToggle from '../../PositionItem/PositionPublicToggle';
 import PositionStatementModal from '../PositionStatementModal'; // eslint-disable-line import/no-cycle
 import ShareButtonDropDown from '../ShareButtonDropdown';
+import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 const HelpWinOrDefeatModal = React.lazy(() => import(/* webpackChunkName: 'HelpWinOrDefeatModal' */ '../../../common/components/CampaignSupport/HelpWinOrDefeatModal')); // eslint-disable-line import/no-cycle
 
@@ -255,6 +257,21 @@ class ItemActionBar extends PureComponent {
   }
 
   openHelpWinOrDefeatModal = () => {
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      event: 'HelpDefeatOrWinClick',
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathName: currentPathname,
+        },
+    };
+    TagManager.dataLayer({dataLayer: dataLayerObject})
     // const { ballotItemWeVoteId } = this.props;
     // console.log('openHelpWinOrDefeatModal ballotItemWeVoteId: ', ballotItemWeVoteId);
     this.setState({
@@ -286,6 +303,7 @@ class ItemActionBar extends PureComponent {
   };
 
   helpThemWinButton = (localUniqueId) => {
+    // console.log("help them win???")
     const { classes, externalUniqueId } = this.props;
     // const buttonRootClass = inCard ? classes.buttonRootForCard : classes.buttonRoot;
     const buttonRootClass = classes.buttonHelpRoot;
