@@ -23,7 +23,7 @@ const { pageName, pageType } = lookupPageNameAndPageTypeDict(window.location.pat
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
         },
         destinationDetails: {
-          destinationPageName: 'SignInModel',
+          destinationPageName: 'SignInModal',
           destinationPathName: window.location.href,
           destinationPageType: 'auth',
         },
