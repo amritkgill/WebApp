@@ -1,4 +1,6 @@
 import { isChallengeSEOFriendlyURL, isPoliticianSEOFriendlyURL } from '../common/utils/isSEOFriendlyURL';
+import { isWeVoteMarketingSite } from '../common/utils/hrefUtils';
+
 
 // If there is a static path for a page, enter it here. If the path includes dynamic elements,
 //  you'll need to generate the pageName and pageType dynamically in calculatePageNameAndPageTypeDict below.
@@ -16,6 +18,18 @@ const pageNameAndTypeSimpleDict = {
     pageName: 'Email',
     pageType: 'settings',
   },
+  '/settings/notifications': {
+    pageName: 'Notifications',
+    pageType: 'settings',
+  },
+  '/settings/account': {
+    pageName: 'Account',
+    pageType: 'settings',
+  },
+  '/settings/yourdata': {
+    pageName: 'Yourdata',
+    pageType: 'settings',
+  },
   '/challenges': {
     pageName: 'ChallengesHomeLoader',
     pageType: 'challenge',
@@ -23,6 +37,22 @@ const pageNameAndTypeSimpleDict = {
   '/': {
     pageName: 'Ready',
     pageType: 'homepage',
+  },
+  '/ready': {
+    pageName: 'Ready',
+    pageType: 'homepage',
+  },
+  '/donate': {
+    pageName: !isWeVoteMarketingSite() || window.isCordovaGlobal ? 'Ready' : 'Donate',
+    pageType: !isWeVoteMarketingSite() || window.isCordovaGlobal ? 'homepage' : 'donate',
+  },
+  '/more/faq': {
+    pageName: 'FAQ',
+    pageType: 'faq',
+  },
+  '/more/network/friends': {
+    pageName: 'Friends',
+    pageType: 'friends',
   },
 };
 
@@ -72,6 +102,26 @@ export default function lookupPageNameAndPageTypeDict (path) {
     return {
       pageName: 'CampaignesHomeLoader',
       pageType: 'candidate',
+    };
+  } else if (path.endsWith('/privacy')) {
+    return {
+      pageName: 'Privacy',
+      pageType: 'privacy',
+    };
+  } else if (path.endsWith('/terms')) {
+    return {
+      pageName: 'TermsOfService',
+      pageType: 'termsOfService',
+    };
+  } else if (path.startsWith('/friends')) {
+    return {
+      pageName: 'Friends',
+      pageType: 'friends',
+    };
+  } else if (path.startsWith('/news')) {
+    return {
+      pageName: 'News',
+      pageType: 'news',
     };
   } else {
     return calculatePageNameAndPageTypeDict(path);
