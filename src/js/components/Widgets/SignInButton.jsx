@@ -1,21 +1,50 @@
+import TagManager from 'react-gtm-module';
 import { Button } from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
+import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 
 // A function component
 export default function SignInButton (props) {
   renderLog('SignInButton');  // Set LOG_RENDER_EVENTS to log all renders
 
+// GTM Data Layer push for SignIn button on HomePage by AnujaLawankar-March24th,2025
+const { pageName, pageType } = lookupPageNameAndPageTypeDict(window.location.pathname);
+  const handleClick = () => {
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'signInClick',
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        destinationDetails: {
+          destinationPageName: 'SignInModel',
+          destinationPathName: window.location.href,
+          destinationPageType: 'auth',
+        },
+        pageDetails: {
+          pageName,
+          pageType,
+          pathName: window.location.href,
+        },
+      },
+    });
+
+    // Trigger the actual sign-in modal
+    props.toggleSignInModal();
+  };
+
   return (
     <StyledButton
       id="SignIn"
       className="header-sign-in"
       color="primary"
-      onClick={props.toggleSignInModal}
+      onClick={handleClick}
       variant="text"
     >
       <SignInButtonInnerWrapper className="u-no-break">

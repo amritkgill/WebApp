@@ -28,8 +28,8 @@ const pageNameAndTypeSimpleDict = {
 
 function calculatePageNameAndPageTypeDict (path) {
   // console.log("gtmPageNameAndType, path:", path);
-  let settingsPageName = '';
-  let settingsPageType = '';
+  let settingsPageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having settingsPageName being identical to settingsPageType will save us grief in the future.
+  let settingsPageType = 'notSet';
   if (isChallengeSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
     settingsPageType = 'challenge';

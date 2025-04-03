@@ -1,25 +1,17 @@
 const { driver } = require('@wdio/globals');
 const { readFileSync } = require('fs');
-const browserStackConfig = require('./browserstack.config');
 const browserCapabilities = require('../capabilities/browser_bvt.json');
 
 let mobileCapabilities = [];
 
-try {
-  const data = readFileSync('./tests/browserstack_automation/capabilities/mobile.json', { encoding: 'utf8' });
-  mobileCapabilities = JSON.parse(data);
-} catch (error) {
 
-  // Run `npm run wdio:setup`
-}
-
-const capabilities = [...browserCapabilities, ...mobileCapabilities];
+const capabilities = [...browserCapabilities];
 
 const date = new Date();
 
 const dateForDisplay = date.toDateString();
 
-const buildName = `${browserStackConfig.NAME}: ${dateForDisplay}`;
+const buildName = `BVT: ${dateForDisplay}`;
 
 // https://webdriver.io/docs/configurationfile
 
