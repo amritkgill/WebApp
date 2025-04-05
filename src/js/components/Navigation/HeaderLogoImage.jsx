@@ -3,35 +3,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { isWebApp } from '../../common/utils/isCordovaOrWebApp';
 import { isLargerThanTablet, isTablet } from '../../common/utils/isMobileScreenSize';
-import TagManager from 'react-gtm-module';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
-const HeaderLogoImage = ({ src }) => {
-  function handleClick(e) {
-    const { location: { pathname: currentPathname } } = window;
-    // console.log(`****HeaderLogoImage clicked!, currentPathname: ${currentPathname}********`);
-
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
-    const destinationPage = lookupPageNameAndPageTypeDict('/ready');
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'click',
-        pageDetails: {
-          pageType: page.pageType,
-          pageName: page.pageName,
-          pathName: currentPathname,
-        },
-        destinationDetails: {
-          destinationPageType: destinationPage.pageType,
-          destinationPageName: destinationPage.pageName,
-          destinationPathName: '/ready',
-        },
-      },
-    });
-  }
-
-  return (<LogoImg id="HeaderLogoImage" alt="WeVote Logo" src={src} onClick={handleClick} />);
-};
+const HeaderLogoImage = ({ src }) => (
+  <LogoImg id="HeaderLogoImage" alt="WeVote Logo" src={src} />
+);
 
 HeaderLogoImage.propTypes = {
   src: PropTypes.string,
