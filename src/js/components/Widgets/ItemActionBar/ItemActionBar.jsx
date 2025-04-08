@@ -261,20 +261,20 @@ class ItemActionBar extends PureComponent {
     const page = lookupPageNameAndPageTypeDict(currentPathname);
 
     const dataLayerObject = {
-      event: 'HelpDefeatOrWinClick',
-        userDetails: {
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        pageDetails: {
-          pageType: page.pageType,
-          pageName: page.pageName,
-          pathName: currentPathname,
-        },
-        destinatonDetails:{
-          destinationPageType: "PayToPromoteProcessModal",
-          destinationPageName: page.pageName,
-          destinationPathName: window.location.href,
-        }
+      event: 'HelpDefeatOrWinClick', // Dale Note: events should be camelCase
+      userDetails: {
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: page.pageName,
+        destinationPageType: "PayToPromoteProcessModal",
+        destinationPathname: currentPathname,
+      }
     };
     TagManager.dataLayer({dataLayer: dataLayerObject})
     // const { ballotItemWeVoteId } = this.props;
