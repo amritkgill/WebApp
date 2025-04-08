@@ -43,7 +43,7 @@ function calculatePageNameAndPageTypeDict (path) {
     settingsPageName = 'Ballot';
     settingsPageType = 'ballot';
   } else if (path.endsWith('/cs/')) {
-    settingsPageName = 'CampaignesHomeLoader';
+    settingsPageName = 'CampaignsHomeLoader';
     settingsPageType = 'candidate';
   } else if (isChallengeSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
