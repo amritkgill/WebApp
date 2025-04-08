@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent, Suspense } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import SupportActions from '../../../actions/SupportActions';
 import VoterActions from '../../../actions/VoterActions';
@@ -29,7 +30,6 @@ import VoterStore from '../../../stores/VoterStore';
 import PositionPublicToggle from '../../PositionItem/PositionPublicToggle';
 import PositionStatementModal from '../PositionStatementModal'; // eslint-disable-line import/no-cycle
 import ShareButtonDropDown from '../ShareButtonDropdown';
-import TagManager from 'react-gtm-module';
 import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 const HelpWinOrDefeatModal = React.lazy(() => import(/* webpackChunkName: 'HelpWinOrDefeatModal' */ '../../../common/components/CampaignSupport/HelpWinOrDefeatModal')); // eslint-disable-line import/no-cycle
