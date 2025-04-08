@@ -1,4 +1,6 @@
 import { isChallengeSEOFriendlyURL, isPoliticianSEOFriendlyURL } from '../common/utils/isSEOFriendlyURL';
+import { isWeVoteMarketingSite } from '../common/utils/hrefUtils';
+
 
 // If there is a static path for a page, enter it here. If the path includes dynamic elements,
 //  you'll need to generate the pageName and pageType dynamically in calculatePageNameAndPageTypeDict below.
@@ -15,22 +17,66 @@ const pageNameAndTypeSimpleDict = {
     pageName: 'ChallengesHomeLoader',
     pageType: 'challenge',
   },
+  '/donate': {
+    pageName: !isWeVoteMarketingSite() || window.isCordovaGlobal ? 'Ready' : 'Donate',
+    pageType: !isWeVoteMarketingSite() || window.isCordovaGlobal ? 'homepage' : 'donate',
+  },
   '/more/about': {
     pageName: 'About',
     pageType: 'about',
+  },
+  '/more/faq': {
+    pageName: 'FAQ',
+    pageType: 'faq',
+  },
+  '/more/network/friends': {
+    pageName: 'Friends',
+    pageType: 'friends',
+  },
+  '/more/privacy': {
+    pageName: 'Privacy',
+    pageType: 'privacy',
+  },
+  '/more/terms': {
+    pageName: 'TermsOfService',
+    pageType: 'termsOfService',
+  },
+  '/privacy': {
+    pageName: 'Privacy',
+    pageType: 'privacy',
+  },
+  '/ready': {
+    pageName: 'Ready',
+    pageType: 'homepage',
   },
   // All pageType 'settings'
   '/settings': {
     pageName: 'Settings',
     pageType: 'settings',
   },
+  '/settings/account': {
+    pageName: 'Account',
+    pageType: 'settings',
+  },
   '/settings/email': {
     pageName: 'Email',
+    pageType: 'settings',
+  },
+  '/settings/notifications': {
+    pageName: 'Notifications',
     pageType: 'settings',
   },
   '/settings/profile': {
     pageName: 'Profile',
     pageType: 'settings',
+  },
+  '/settings/yourdata': {
+    pageName: 'Yourdata',
+    pageType: 'settings',
+  },
+  '/terms': {
+    pageName: 'TermsOfService',
+    pageType: 'termsOfService',
   },
 };
 
@@ -59,10 +105,19 @@ function calculatePageNameAndPageTypeDict (path) {
     } else {
       settingsPageName = 'ChallengeHomePage';
     }
+  } else if (path.startsWith('/friends')) {
+    settingsPageName = 'Friends';
+    settingsPageType = 'friends';
+  } else if (path.startsWith('/news')) {
+    settingsPageName = 'News';
+    settingsPageType = 'news';
   } else if (isPoliticianSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
     settingsPageType = 'politician';
     settingsPageName = 'PoliticianDetailsPage';
+  } else if (/^\/[^/\s]+$/.test(path)) {
+    settingsPageName = 'TwitterHandleLanding';
+    settingsPageType = 'twitterHandleLanding';
   }
 
   return {

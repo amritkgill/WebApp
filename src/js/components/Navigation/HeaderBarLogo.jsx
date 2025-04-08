@@ -5,36 +5,64 @@ import styled from 'styled-components';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HeaderLogoImage from './HeaderLogoImage';
+import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
 
 const logoLight = '../../../img/global/svg-icons/we-vote-logo-horizontal-color-200x66.svg';
 const logoDark = '../../../img/global/svg-icons/we-vote-logo-horizontal-color-dark-141x46.svg';
 
-const HeaderBarLogo = ({ chosenSiteLogoUrl, isBeta, light }) => (
-  <HeaderBarLogoWrapper id="HeaderBarLogoWrapper">
-    {chosenSiteLogoUrl ? (
-      <Link to="/ready" id="logoHeaderBar">
-        <HeaderLogoImage src={chosenSiteLogoUrl} />
-      </Link>
-    ) : (
-      <WeVoteLogoWrapper>
-        <Link to="/ready" id="logoHeaderBar">
-          <HeaderLogoImage src={light ? normalizedImagePath(logoLight) : normalizedImagePath(logoDark)} />
-          {(isBeta && !isCordova()) && (
-            <BetaMarker>
-              <Suspense fallback={<></>}>
-                <DelayedLoad waitBeforeShow={200}>
-                  <BetaMarkerInner light={light}>ballot</BetaMarkerInner>
-                </DelayedLoad>
-              </Suspense>
-            </BetaMarker>
-          )}
+const HeaderBarLogo = ({ chosenSiteLogoUrl, isBeta, light }) => {
+  const homepagePath = '/ready';
+
+  function handleClick() {
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPage = lookupPageNameAndPageTypeDict(homepagePath);
+
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'click',
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathName: currentPathname,
+        },
+        destinationDetails: {
+          destinationPageType: destinationPage.pageType,
+          destinationPageName: destinationPage.pageName,
+          destinationPathName: homepagePath,
+        },
+      },
+    });
+  }
+
+  return (
+    <HeaderBarLogoWrapper id="HeaderBarLogoWrapper">
+      {chosenSiteLogoUrl ? (
+        <Link to={homepagePath} id="logoHeaderBar" onClick={handleClick} >
+          <HeaderLogoImage src={chosenSiteLogoUrl} />
         </Link>
-      </WeVoteLogoWrapper>
-    )}
-  </HeaderBarLogoWrapper>
-);
+      ) : (
+        <WeVoteLogoWrapper>
+          <Link to={homepagePath} id="logoHeaderBar" onClick={handleClick} >
+            <HeaderLogoImage src={light ? normalizedImagePath(logoLight) : normalizedImagePath(logoDark)} />
+            {(isBeta && !isCordova()) && (
+              <BetaMarker>
+                <Suspense fallback={<></>}>
+                  <DelayedLoad waitBeforeShow={200}>
+                    <BetaMarkerInner light={light}>ballot</BetaMarkerInner>
+                  </DelayedLoad>
+                </Suspense>
+              </BetaMarker>
+            )}
+          </Link>
+        </WeVoteLogoWrapper>
+      )}
+    </HeaderBarLogoWrapper>
+  );
+};
 
 HeaderBarLogo.propTypes = {
   chosenSiteLogoUrl: PropTypes.string,
