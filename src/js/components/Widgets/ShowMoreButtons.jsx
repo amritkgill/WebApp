@@ -3,30 +3,29 @@ import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
-import TagManager from 'react-gtm-module';
 import VoterStore from '../../stores/VoterStore';
 
 class ShowMoreButtons extends React.Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.handleShowMoreClick = this.handleShowMoreClick.bind(this);
     this.pushDataLayer = this.pushDataLayer.bind(this);
   }
 
   handleShowMoreClick = () => {
-    const { showMoreId, showMoreButtonWasClicked, trackInGTM, showMoreButtonsLink } = this.props;
+    const { showMoreId, showMoreButtonWasClicked, showMoreButtonsLink } = this.props; // trackInGTM,
     const { location: { pathname: currentPathname } } = window; // Get path here
-    //if (trackInGTM) {
-      //console.log('click');
-      const eventName = showMoreButtonWasClicked ? 'showLessButtonClick' : 'showMoreButtonClick';
-      this.pushDataLayer(eventName, showMoreId, currentPathname); // Use currentPathname
-    //} else {
-      //console.log('Show More/Less clicked (not tracked):', showMoreId);
-    //}
+    // if (trackInGTM) {
+    //   console.log('click');
+    const eventName = showMoreButtonWasClicked ? 'showLessButtonClick' : 'showMoreButtonClick';
+    this.pushDataLayer(eventName, showMoreId, currentPathname); // Use currentPathname
+    // } else {
+    //   console.log('Show More/Less clicked (not tracked):', showMoreId);
+    // }
     showMoreButtonsLink();
   };
 

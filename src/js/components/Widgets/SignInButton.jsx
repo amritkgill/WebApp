@@ -18,7 +18,7 @@ export default function SignInButton (props) {
   const handleClick = () => {
     TagManager.dataLayer({
       dataLayer: {
-        event: 'signInClick',
+        event: 'signInClick', // sign_in_click
         userDetails: {
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
         },
