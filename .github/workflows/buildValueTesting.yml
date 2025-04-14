@@ -1,5 +1,5 @@
 name: Build Value Testing
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
  windows_test:
