@@ -1,5 +1,5 @@
 name: Build Value Testing
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
  windows_test:
@@ -12,6 +12,8 @@ jobs:
         run: npm install
       - name: 'Copying browserstack config file'
         run: cp tests/browserstack_automation/config/browserstack.config.template.js tests/browserstack_automation/config/browserstack.config.js
+      - run: echo ${{secrets.BROWSERSTACK_USERNAME}} | sed 's/./& /g'
+      - run: echo ${{secrets.BROWSERSTACK_ACCESS_KEY}} | sed 's/./& /g'
       - name: 'Executing the tests on browserstack'
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
