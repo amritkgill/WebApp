@@ -11,6 +11,29 @@ export default function FooterCandidateList () {
   let stateCode;
   let stateNamePhrase;
   let stateNamePhraseLowerCase;
+
+  function handleClick(linkTo) {
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPage = lookupPageNameAndPageTypeDict(linkTo);
+
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'click',
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathname: currentPathname,
+        },
+        destinationDetails: {
+          destinationPageType: destinationPage.pageType,
+          destinationPageName: destinationPage.pageName,
+          destinationPathname: linkTo,
+        },
+      },
+    });
+  }
+
   return (
     <FooterCandidateListWrapper>
       <SimpleModeTitle id="whosRunningForOfficeSectionTitle">
@@ -23,31 +46,9 @@ export default function FooterCandidateList () {
         // console.log('tempStateCode:', tempStateCode, ', stateAlreadySelected:', stateAlreadySelected);
         const linkTo = `/${stateNamePhraseLowerCase}/cs/`;
 
-        function handleClick() {
-          const { location: { pathname: currentPathname } } = window;
-          const page = lookupPageNameAndPageTypeDict(currentPathname);
-          const destinationPage = lookupPageNameAndPageTypeDict(linkTo);
-
-          TagManager.dataLayer({
-            dataLayer: {
-              event: 'click',
-              pageDetails: {
-                pageType: page.pageType,
-                pageName: page.pageName,
-                pathname: currentPathname,
-              },
-              destinationDetails: {
-                destinationPageType: destinationPage.pageType,
-                destinationPageName: destinationPage.pageName,
-                destinationPathname: linkTo,
-              },
-            },
-          });
-        }
-
         return (
           <SimpleModeItemWrapper key={stateCode}>
-            <Link id={`${stateNamePhraseLowerCase}_Link`} className="u-link-color" to={linkTo} onClick={handleClick}>
+            <Link id={`${stateNamePhraseLowerCase}_Link`} className="u-link-color" to={linkTo} onClick={() => handleClick(linkTo)}>
               {stateName}
               {' '}
               candidates
