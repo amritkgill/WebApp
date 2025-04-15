@@ -21,7 +21,6 @@ import RepresentativeStore from '../../../stores/RepresentativeStore';
 import { headroomWrapperOffset } from '../../../utils/cordovaCalculatedOffsets';
 import { cordovaBallotFilterTopMargin } from '../../../utils/cordovaOffsets';
 import { getPageKey } from '../../../utils/cordovaPageUtils';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 import CampaignChipInLink from '../../components/Campaign/CampaignChipInLink';
 import CampaignOwnersList from '../../components/CampaignSupport/CampaignOwnersList';
 import CompleteYourProfileModalController from '../../components/Settings/CompleteYourProfileModalController';
@@ -98,7 +97,7 @@ function marginTopOffset (scrolledDown) {
   return 0;
 }
 
-function extractPoliticianDetailsFromUrl(url) {
+function extractPoliticianDetailsFromUrl (url) {
   // Split the URL into parts using '/'
   const parts = url.split('/');
 
@@ -340,7 +339,7 @@ class PoliticianDetailsPage extends Component {
       window.scrollTo(0, 0);
     }
     // --------Zubin - TAGMANAGER DATA LAYER LOGIC---------
-    if (!this.state.dataLayerSent) {
+    if (!this.state.Sent) {
       // console.log("TagManager code executing...");
       // console.log("Politician ID id exists? ", politician);
       if (politician && politician.politician_we_vote_id) {
@@ -648,27 +647,27 @@ class PoliticianDetailsPage extends Component {
       console.log('PoliticianDetailsPage functionToUseWhenProfileComplete linkedCampaignXWeVoteId not found');
     }
   }
- //TagManger from Candidate page on View your full Ballot button-AnujaLawankar
+
+  // TagManger from Candidate page on View your full Ballot button-AnujaLawankar
   goToBallot = () => {
-    const { pageName, pageType } = lookupPageNameAndPageTypeDict(window.location.pathname);
-   TagManager.dataLayer({
-    dataLayer: {
-      event: 'viewYourFullBallot',
-      userDetails: {
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'view_your_full_ballot',
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        destinationDetails: {
+          destinationPageName: 'Ballot',  // Navigated Page
+          destinationPageType: 'ballot',  // Type of page
+          destinationPathname: '/ballot', // Path for Navigation
+        },
+        pageDetails: {
+          pageName: 'PoliticianDetailsPage',
+          pageType: 'politician',
+          pathname: window.location.pathname, // Current page path
+        },
       },
-      destinationDetails: {
-        destinationPageName: 'Ballot',  // Navigated Page
-        destinationPathname: '/ballot', // Path for Navigation
-        destinationPageType: 'ballot',  // Type of page
-      },
-      pageDetails: {
-        pageName,                       // Dynamically determined page name
-        pageType,                       // Dynamically determined page type
-        pathname: window.location.pathname, // Current page path
-      },
-    },
-  });
+    });
     historyPush('/ballot');
   }
 
