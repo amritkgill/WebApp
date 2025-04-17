@@ -24,6 +24,10 @@ const pageNameAndTypeSimpleDict = {
     pageName: 'About',
     pageType: 'about',
   },
+  '/more/attributions': {
+    pageName: 'Attributions',
+    pageType: 'attributions',
+  },
   '/more/faq': {
     pageName: 'FAQ',
     pageType: 'faq',
