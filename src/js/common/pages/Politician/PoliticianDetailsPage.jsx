@@ -339,7 +339,7 @@ class PoliticianDetailsPage extends Component {
       window.scrollTo(0, 0);
     }
     // --------Zubin - TAGMANAGER DATA LAYER LOGIC---------
-    if (!this.state.Sent) {
+    if (!this.state.dataLayerSent) {
       // console.log("TagManager code executing...");
       // console.log("Politician ID id exists? ", politician);
       if (politician && politician.politician_we_vote_id) {
