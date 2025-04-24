@@ -24,8 +24,7 @@ import {
 } from './Style/CampaignCardStyles';
 import DesignTokenColors from './Style/DesignTokenColors';
 import { renderLog } from '../utils/logging';
-import extractPoliticianDetailsFromUrl
-  from "../utils/extractPoliticianDetailsFromUrl";
+import extractPoliticianDetailsFromUrl from '../utils/extractPoliticianDetailsFromUrl';
 
 function CardForListBodyPlaceholder (props) {
   renderLog('CardForListBodyPlaceholder functional component');
