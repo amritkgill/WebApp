@@ -50,7 +50,7 @@ class CandidatesPage extends Page {
   }
 
   get likeDislikeSignin () {
-    return $('button#LikeDislikeSignIn');
+    return $('button#likeDislikeSignIn');
   }
 
   get searchBar () {
