@@ -37,11 +37,31 @@ class CandidatesPage extends Page {
     return $('div#opposeButtonTooltip');
   }
 
+  get likeTooltip () {
+    return $('div#supportTooltip');
+  }
+
+  get dislikeTooltip () {
+    return $('div#opposeTooltip');
+  }
+
   get scrollRight () {
     return $('div#candidateRightArrowDesktop');
   }
 
+  get likeDislikeSignin () {
+    return $('button#LikeDislikeSignIn');
+  }
 
+  get searchBar () {
+    return $('input#searchCandidate');
+  }
+
+  async getCandidateCardCandidate(cardId) {
+    const candidate = await $(`//div[@id='${cardId}']//a[@id='candidateCardDisplayName' or @id='representativeCardDisplayName']`);
+    return candidate;
+  }
+  
   async getCandidateCardCandidateName(cardId) {
     const candidate = await $(`//div[@id='${cardId}']//a[@id='candidateCardDisplayName' or @id='representativeCardDisplayName']`);
     const candidateName = await candidate.getText();
@@ -91,5 +111,30 @@ class CandidatesPage extends Page {
   async getCandidateCardHelpDefeatButton (cardId) {
     return $(`div#${cardId} button[id*='itemActionBarHelpDefeatButton'][id*='desktop']`);
   }
+
+  async getCandidateCardLike (cardId) {
+    return $(`div#${cardId} button[class*='LikeContainer'] svg`);
+  }
+
+  async getCandidateCardLikeButton (cardId) {
+    return $(`div#${cardId} button[class*='LikeContainer']`);
+  }
+
+  async getCandidateCardDislikeButton (cardId) {
+    return $(`div#${cardId} button[class*='DislikeContainer']`);
+  }
+
+  async getCandidateCardDislike (cardId) {
+    return $(`div#${cardId} button[class*='DislikeContainer'] svg`);
+  }
+
+  async getCandidateCardLikeIcon (cardId) {
+    return $(`div#${cardId} button[class*='LikeContainer'] svg path`);
+  }
+
+  async getCandidateCardDislikeIcon (cardId) {
+    return $(`div#${cardId} button[class*='DislikeContainer'] svg path`);
+  }
+
 }
 export default new CandidatesPage();

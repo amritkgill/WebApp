@@ -403,6 +403,7 @@ class HeartFavoriteToggleBase extends Component {
                 className="signInText"
                 onClick={() => this.handleSignInClick(showSignInPromptSupports, showSignInPromptOpposes)}
                 style={{ marginLeft: '-8px' }}
+                id="LikeDislikeSignIn"
               >
                 Sign in
               </Button>

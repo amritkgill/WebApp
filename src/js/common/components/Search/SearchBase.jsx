@@ -41,6 +41,7 @@ class SearchBase extends React.Component {
         {!this.state.searchText && <SearchIcon />}
         <SearchInput
           type="search"
+          id="searchCandidate"
           placeholder={this.props.placeholder}
           value={this.state.searchText}
           onBlur={this.props.onBlur}

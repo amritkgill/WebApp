@@ -15,7 +15,8 @@ const waitTime = 8000;
 beforeEach(async () => {
   await CandidatesPage.load();
   await driver.pause(waitTime);
- // await CandidatesPage.stateSelect.selectByVisibleText('Hawaii');
+  await CandidatesPage.stateSelect.selectByVisibleText('Hawaii');
+  await driver.pause(waitTime);
 });
 
 afterEach(async () => {
@@ -268,6 +269,137 @@ describe('Candidates Page', () => {
     await expect(opposeButton).toBePresent();
     await expect(opposeButton).toHaveText('Oppose');
   });
+
+  // Candidates_016, // Candidates_017
+  it('verifyCandidateLikeUnlikeHoverMessage @WV-1073', async () => {
+    const stateNameRandomTC10 = readTestDataStates('random', 1)[0];
+    const errors = [];
+    console.log(`Running verifyCandidateLikeUnlikeHoverMessage using state ${stateNameRandomTC10}`);
+    await CandidatesPage.stateSelect.selectByVisibleText(stateNameRandomTC10);
+    await driver.pause(waitTime);
+    const cardId = await getCandidateCardId();
+
+    const likeIcon = await CandidatesPage.getCandidateCardLike(cardId);
+    const dislikeIcon = await CandidatesPage.getCandidateCardDislike(cardId);
+    const likeClr = await CandidatesPage.getCandidateCardLikeIcon(cardId);
+    const dislikeClr = await CandidatesPage.getCandidateCardDislikeIcon(cardId);
+    const chooseButton = await CandidatesPage.getCandidateCardChoose(cardId);
+    const expectedTooltipTextLike = readTooltipsText('LikeCandidate');
+    const expectedTooltipTextDislike = new RegExp(readTooltipsText('DislikeCandidate'));
+    const expectedColor = readTooltipsText('LikeDislikeIconColor');
+    const errMsgIncorrectLike = `Like tooltip does not match expected tooltip:\n${expectedTooltipTextLike}`;
+    const errMsgIncorrectUnlike = `Unlike tooltip does not match expected tooltip:\n${expectedTooltipTextDislike.source.replace('/', '').replace(/\\/g, '').replace('^', '').replace('$', '')
+      .replace('d+', '<N>')}`;
+
+    await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });", [chooseButton]);
+    await driver.pause(waitTime/2);
+    await likeIcon.moveTo();
+    const likeIconColorAfter = ((await likeClr.getCSSProperty('fill')).value); 
+    await driver.executeScript("arguments[0].dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));", [likeClr]);
+    await driver.waitUntil(async () => CandidatesPage.likeTooltip.isDisplayed(), { timeout: 5000, timeoutMsg: 'Like Tooltip did not appear in time' });
+    const tooltipTextLike = await CandidatesPage.likeTooltip.getText();
+    if (tooltipTextLike !== expectedTooltipTextLike) {
+      errors.push(errMsgIncorrectLike);
+    }
+    if (likeIconColorAfter !== expectedColor && browser.capabilities.browserName === 'chrome') {
+      errors.push(`Like Icon color not changed on mouse hover to: ${expectedColor}`);
+    }
+
+    await driver.pause(waitTime);
+    await dislikeIcon.moveTo();
+    const disLikeIconColorAfter = ((await dislikeClr.getCSSProperty('fill')).value);
+    await driver.executeScript("arguments[0].dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));", [dislikeClr]);
+    await driver.waitUntil(async () => CandidatesPage.dislikeTooltip.isDisplayed(), { timeout: 5000, timeoutMsg: 'Dislike Tooltip did not appear in time' });
+    const tooltipTextDislike = await CandidatesPage.dislikeTooltip.getText();
+    if (!tooltipTextDislike.match(expectedTooltipTextDislike)) {
+      errors.push(errMsgIncorrectUnlike);
+    }
+    if (disLikeIconColorAfter !== expectedColor && browser.capabilities.browserName === 'chrome') {
+      errors.push(`Dislike Icon color not changed on mouse hover to: ${expectedColor}`);
+    }
+
+    if (errors.length > 0) {
+      let errorsAll = '';
+      for (let i = 0; i < errors.length; i++) {
+        errorsAll += `\n${errors[i]}`;
+      }
+      throw new Error(errorsAll);
+    }
+  });
+
+    // Candidates_018
+  it('verifyLikeCandidateClick @WV-1073', async () => {
+    const stateNameRandomTC10 = readTestDataStates('random', 1)[0];
+    console.log(`Running verifyLikeCandidateClick using state ${stateNameRandomTC10}`);
+    await CandidatesPage.stateSelect.selectByVisibleText(stateNameRandomTC10);
+    await driver.pause(waitTime);
+    const cardId = await getCandidateCardId();
+    const likeButton = await CandidatesPage.getCandidateCardLikeButton(cardId);
+    const chooseButton = await CandidatesPage.getCandidateCardChoose(cardId);
+    const signInButton = CandidatesPage.likeDislikeSignin;
+    await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });", [chooseButton]);
+    await driver.pause(waitTime/2);
+    await likeButton.click();
+    await driver.pause(waitTime/2);
+    await driver.waitUntil(async () => (await signInButton).isDisplayed(), { timeout: 5000, timeoutMsg: 'Sign In button did not appear within expected duration' });
+    await expect(signInButton).toBeDisplayed();
+  });
+
+    // Candidates_019
+  it('verifyDislikeCandidateClick @WV-1073', async () => {
+    const stateNameRandomTC10 = readTestDataStates('random', 1)[0];
+    console.log(`Running verifyDislikeCandidateClick using state ${stateNameRandomTC10}`);
+    await CandidatesPage.stateSelect.selectByVisibleText(stateNameRandomTC10);
+    await driver.pause(waitTime);
+    const cardId = await getCandidateCardId();
+    const dislikeButton = await CandidatesPage.getCandidateCardDislikeButton(cardId);
+    const chooseButton = await CandidatesPage.getCandidateCardChoose(cardId);
+    const signInButton = CandidatesPage.likeDislikeSignin;
+    await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });", [chooseButton]);
+    await driver.pause(waitTime/2);
+    await dislikeButton.click();
+    await driver.pause(waitTime/2);
+    await driver.waitUntil(async () => (await signInButton).isDisplayed(), { timeout: 5000, timeoutMsg: 'Sign In button did not appear within expected duration' });
+    await expect(signInButton).toBeDisplayed();
+  });
+
+    // Candidates_020
+  it('verifyCandidateNameClick @WV-1073', async () => {
+    const stateNameRandomTC10 = readTestDataStates('random', 1)[0];
+    console.log(`Running verifyCandidateNameClick using state ${stateNameRandomTC10}`);
+    await CandidatesPage.stateSelect.selectByVisibleText(stateNameRandomTC10);
+    await driver.pause(waitTime);
+    const cardId = await getCandidateCardId();
+    const candidate = await CandidatesPage.getCandidateCardCandidate(cardId);
+    const candidateName = await candidate.getText();
+    const expectedTitle = `${candidateName} - WeVote.US`;
+    const nameFirst = candidateName.split(' ')[0];
+    await candidate.click();
+    await driver.pause(waitTime);
+    const newTitle = await driver.getTitle();
+    driver.waitUntil(async () => (browser.getUrl()).contains(nameFirst), { timeput: 4000, timeoutMsg: 'Candidate Page not opened within exected duration.' });
+    await expect(newTitle).toMatch(expectedTitle);
+  });
+
+    // Candidates_021
+  it('verifyCandidateImageClick @WV-1073', async () => {
+    const stateNameRandomTC10 = readTestDataStates('random', 1)[0];
+    console.log(`Running verifyCandidateImageClick using state ${stateNameRandomTC10}`);
+    await CandidatesPage.stateSelect.selectByVisibleText(stateNameRandomTC10);
+    await driver.pause(waitTime);
+    const cardId = await getCandidateCardId();
+    const candidateImage = await CandidatesPage.getCandidateCardImage(cardId);
+    const candidateName = await CandidatesPage.getCandidateCardCandidateName(cardId);
+    const expectedTitle = `${candidateName} - WeVote.US`;
+    const nameFirst = candidateName.split(' ')[0];
+    await candidateImage.click();
+    await driver.pause(waitTime);
+    const newTitle = await driver.getTitle();
+    driver.waitUntil(async () => (browser.getUrl()).contains(nameFirst), { timeput: 4000, timeoutMsg: 'Candidate Page not opened within exected duration.' });
+    await expect(newTitle).toMatch(expectedTitle);
+  });
+
+
 
   // read All Possible Headers from candidatesPage_TC001.json
   function readTestDataAllPossibleHeaders () {
