@@ -173,7 +173,7 @@ class PoliticianEndorsementsList extends Component {
         {/* Render the modal */}
         <VoterPositionEntryAndDisplay
           show={showOpinionModal}
-          toggleModal={this.toggleOpinionModal}
+          politicianWeVoteId={politicianWeVoteId}
           politicianName={politicianName}
         />
         <LoadMoreItemsManuallyWrapper>
