@@ -772,9 +772,17 @@ class PoliticianDetailsPage extends Component {
       );
     }
 
-    let htmlTitle = `${chosenWebsiteName}`;
+    let htmlTitle = '';
     if (politicianName) {
-      htmlTitle = `${politicianName} - ${chosenWebsiteName}`;
+      htmlTitle = politicianName;
+    } else if (politicianNameParsedFromURLBeforeLoad) {
+      htmlTitle = politicianNameParsedFromURLBeforeLoad;
+    }
+    if (chosenWebsiteName) {
+      if (htmlTitle.length > 0 ) {
+        htmlTitle += ' - ';
+      }
+      htmlTitle += chosenWebsiteName;
     }
 
     const politicianLinksContainer = (politicianLinksList) ? (
@@ -952,8 +960,6 @@ class PoliticianDetailsPage extends Component {
         <Helmet>
           <title>
             {htmlTitle}
-            {' - '}
-            {politicianNameParsedFromURLBeforeLoad}
           </title>
           {politicianSEOFriendlyPathFromUrl ? (
             <link rel="canonical" href={`https://wevote.us/${politicianSEOFriendlyPathFromUrl}/-/`} />

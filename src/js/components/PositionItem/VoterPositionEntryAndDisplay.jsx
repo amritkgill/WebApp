@@ -20,7 +20,7 @@ import ActivityPostPublicDropdown from '../Activity/ActivityPostPublicDropdown';
 import VoterPositionEditNameAndPhotoModal from './VoterPositionEditNameAndPhotoModal';
 
 const VoterPositionEntryAndDisplay = (props) => {
-  const { activityTidbitWeVoteId, classes, externalUniqueId, toggleModal, politicianName } = props;
+  const { activityTidbitWeVoteId, classes, externalUniqueId, politicianName, politicianWeVoteId } = props;
 
   // useState used for state variables
   const [visibilityIsPublic, setVisibilityIsPublic] = useState(false);
@@ -29,12 +29,17 @@ const VoterPositionEntryAndDisplay = (props) => {
   const [initialFocusSet, setInitialFocusSet] = useState(false);
   const [voterName, setVoterName] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleEditModalOpen = () => {
     setIsEditModalOpen(true); // Open the modal
   };
   const handleEditModalClose = () => {
     setIsEditModalOpen(false); // Close the modal
+  };
+
+  const toggleModalLocal = () => {
+    setShowModal((prev) => !prev); // Toggle the modal
   };
 
   // useRef to reference the post input
@@ -59,7 +64,6 @@ const VoterPositionEntryAndDisplay = (props) => {
   const handleOpinionChange = (event) => {
     setSelectedOpinion(event.target.value);
   };
-
 
   // useEffect replaces componentDidMount and componentWillUnmount
   useEffect(() => {
@@ -93,7 +97,8 @@ const VoterPositionEntryAndDisplay = (props) => {
     e.preventDefault();
     const visibilitySetting = visibilityIsPublic ? 'SHOW_PUBLIC' : 'FRIENDS_ONLY';
     ActivityActions.activityPostSave(activityTidbitWeVoteId, statementText, visibilitySetting);
-    toggleModal();
+    // toggleModal(); toggleModal is undefined from PoliticianEndorsementList
+    toggleModalLocal();
   };
 
   const updateStatementTextToBeSaved = (e) => {
@@ -107,11 +112,6 @@ const VoterPositionEntryAndDisplay = (props) => {
   const dialogTitleText = politicianName ? `Create opinion about ${politicianName}`  : `Edit opinion about:  ${politicianName}`;
   const statementPlaceholderText = 'What\'s on your mind?';
   const rowsToShow = isAndroid() ? 4 : 6;
-  const [showModal, setShowModal] = useState(false);
-
-  const toggleLocalModal = () => {
-    setShowModal((prev) => !prev); // Toggle the modal
-  };
 
   const OpinionBlock = ({ onClick }) => (
     <OptionBlockWrapper>
@@ -252,7 +252,7 @@ const VoterPositionEntryAndDisplay = (props) => {
         dialogTitleJSX={<>{dialogTitleText}</>}
         show={showModal}
         textFieldJSX={textFieldJSX}
-        toggleModal={toggleLocalModal}
+        toggleModal={toggleModalLocal}
       />
       {isEditModalOpen && (
         <VoterPositionEditNameAndPhotoModal
@@ -261,7 +261,7 @@ const VoterPositionEntryAndDisplay = (props) => {
         />
       )}
       <OpinionBlock
-        onClick={toggleLocalModal}
+        onClick={toggleModalLocal}
         voterPhotoUrlMedium={voterPhotoUrlMedium}
         voterName={voterName}
       />
@@ -273,8 +273,8 @@ VoterPositionEntryAndDisplay.propTypes = {
   activityTidbitWeVoteId: PropTypes.string,
   classes: PropTypes.object,
   externalUniqueId: PropTypes.string,
-  toggleModal: PropTypes.func.isRequired,
   politicianName: PropTypes.string,
+  politicianWeVoteId: PropTypes.string,
 };
 
 export default withStyles(templateBStyles)(VoterPositionEntryAndDisplay);
