@@ -721,6 +721,8 @@ class CampaignsHome extends Component {
     // console.log('CampaignsHomeLoader.jsx render campaignList:', campaignList);
     const pigsCanFly = false;
 
+    // console.log("Actual list: ", representativeListShownAsRepresentatives.length, "number of results: ", numberOfRepresentativeResults)
+
     if (detailsListMode) {
       // console.log('detailsListMode TRUE');
       return (
@@ -822,7 +824,7 @@ class CampaignsHome extends Component {
             {displayBattlegroundPlaceholder && <CandidateListRootPlaceholder titleTextForList="Candidates in Close Races" />}
           </>
         )}
-        {(representativeListShownAsRepresentatives && representativeListShownAsRepresentatives.length > 0) ? (
+        {(representativeListShownAsRepresentatives && representativeListShownAsRepresentatives.length > 0) && (
           <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfRepresentativeResults > 0}>
             <Suspense fallback={<span><CandidateListRootPlaceholder titleTextForList="Current Representatives" /></span>}>
               <RepresentativeListRoot
@@ -838,14 +840,6 @@ class CampaignsHome extends Component {
               />
             </Suspense>
           </WhatIsHappeningSection>
-        ) : (
-          <>
-            {numberOfRepresentativeResults > 0 && (
-              <>
-                <CandidateListRootPlaceholder titleTextForList="Current Representatives" />
-              </>
-            )}
-          </>
         )}
         {(candidateListOnYourBallot && candidateListOnYourBallot.length > 0) ? (
           <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfCandidatesOnBallotResults > 0}>
