@@ -316,7 +316,7 @@ class PoliticianDetailsPage extends Component {
         const dataLayerObj = {
           event: 'politician_page_view',
           userDetails: {
-            stateCode: VoterStore.getStateCodeAny(),
+            stateCode: VoterStore.getVoterStateCode(),
             userCohort: VoterStore.getAnalyticsUserCohort(),
             voterWeVoteId: VoterStore.getVoterWeVoteId(),
           },

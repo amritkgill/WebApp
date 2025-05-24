@@ -34,12 +34,12 @@ export default class OpenExternalWebSite extends Component {
           pathname: window.location.pathname,
         },
         userDetails: {
-          stateCode: VoterStore.getStateCodeAny(),
+          stateCode: VoterStore.getVoterStateCode(),
           userCohort: VoterStore.getAnalyticsUserCohort(),
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
         },
       };
-      console.log('Sending dataLayerObj to GTM:', dataLayerObj);
+      // console.log('Sending dataLayerObj to GTM:', dataLayerObj);
       TagManager.dataLayer({ dataLayer: dataLayerObj });
     }
   }

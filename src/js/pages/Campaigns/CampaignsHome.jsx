@@ -731,7 +731,7 @@ class CampaignsHome extends Component {
             changeListModeShown={this.changeListModeShown}
             clearSearchFunction={this.clearSearchFunction}
             handleChooseStateChange={this.handleChooseStateChange}
-            isSearching={isSearching}
+            isSearching={!!(isSearching)}
             listModeFiltersAvailable={listModeFiltersAvailable}
             searchFunction={this.searchFunction}
             searchText={searchText}
@@ -770,7 +770,7 @@ class CampaignsHome extends Component {
           changeListModeShown={this.changeListModeShown}
           clearSearchFunction={this.clearSearchFunction}
           handleChooseStateChange={this.handleChooseStateChange}
-          isSearching={isSearching}
+          isSearching={!!(isSearching)}
           listModeFiltersAvailable={listModeFiltersAvailable}
           searchFunction={this.searchFunction}
           searchText={searchText}
@@ -779,7 +779,7 @@ class CampaignsHome extends Component {
         {(isSearching && numberOfSearchResults === 0) && (
           <NoSearchResult
             title="No Candidates Found"
-            subtitle="Please try a different search term."
+            subtitle={stateCode ? 'Please try a different search term or state.' : 'Please try a different search term.'}
           />
         )}
 
@@ -841,7 +841,7 @@ class CampaignsHome extends Component {
             </Suspense>
           </WhatIsHappeningSection>
         )}
-        {(candidateListOnYourBallot && candidateListOnYourBallot.length > 0) ? (
+        {(candidateListOnYourBallot && candidateListOnYourBallot.length > 0) && (
           <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfCandidatesOnBallotResults > 0}>
             <Suspense fallback={<span><CandidateListRootPlaceholder titleTextForList="On Your Ballot" /></span>}>
               <CandidateListRoot
@@ -857,14 +857,6 @@ class CampaignsHome extends Component {
               />
             </Suspense>
           </WhatIsHappeningSection>
-        ) : (
-          <>
-            {numberOfCandidatesOnBallotResults > 0 && (
-              <>
-                <CandidateListRootPlaceholder titleTextForList="On Your Ballot" />
-              </>
-            )}
-          </>
         )}
         <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfMorePoliticiansResults > 0}>
           <Suspense fallback={<span><CandidateListRootPlaceholder /></span>}>
