@@ -780,7 +780,7 @@ class PoliticianDetailsPage extends Component {
       htmlTitle = politicianNameParsedFromURLBeforeLoad;
     }
     if (chosenWebsiteName) {
-      if (htmlTitle.length > 0 ) {
+      if (htmlTitle.length > 0) {
         htmlTitle += ' - ';
       }
       htmlTitle += chosenWebsiteName;
