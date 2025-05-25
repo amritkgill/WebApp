@@ -49,6 +49,7 @@ import returnFirstXWords from '../../utils/returnFirstXWords';
 import saveCampaignSupportAndGoToNextPage from '../../utils/saveCampaignSupportAndGoToNextPage';
 import extractPoliticianDetailsFromUrl from '../../utils/extractPoliticianDetailsFromUrl';
 import VoterStore from '../../../stores/VoterStore';
+import VoterPositionEntryAndDisplay from '../../../components/PositionItem/VoterPositionEntryAndDisplay';
 
 const CampaignRetrieveController = React.lazy(() => import(/* webpackChunkName: 'CampaignRetrieveController' */ '../../components/Campaign/CampaignRetrieveController'));
 const CampaignSupportThermometer = React.lazy(() => import(/* webpackChunkName: 'CampaignSupportThermometer' */ '../../components/CampaignSupport/CampaignSupportThermometer'));
@@ -527,7 +528,24 @@ class PoliticianDetailsPage extends Component {
 
   getCandidateCampaignListTitle () {
     // thisYearElectionExists, nextYearElectionExists, priorYearElectionExists
-    return 'Elections with Candidate';
+    const { politicianName } = this.state;
+    return (
+      <span>
+        {politicianName ? (
+          <>
+            Elections
+            {' '}
+            with
+            {' '}
+            {politicianName}
+          </>
+        ) : (
+          <>
+            Election History
+          </>
+        )}
+      </span>
+    );
   }
 
   clearPoliticianValues = () => {
@@ -857,6 +875,21 @@ class PoliticianDetailsPage extends Component {
         );
       });
     }
+    const listTitleHtml = (
+      <CampaignSubSectionTitleWrapper>
+        <CampaignSubSectionTitle>
+          What people are saying
+          {!!(politicianName) && (
+            <>
+              {' '}
+              about
+              {' '}
+              {politicianName}
+            </>
+          )}
+        </CampaignSubSectionTitle>
+      </CampaignSubSectionTitleWrapper>
+    );
     if (opponentCandidateList && opponentCandidateList.length > 0) {
       let opponentCandidatesShownCount = 0;
       opponentCandidatesHtml = opponentCandidateList.map((opposingCandidate) => {
@@ -1044,11 +1077,6 @@ class PoliticianDetailsPage extends Component {
                   </CampaignDescription>
                 </DelayedLoad>
               )}
-              {politicianDataFound && (
-                <DelayedLoad waitBeforeShow={250}>
-                  {politicianLinksContainer}
-                </DelayedLoad>
-              )}
               {/* {finalElectionDateInPast && ( */}
               {/*  <IndicatorRow> */}
               {/*    <IndicatorButtonWrapper> */}
@@ -1077,6 +1105,13 @@ class PoliticianDetailsPage extends Component {
                 </IndicatorRow>
               )}
             </CampaignDescriptionWrapper>
+            {listTitleHtml}
+            <VoterPositionEntryAndDisplay
+              politicianWeVoteId={politicianWeVoteId}
+              politicianName={politicianName}
+            />
+            {positionListTeaserHtml}
+            <SpacerAfterPositions />
             {(opponentCandidateList && opponentCandidateList.length > 0) && (
               <CandidateCampaignListMobile>
                 <CampaignSubSectionTitleWrapper>
@@ -1092,9 +1127,9 @@ class PoliticianDetailsPage extends Component {
                         ballotItemDisplayName=""  // {contestOfficeNameFromOpponentList}
                         candidateList={opponentCandidateList}
                         // candidatesToShowForSearchResults={candidatesToShowForSearchResults}
-                        disableAutoRollUp
-                      // isFirstBallotItem={isFirstBallotItem}
-                      // primaryParty={primaryParty}
+                        // disableAutoRollUp
+                        // isFirstBallotItem={isFirstBallotItem}
+                        // primaryParty={primaryParty}
                       />
                     </Suspense>
                   </BallotOverflowWrapper>
@@ -1105,7 +1140,6 @@ class PoliticianDetailsPage extends Component {
                 )}
               </CandidateCampaignListMobile>
             )}
-            {positionListTeaserHtml}
             {(isWebApp() && pigsCanFly) && (
               <CampaignChipInLinkOuterWrapper>
                 <CampaignChipInLink
@@ -1167,11 +1201,11 @@ class PoliticianDetailsPage extends Component {
                 </OtherElectionsWrapper>
               </CandidateCampaignListMobile>
             )}
-            {/* <ViewBallotButtonWrapper> */}
-            {/*  <Suspense fallback={<></>}> */}
-            {/*    <ViewUpcomingBallotButton onClickFunction={this.goToBallot} onlyOfferViewYourBallot /> */}
-            {/*  </Suspense> */}
-            {/* </ViewBallotButtonWrapper> */}
+            {politicianDataFound && (
+              <DelayedLoad waitBeforeShow={250}>
+                {politicianLinksContainer}
+              </DelayedLoad>
+            )}
           </DetailsSectionMobile>
           <DetailsSectionDesktopTablet className="u-show-desktop-tablet">
             <ColumnsWrapper>
@@ -1240,6 +1274,13 @@ class PoliticianDetailsPage extends Component {
                 />
               </ColumnOneThird>
               <ColumnTwoThirds>
+                {listTitleHtml}
+                <VoterPositionEntryAndDisplay
+                  politicianWeVoteId={politicianWeVoteId}
+                  politicianName={politicianName}
+                />
+                {positionListTeaserHtml}
+                <SpacerAfterPositions />
                 {(opponentCandidateList && opponentCandidateList.length > 0) && (
                   <CandidateCampaignListDesktop>
                     <CampaignSubSectionTitleWrapper>
@@ -1254,9 +1295,9 @@ class PoliticianDetailsPage extends Component {
                           ballotItemDisplayName=""  // {contestOfficeNameFromOpponentList}
                           candidateList={opponentCandidateList}
                           // candidatesToShowForSearchResults={candidatesToShowForSearchResults}
-                          disableAutoRollUp
-                        // isFirstBallotItem={isFirstBallotItem}
-                        // primaryParty={primaryParty}
+                          // disableAutoRollUp
+                          // isFirstBallotItem={isFirstBallotItem}
+                          // primaryParty={primaryParty}
                         />
                       </BallotOverflowWrapper>
                     ) : (
@@ -1271,7 +1312,6 @@ class PoliticianDetailsPage extends Component {
                     <ViewUpcomingBallotButton buttonText="View Your Full Ballot" onClickFunction={this.goToBallot} onlyOfferViewYourBallot />
                   </Suspense>
                 </ViewBallotButtonWrapper>
-                {positionListTeaserHtml}
                 {/* {commentListTeaserHtml} */}
                 {(!futureFeaturesDisabled && nextReleaseFeaturesEnabled) && (
                   <CommentsListWrapper>
@@ -1519,6 +1559,10 @@ const PoliticianLinksWrapper = styled('div')`
     padding-top: 18px;
     margin: 0;
   }
+`;
+
+const SpacerAfterPositions = styled('div')`
+  margin-bottom: 60px;
 `;
 
 const ViewBallotButtonWrapper = styled('div')`

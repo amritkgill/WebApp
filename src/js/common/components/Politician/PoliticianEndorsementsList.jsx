@@ -115,27 +115,10 @@ class PoliticianEndorsementsList extends Component {
     const { politicianWeVoteId, hideEncouragementToEndorse, showTitle } = this.props;
     const { filteredPositionList, numberOfPositionsToDisplay, politicianName, showOpinionModal } = this.state;
     // console.log('PoliticianEndorsementsList render numberOfPositionsToDisplay:', numberOfPositionsToDisplay);
-    const showTitleAndPositionsToShow = showTitle && (filteredPositionList && filteredPositionList.length > 0);
-    const listTitleHtml = showTitleAndPositionsToShow && (
-      <CampaignSubSectionTitleWrapper>
-        <CampaignSubSectionTitle>
-          What people are saying
-          {!!(politicianName) && (
-            <>
-              {' '}
-              about
-              {' '}
-              {politicianName}
-            </>
-          )}
-        </CampaignSubSectionTitle>
-      </CampaignSubSectionTitleWrapper>
-    );
 
     if ((!filteredPositionList || filteredPositionList.length === 0) && !hideEncouragementToEndorse) {
       return (
         <>
-          {listTitleHtml}
           <PoliticianEndorsementsListWrapper>
             {!hideEncouragementToEndorse && (
               <NoPositionsFound>
@@ -149,9 +132,6 @@ class PoliticianEndorsementsList extends Component {
     let numberOfCampaignsDisplayed = 0;
     return (
       <PoliticianEndorsementsListWrapper>
-        {listTitleHtml}
-        {/* WV-532 This component forces open the width of the entire product, so commenting out for now. */}
-        {/* <VoterPositionEntryAndDisplayJohnMook /> */}
         <div>
           {filteredPositionList.map((position) => {
             // console.log('PoliticianEndorsementList position:', position);
@@ -169,13 +149,6 @@ class PoliticianEndorsementsList extends Component {
             );
           })}
         </div>
-        {/* Opinion block */}
-        {/* Render the modal */}
-        <VoterPositionEntryAndDisplay
-          show={showOpinionModal}
-          politicianWeVoteId={politicianWeVoteId}
-          politicianName={politicianName}
-        />
         <LoadMoreItemsManuallyWrapper>
           {!!(filteredPositionList &&
               filteredPositionList.length > 1 &&

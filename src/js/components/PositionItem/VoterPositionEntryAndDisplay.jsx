@@ -8,6 +8,7 @@ import { prepareForCordovaKeyboard } from '../../common/utils/cordovaUtils';
 import { isAndroid } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
 import ActivityStore from '../../stores/ActivityStore';
+import AppObservableStore from '../../common/stores/AppObservableStore';
 import VoterStore from '../../stores/VoterStore';
 import { avatarGeneric } from '../../utils/applicationUtils';
 import ModalDisplayTemplateB, {
@@ -32,7 +33,11 @@ const VoterPositionEntryAndDisplay = (props) => {
   const [showModal, setShowModal] = useState(false);
 
   const handleEditModalOpen = () => {
-    setIsEditModalOpen(true); // Open the modal
+    if (VoterStore.getVoterIsSignedIn()) {
+      setIsEditModalOpen(true);
+    } else {
+      AppObservableStore.setShowSignInModal(true);
+    }
   };
   const handleEditModalClose = () => {
     setIsEditModalOpen(false); // Close the modal
@@ -40,6 +45,14 @@ const VoterPositionEntryAndDisplay = (props) => {
 
   const toggleModalLocal = () => {
     setShowModal((prev) => !prev); // Toggle the modal
+  };
+
+  const openPositionModal = () => {
+    if (VoterStore.getVoterIsSignedIn()) {
+      toggleModalLocal();
+    } else {
+      AppObservableStore.setShowSignInModal(true);
+    }
   };
 
   // useRef to reference the post input
@@ -261,7 +274,7 @@ const VoterPositionEntryAndDisplay = (props) => {
         />
       )}
       <OpinionBlock
-        onClick={toggleModalLocal}
+        onClick={openPositionModal}
         voterPhotoUrlMedium={voterPhotoUrlMedium}
         voterName={voterName}
       />
