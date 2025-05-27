@@ -33,8 +33,8 @@ class FilterBaseSearch extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
   handleClick = (path)=> {
-    console.log('User clicked search icon at', new Date().toLocaleTimeString());
-    console.log('handleClick called with:', path);
+//     console.log('User clicked search icon at', new Date().toLocaleTimeString());
+//     console.log('handleClick called with:', path);
     const { location: { pathname: currentPathname } } = window;
     const page = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(path);
