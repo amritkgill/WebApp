@@ -2,6 +2,7 @@ import { ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import { BallotHorizontallyScrollingContainer, BallotScrollingInnerWrapper, LeftArrowInnerWrapper, LeftArrowOuterWrapper, RightArrowInnerWrapper, RightArrowOuterWrapper } from '../../common/components/Style/ScrollingStyles';
 import HeartFavoriteToggleLoader from '../../common/components/Widgets/HeartFavoriteToggle/HeartFavoriteToggleLoader';
 import { handleHorizontalScroll } from '../../common/utils/leftRightArrowCalculation';
@@ -141,6 +142,26 @@ class BallotScrollingContainer extends Component {
           <CandidateContainer
             data-modal-trigger
             className="u-cursor--pointer"
+            onClick={() => {
+              // DataLayer push
+              const dataLayerObject = {
+                event: 'relatedCandidateCardClick',
+                element_id: oneCandidate.we_vote_id,
+                candidateDetails: {
+                  name: oneCandidate.ballot_item_display_name,
+                  party: oneCandidate.party,
+                  office: oneCandidate.contest_office_name,
+                  state: oneCandidate.state_code,
+                },
+                pageDetails: {
+                  pageName: 'CandidatePage',
+                  section: 'CandidatesWhoRanForSameOffice',
+                  pathname: window.location.pathname,
+                }
+              };
+              console.log('Pushing to dataLayer:', dataLayerObject);
+              TagManager.dataLayer({ dataLayer: dataLayerObject });
+            }}
           >
             <CandidateWrapper>
               <CandidateInfo data-modal-trigger>
