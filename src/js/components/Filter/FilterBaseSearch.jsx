@@ -15,6 +15,9 @@ import ballotSearchPriority from '../../utils/ballotSearchPriority';
 import opinionsAndBallotItemsSearchPriority from '../../utils/opinionsAndBallotItemsSearchPriority';
 import positionSearchPriority from '../../utils/positionSearchPriority';
 import voterGuidePositionSearchPriority from '../../utils/voterGuidePositionSearchPriority';
+import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+
 
 const delayBeforeSearchExecution = 600;
 
@@ -22,10 +25,35 @@ class FilterBaseSearch extends Component {
   constructor (props) {
     super(props);
     this.state = {
+      tabCounter: 0,
       searchText: '',
       searchTextAlreadyRetrieved: [],
     };
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick = (path)=> {
+    console.log('User clicked search icon at', new Date().toLocaleTimeString());
+    console.log('handleClick called with:', path);
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPage = lookupPageNameAndPageTypeDict(path);
+
+    TagManager.dataLayer({
+      dataLayer: {
+        e: "click",
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathname: currentPathname,
+        },
+        destinationDetails: {
+          destinationPageType: destinationPage.pageType,
+          destinationPageName: destinationPage.pageName,
+          destinationPathname: path,
+        },
+      },
+    });
   }
 
   componentDidMount () {
@@ -224,6 +252,19 @@ class FilterBaseSearch extends Component {
       this.toggleSearch();
     }
   }
+//   handleKeyDown=(e)=>{
+//     e.preventDefault()
+//   }
+  handleKeyDown = (e) => {
+  if (e.key === "Tab" && e.target.id === "searchInput") {
+    e.preventDefault();
+  }
+  };
+
+  handleIconClick =(event)=>{
+    this.toggleSearch(event);
+    this.handleClick('/search');;
+  };
 
   render () {
     const { alwaysOpen, classes, isSearching, searchTextLarge, theme } = this.props;
@@ -251,7 +292,7 @@ class FilterBaseSearch extends Component {
           <IconButton
             classes={{ root: classes.iconButtonRoot }}
             id="searchIcon"
-            onClick={(!isAndroid() && !alwaysOpen) ? this.toggleSearch : undefined}
+            onClick={(!isAndroid() && !alwaysOpen) ? this.handleIconClick : undefined}
             size="large"
             aria-label="Search Button"
             tabIndex={0}
@@ -268,7 +309,8 @@ class FilterBaseSearch extends Component {
             onFocus={() => focusTextFieldAndroid('FilterBaseSearch')}
             onBlur={blurTextFieldAndroid}
             placeholder="Search"
-            tabIndex={isSearching ? 0 : -1}
+            onKeyDown={this.handleKeyDown}
+//             tabIndex={isSearching ? 0 : -1}
           />
           <Closer
             id="searchCloseButton"
