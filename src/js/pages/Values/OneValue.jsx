@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import IssueActions from '../../actions/IssueActions';
 import OrganizationActions from '../../actions/OrganizationActions';
 import apiCalming from '../../common/utils/apiCalming';
@@ -19,6 +20,8 @@ import ValuesList from './ValuesList';
 import { convertNameToSlug } from '../../common/utils/textFormat';
 import NoSearchResult from '../../components/Search/NoSearchResult';
 import EndorsementCard from '../../components/Widgets/EndorsementCard';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import VoterStore from '../../stores/VoterStore';
 
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
 const IssueCard = React.lazy(() => import(/* webpackChunkName: 'IssueCard' */ '../../components/Values/IssueCard'));
@@ -264,20 +267,55 @@ class OneValue extends Component {
             <FilterChoices>
               <Chip
                 key="forThisElectionKey"
-                id = "forThisElection"
+                id="forThisElection"
                 label={<span style={showEndorsersForThisElection ? { fontWeight: 600 } : {}}>For This Election</span>}
                 className={showEndorsersForThisElection ? classes.selectedChip : classes.notSelectedChip}
                 component="div"
-                onClick={() => this.changeListModeShown('voterGuidesForThisElection')}
+                // Yousra Elzamzami - WV-1135
+                onClick={() => {
+                  const {pageName, pageType} = lookupPageNameAndPageTypeDict(window.location.pathname);
+                  TagManager.dataLayer({
+                    dataLayer: {
+                      event: 'filterToggleClick',
+                      filterSelected: 'voterGuidesForThisElection',
+                      pageDetails: {
+                        pageName,
+                        pageType,
+                        pathname: window.location.pathname,
+                      },
+                      userDetails: {
+                        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+                      },
+                    },
+                  });
+                  this.changeListModeShown('voterGuidesForThisElection');
+                }}
                 variant={showEndorsersForThisElection ? undefined : 'outlined'}
               />
               <Chip
                 key="allOrganizationsKey"
-                id = "allEndorsers"
+                id="allEndorsers"
                 label={<span style={showAllEndorsers ? { fontWeight: 600 } : {}}>All Endorsers</span>}
                 className={showAllEndorsers ? classes.selectedChip : classes.notSelectedChip}
                 component="div"
-                onClick={() => this.changeListModeShown('allEndorsers')}
+                onClick={() => {
+                  const { pageName, pageType } = lookupPageNameAndPageTypeDict(window.location.pathname);
+                  TagManager.dataLayer({
+                    dataLayer: {
+                      event: 'filterToggleClick',
+                      filterSelected: 'allEndorsers',
+                      pageDetails: {
+                        pageName,
+                        pageType,
+                        pathname: window.location.pathname,
+                      },
+                      userDetails: {
+                        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+                      },
+                    },
+                  });
+                  this.changeListModeShown('allEndorsers');
+                }}
                 variant={showAllEndorsers ? undefined : 'outlined'}
               />
             </FilterChoices>
