@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent, Suspense } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import SupportActions from '../../../actions/SupportActions';
 import VoterActions from '../../../actions/VoterActions';
@@ -29,6 +30,7 @@ import VoterStore from '../../../stores/VoterStore';
 import PositionPublicToggle from '../../PositionItem/PositionPublicToggle';
 import PositionStatementModal from '../PositionStatementModal'; // eslint-disable-line import/no-cycle
 import ShareButtonDropDown from '../ShareButtonDropdown';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 const HelpWinOrDefeatModal = React.lazy(() => import(/* webpackChunkName: 'HelpWinOrDefeatModal' */ '../../../common/components/CampaignSupport/HelpWinOrDefeatModal')); // eslint-disable-line import/no-cycle
 
@@ -255,6 +257,26 @@ class ItemActionBar extends PureComponent {
   }
 
   openHelpWinOrDefeatModal = () => {
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      event: 'HelpDefeatOrWinClick', // Dale Note: events should be camelCase
+      userDetails: {
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: page.pageName,
+        destinationPageType: "PayToPromoteProcessModal",
+        destinationPathname: currentPathname,
+      }
+    };
+    TagManager.dataLayer({dataLayer: dataLayerObject})
     // const { ballotItemWeVoteId } = this.props;
     // console.log('openHelpWinOrDefeatModal ballotItemWeVoteId: ', ballotItemWeVoteId);
     this.setState({
@@ -286,6 +308,7 @@ class ItemActionBar extends PureComponent {
   };
 
   helpThemWinButton = (localUniqueId) => {
+    // console.log("help them win???")
     const { classes, externalUniqueId } = this.props;
     // const buttonRootClass = inCard ? classes.buttonRootForCard : classes.buttonRoot;
     const buttonRootClass = classes.buttonHelpRoot;

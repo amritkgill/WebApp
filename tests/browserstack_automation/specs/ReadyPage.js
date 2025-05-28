@@ -23,7 +23,7 @@ const waitTime = 8000;
 
 
 describe('ReadyPage',  function () {
-  this.timeout(9999999); 
+  this.timeout(9999999);
  // Ready_001 and Ready_003
  it('Ready_001 and Ready_003:verifyElectionCountDownRedirect and verifyViewYourBallotRedirect', async () => {
    console.log('Tcs : Ready_001 and Ready_003 : verifyElectionCountDownRedirect and verifyViewYourBallotRedirect');
@@ -208,7 +208,7 @@ it('Ready_023: Verify Text and links -> we vote helps you - Be ready to vote', a
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -240,7 +240,7 @@ it('Ready_024: Verify Text and links -> we vote helps you - Be confident in your
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -292,7 +292,7 @@ it('Ready_025: Verify Text and links -> we vote helps you - Help friends & ampli
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -314,7 +314,7 @@ it('Ready_026: Verify Text and links -> The fine print: You cannot cast your vot
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -336,7 +336,7 @@ it('Ready_027: Verify Text and links -> The fine print: WeVote does not represen
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -358,7 +358,7 @@ it('Ready_028: Verify Text and links -> The fine print: - Please make sure you a
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 
@@ -408,7 +408,7 @@ it('Ready_029: Verify Text and links -> The fine print:- How your data is used &
  else{
    console.log("ERROR: Menu item text cannot be empty");
  }
-      
+
 });
 
 // Ready_030, Ready_031
@@ -422,15 +422,15 @@ it('Ready_030,Ready_31: Verify tooltip msgs on pointing to topic name, topic ico
    let tooltipSelector;
    var element1;
    try{
-      // calling fn to find the topic element 
+      // calling fn to find the topic element
      element1=await findTopicElement(selectorType, selectorValue) ;
       // Check if the element or its parent/grandparent is a link
      let parentElement = await element1.parentElement();  // Get the parent element
      let grandParentElement = parentElement ? await parentElement.parentElement() : null;  // Get the grandparent element if possible
- 
+
      // Check if parent or grandparent is an anchor <a> tag
      const isLink = (await parentElement.getTagName() === 'a') || (grandParentElement && await grandParentElement.getTagName() === 'a');
- 
+
      // Assert if the element is inside a link
      assert.strictEqual(isLink, true, `${selectorValue} should be inside a link, but it's not.`);
      console.log(`${selectorValue} is a link: ${isLink}`);
@@ -441,7 +441,7 @@ it('Ready_030,Ready_31: Verify tooltip msgs on pointing to topic name, topic ico
      await element1.moveTo();
      expect(ReadyPage.topicToolTipMsg).toExist();
      const ttmsg = await ReadyPage.topicToolTipMsg.getText();
-     console.log('ttmsg:' + ttmsg); 
+     console.log('ttmsg:' + ttmsg);
    } catch (error) {
      console.error(`Error interacting with element: ${elementXPath}`, error);
    }
@@ -475,16 +475,16 @@ it('Ready_032: Verify popular topics and the icons are a link', async () => {
    let elementXPath;
    var element1;
    try{
-   // calling fn to find the topic element 
+   // calling fn to find the topic element
    element1=await findTopicElement(selectorType, selectorValue);
-  
+
    // Check if the element or its parent/grandparent is a link
    let parentElement = await element1.parentElement();  // Get the parent element
    let grandParentElement = parentElement ? await parentElement.parentElement() : null;  // Get the grandparent element if possible
- 
+
    // Check if parent or grandparent has an anchor <a> tag
    const isLink = (await parentElement.getTagName() === 'a') || (grandParentElement && await grandParentElement.getTagName() === 'a');
- 
+
    // Assert if the element is inside a link
    assert.strictEqual(isLink, true, `${selectorValue} should be inside a link, but it's not.`);
    console.log(`${selectorValue} is a link: ${isLink}`);
@@ -526,14 +526,14 @@ it('Ready_033: Verify followers text and tooltip for every topic', async () => {
 
 
    try{
-   // calling fn to find the topic element 
+   // calling fn to find the topic element
    element1=await findTopicElement(selectorType, selectorValue);
-   
+
    // Now, check for the followers text for the specific topic
    // XPath for followers element under the same topic card
    let followersXPath = `//h3[@id="${selectorValue}_topicName"]/ancestor::div[contains(@class, 'IssueCardWrapper-sc')]/div[contains(@class, 'IssueAdvocatesAndFollowersWrapper-sc-169wgaf-5')]/span/div[@id="followers"]`;
    const followersElement = await $(followersXPath);
- 
+
    if (await followersElement.isExisting()) {
     const followersText = await followersElement.getText();
      console.log(`Followers for ${selectorValue}: ${followersText}`);
@@ -601,13 +601,13 @@ it('Ready_034: Verify endorsements text and link for every topic', async () => {
  console.log('Tcs : Ready_034: Verify endorsements text and link for every topic');
  const popTopics = JSON.parse(fs.readFileSync(`${testDataPath}popularTopics.json`, 'utf8')).topics1;
 
- 
+
 //Function to point to an endorsement and verify text and tooltip
  async function pointToElementAndVerifyEndorsementsTextTooltip(selectorType, selectorValue) {
- 
+
  let elementXPath;
  let tooltipSelector;
- var element1; 
+ var element1;
 
 
  // Function to extract endorsements count and link for a given topic
@@ -670,12 +670,12 @@ it('Ready_034: Verify endorsements text and link for every topic', async () => {
 it('Ready_035: Verify count of topics displayed with showMore link', async () => {
  console.log('Tcs : Ready_035: Verify count of topics displayed with showMore link');
  try {
-  
+
    var h3ElementsSelector;
    // Function to collect h3 elements with 'topicName' in their id
    async function collectH3TopicIds() {
        const h3Elements = await browser.$$(`${h3ElementsSelector}`);
-      
+
        // Initialize an array to store the IDs
        const h3TopicIds = [];
 
@@ -764,28 +764,28 @@ async function findTopicElement(selectorType, selectorValue) {
     } else {
       elementXPath = `//h3[contains(normalize-space(text()), "${selectorValue}")]`;
     }
-   
+
   } else {
     throw new Error('Unsupported selector type. Use "img" or "h3".');
   }
- 
+
   console.log(`Searching for element with XPath: ${elementXPath}`);
-  
+
   await ReadyPage.load();
   await driver.pause(waitTime);
   await browser.execute(() => window.scrollBy(0, 300));
   await driver.pause(waitTime);
- 
+
   let element = await $(elementXPath);
   let foundElement = await element.isExisting();
   let retryCount = 0;
   const maxRetries = 3;
- 
- 
+
+
   while (!foundElement && retryCount < maxRetries) {
     console.log(`Retry ${retryCount + 1}: Scrolling to load more topics...`);
- 
- 
+
+
     // Click "Show More" if available
     const showMoreButton = await $('#showMoreLink');
     if (await showMoreButton.isExisting()) {
@@ -793,25 +793,25 @@ async function findTopicElement(selectorType, selectorValue) {
       await showMoreButton.click();
       await driver.pause(waitTime);
     }
- 
- 
+
+
     // Scroll the page
     await browser.execute(() => window.scrollBy(0, 600));
     await driver.pause(waitTime);
- 
- 
+
+
     // Reattempt to find the element after scrolling or clicking "Show More"
     element = await $(elementXPath);
     foundElement = await element.isExisting();
- 
- 
+
+
     retryCount++;
   }
- 
+
   if (!foundElement) {
     throw new Error(`Could not find topic "${selectorValue}" after ${maxRetries} retries.`);
   }
- 
+
   console.log(`Element for ${selectorValue} found.`);
   console.log(`Element text: ` + await element.getText());
 
@@ -820,7 +820,7 @@ async function findTopicElement(selectorType, selectorValue) {
   throw new Error('Test Failed unknown error'+error);
 }
  }
- 
+
 
 //********************************************************************************** */
 // Function to hover over the endorsements link and retrieve the tooltip
@@ -842,14 +842,14 @@ const expectedTooltipMatch = tooltipText.match(/See endorsements from \d+ advoca
 
 
 // Verify the tooltip message
-//assert.strictEqual(tooltipText.includes(selectorValue1), true, `Expected tooltip message to contain "${expectedTooltipMessage}", but got "${tooltipText}"`);       
+//assert.strictEqual(tooltipText.includes(selectorValue1), true, `Expected tooltip message to contain "${expectedTooltipMessage}", but got "${tooltipText}"`);
 
 
 assert.strictEqual(
  expectedTooltipMatch !== null,
  true,
  `Tooltip message mismatch. Expected part of "See endorsements from X advocates", but got "${tooltipText}"`
-); 
+);
 }
 
 

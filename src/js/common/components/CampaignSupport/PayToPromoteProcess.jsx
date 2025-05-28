@@ -193,6 +193,7 @@ class PayToPromoteProcess extends Component {
   }
 
   changeValueFromButton (newValue) {
+    // console.log("this is the donation modal:", window.location.href)
     this.setState({
       chipInPaymentValue: newValue,
       chipInPaymentOtherValue: '',

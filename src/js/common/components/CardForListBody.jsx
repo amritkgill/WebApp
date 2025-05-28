@@ -2,7 +2,7 @@ import { HowToVote, Launch } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Suspense } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import TruncateMarkup from 'react-truncate-markup';
 import styled from 'styled-components';
 import webAppConfig from '../../config';
@@ -17,6 +17,7 @@ import { CampaignActionButtonsWrapper, CampaignImageDesktop, CampaignImageDeskto
 import DesignTokenColors from './Style/DesignTokenColors';
 import HeartFavoriteToggleLoader from './Widgets/HeartFavoriteToggle/HeartFavoriteToggleLoader';
 import SvgImage from './Widgets/SvgImage';
+import extractPoliticianDetailsFromUrl from "../utils/extractPoliticianDetailsFromUrl";
 
 const CampaignSupportThermometer = React.lazy(() => import(/* webpackChunkName: 'CampaignSupportThermometer' */ './CampaignSupport/CampaignSupportThermometer'));
 const ItemActionBar = React.lazy(() => import(/* webpackChunkName: 'ItemActionBar' */ '../../components/Widgets/ItemActionBar/ItemActionBar'));
@@ -60,6 +61,8 @@ function CardForListBody (props) {
     politicalPartySvgNameWithPath = '../../img/global/svg-icons/political-party-working-families.svg';
   }
   const politicianDetailsURL = `${webAppConfig.WE_VOTE_URL_PROTOCOL + webAppConfig.WE_VOTE_HOSTNAME}${politicianBaseBath}`;
+  const location = useLocation();
+  const { state: stateFromUrl, name: nameFromUrl } = extractPoliticianDetailsFromUrl(location.pathname);
 
   // /////////////////////// START OF DISPLAY
   return (
@@ -73,7 +76,7 @@ function CardForListBody (props) {
             <TitleAndTextWrapper hideCardMargins={hideCardMargins}>
               {stateName && (
                 <StateName id={`stateName-${stateCode}-${candidateWeVoteId}`}>
-                  {stateName}
+                  {stateName || stateFromUrl}
                 </StateName>
               )}
               {hideCardMargins && isWebApp() ? (
@@ -112,7 +115,7 @@ function CardForListBody (props) {
                     to={politicianBaseBath}
                     onClick={() => (isCordova() ? AppObservableStore.setShowOrganizationModal(false) : null)}
                   >
-                    {ballotItemDisplayName}
+                    {ballotItemDisplayName || nameFromUrl}
                   </Link>
                 </OneCampaignTitleLink>
               )}

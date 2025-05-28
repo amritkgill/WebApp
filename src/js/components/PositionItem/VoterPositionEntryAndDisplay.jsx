@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, InputBase, Radio, FormControlLabel, RadioGroup } from '@mui/material';
+import { Button, InputBase, Radio, FormControlLabel, RadioGroup, Tooltip } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import { Edit as EditIcon } from '@mui/icons-material';
@@ -20,7 +20,7 @@ import ActivityPostPublicDropdown from '../Activity/ActivityPostPublicDropdown';
 import VoterPositionEditNameAndPhotoModal from './VoterPositionEditNameAndPhotoModal';
 
 const VoterPositionEntryAndDisplay = (props) => {
-  const { activityTidbitWeVoteId, classes, externalUniqueId, toggleModal, politicianName } = props;
+  const { activityTidbitWeVoteId, classes, externalUniqueId, politicianName, politicianWeVoteId } = props;
 
   // useState used for state variables
   const [visibilityIsPublic, setVisibilityIsPublic] = useState(false);
@@ -29,12 +29,17 @@ const VoterPositionEntryAndDisplay = (props) => {
   const [initialFocusSet, setInitialFocusSet] = useState(false);
   const [voterName, setVoterName] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleEditModalOpen = () => {
     setIsEditModalOpen(true); // Open the modal
   };
   const handleEditModalClose = () => {
     setIsEditModalOpen(false); // Close the modal
+  };
+
+  const toggleModalLocal = () => {
+    setShowModal((prev) => !prev); // Toggle the modal
   };
 
   // useRef to reference the post input
@@ -54,12 +59,11 @@ const VoterPositionEntryAndDisplay = (props) => {
     setVoterPhotoUrlMedium(voter.voter_photo_url_medium);
     setVoterName(voter.full_name || 'Anonymous');
   };
-  const [selectedOpinion, setSelectedOpinion] = useState('');
+  const [selectedOpinion, setSelectedOpinion] = useState('Neutral');
 
   const handleOpinionChange = (event) => {
     setSelectedOpinion(event.target.value);
   };
-
 
   // useEffect replaces componentDidMount and componentWillUnmount
   useEffect(() => {
@@ -74,7 +78,7 @@ const VoterPositionEntryAndDisplay = (props) => {
     };
   }, []);
 
-  // useEffect handles setting inital focus replacing componentDidUpdate
+  // useEffect handles setting initial focus replacing componentDidUpdate
   useEffect(() => {
     if (activityPostInputRef.current && !initialFocusSet) {
       const input = activityPostInputRef.current;
@@ -93,13 +97,14 @@ const VoterPositionEntryAndDisplay = (props) => {
     e.preventDefault();
     const visibilitySetting = visibilityIsPublic ? 'SHOW_PUBLIC' : 'FRIENDS_ONLY';
     ActivityActions.activityPostSave(activityTidbitWeVoteId, statementText, visibilitySetting);
-    toggleModal();
+    // toggleModal(); toggleModal is undefined from PoliticianEndorsementList
+    toggleModalLocal();
   };
 
   const updateStatementTextToBeSaved = (e) => {
     setStatementText(e.target.value);
   };
- 
+
   const activityTidbitIdCheck = activityTidbitWeVoteId === '' || activityTidbitWeVoteId === undefined;
 
   renderLog('VoterPositionEntryAndDisplay'); // Set LOG_RENDER_EVENTS to log all renders
@@ -107,11 +112,7 @@ const VoterPositionEntryAndDisplay = (props) => {
   const dialogTitleText = politicianName ? `Create opinion about ${politicianName}`  : `Edit opinion about:  ${politicianName}`;
   const statementPlaceholderText = 'What\'s on your mind?';
   const rowsToShow = isAndroid() ? 4 : 6;
-  const [showModal, setShowModal] = useState(false);
 
-  const toggleLocalModal = () => {
-    setShowModal((prev) => !prev); // Toggle the modal
-  };
   const OpinionBlock = ({ onClick }) => (
     <OptionBlockWrapper>
       <UserInfoWrapper>
@@ -139,6 +140,21 @@ const VoterPositionEntryAndDisplay = (props) => {
   OpinionBlock.propTypes = {
     onClick: PropTypes.func.isRequired,
   };
+
+  const defaultOpinionVisibilityText = (
+    <p>
+      Change your default visibility
+      {' '}
+      <a
+        href="/settings/profile"
+        className={classes.tooltipLink}
+      >
+        in your profile
+      </a>
+      .
+    </p>
+  );
+
   const textFieldJSX = (
     <TextFieldWrapper>
       <TextFieldForm
@@ -162,10 +178,19 @@ const VoterPositionEntryAndDisplay = (props) => {
               {voterName}
               {/* Display the fetched name */}
             </UserName>
-            <ActivityPostPublicDropdown
-              visibilityIsPublic={visibilityIsPublic}
-              onVisibilityChange={(newVisibility) => setVisibilityIsPublic(newVisibility)}
-            />
+            <Tooltip
+              arrow
+              title={defaultOpinionVisibilityText}
+              placement="top"
+              classes={{ tooltip: classes.tooltipPaper, arrow: classes.tooltipArrow }}
+            >
+              <div>
+                <ActivityPostPublicDropdown
+                  visibilityIsPublic={visibilityIsPublic}
+                  onVisibilityChange={(newVisibility) => setVisibilityIsPublic(newVisibility)}
+                />
+              </div>
+            </Tooltip>
           </UserInfoText>
         </UserInfoWrapper>
         <RadioGroup
@@ -227,7 +252,7 @@ const VoterPositionEntryAndDisplay = (props) => {
         dialogTitleJSX={<>{dialogTitleText}</>}
         show={showModal}
         textFieldJSX={textFieldJSX}
-        toggleModal={toggleLocalModal}
+        toggleModal={toggleModalLocal}
       />
       {isEditModalOpen && (
         <VoterPositionEditNameAndPhotoModal
@@ -236,7 +261,7 @@ const VoterPositionEntryAndDisplay = (props) => {
         />
       )}
       <OpinionBlock
-        onClick={toggleLocalModal}
+        onClick={toggleModalLocal}
         voterPhotoUrlMedium={voterPhotoUrlMedium}
         voterName={voterName}
       />
@@ -248,8 +273,8 @@ VoterPositionEntryAndDisplay.propTypes = {
   activityTidbitWeVoteId: PropTypes.string,
   classes: PropTypes.object,
   externalUniqueId: PropTypes.string,
-  toggleModal: PropTypes.func.isRequired,
   politicianName: PropTypes.string,
+  politicianWeVoteId: PropTypes.string,
 };
 
 export default withStyles(templateBStyles)(VoterPositionEntryAndDisplay);

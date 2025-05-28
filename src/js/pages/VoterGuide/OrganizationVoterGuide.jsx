@@ -111,13 +111,13 @@ export default class OrganizationVoterGuide extends Component {
       OrganizationActions.organizationFollow(organizationWeVoteId);
 
       // Now redirect to the same page without the '/af' in the route
-      const { location: { pathname: currentPathName } } = this.props;
+      const { location: { pathname: currentPathname } } = this.props;
 
       // AUTO_FOLLOW is 'af'
-      const currentPathNameWithoutAutoFollow = currentPathName.replace(`/${AUTO_FOLLOW}`, '');
+      const currentPathnameWithoutAutoFollow = currentPathname.replace(`/${AUTO_FOLLOW}`, '');
 
-      // console.log('OrganizationVoterGuide, currentPathNameWithoutAutoFollow: ', currentPathNameWithoutAutoFollow);
-      historyPush(currentPathNameWithoutAutoFollow);
+      // console.log('OrganizationVoterGuide, currentPathnameWithoutAutoFollow: ', currentPathnameWithoutAutoFollow);
+      historyPush(currentPathnameWithoutAutoFollow);
       this.setState({
         autoFollowRedirectHappening: true,
       });

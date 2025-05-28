@@ -12,6 +12,7 @@ import ChallengeParticipantActions from '../../actions/ChallengeParticipantActio
 import ReadyStore from '../../../stores/ReadyStore';
 import VoterStore from '../../../stores/VoterStore';
 import { getChallengeValuesFromIdentifiers } from '../../utils/challengeUtils';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class JoinChallengeButton extends React.Component {
   constructor (props) {
@@ -127,6 +128,8 @@ class JoinChallengeButton extends React.Component {
     // console.log('goToInviteFriends currentPathname: ', currentPathname);
 
     // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPage = lookupPageNameAndPageTypeDict(inviteFriendsPath);
     TagManager.dataLayer({
       dataLayer: {
         event: 'inviteFriendsToChallenge',
@@ -137,14 +140,14 @@ class JoinChallengeButton extends React.Component {
           challengeWeVoteId,
         },
         pageDetails: {
-          pageType: "challenge",
-          pageName: window.location.href,
-          pathName: currentPathname,
+          pageName: page.pageName,
+          pageType: page.pageType,
+          pathname: currentPathname,
         },
         destinationDetails: {
-          destinationPageType: "challenge",
-          destinationPageName: `${window.location.origin}${inviteFriendsPath}`,
-          destinationPathName: inviteFriendsPath,
+          destinationPageName: destinationPage.pageName,
+          destinationPageType: destinationPage.pageType,
+          destinationPathname: inviteFriendsPath,
         },
       },
     });
@@ -174,6 +177,8 @@ class JoinChallengeButton extends React.Component {
       AppObservableStore.setSetUpAccountEntryPath(joinChallengeNextStepPath);
       // console.log('goToJoinChallenge currentPathname: ', currentPathname);
       // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
+      const page = lookupPageNameAndPageTypeDict(currentPathname);
+      const destinationPage = lookupPageNameAndPageTypeDict(joinChallengeNextStepPath);
       TagManager.dataLayer({
         dataLayer: {
           event: 'joinChallenge',
@@ -184,14 +189,14 @@ class JoinChallengeButton extends React.Component {
             challengeWeVoteId,
           },
           pageDetails: {
-            pageType: "challenge",
-            pageName: window.location.href,
-            pathName: currentPathname,
+            pageType: page.pageType,
+            pageName: page.pageName,
+            pathname: currentPathname,
           },
           destinationDetails: {
-            destinationPageType: 'challenge',
-            destinationPageName: `${window.location.origin}${joinChallengeNextStepPath}`,
-            destinationPathName: joinChallengeNextStepPath,
+            destinationPageType: destinationPage.pageType,
+            destinationPageName: destinationPage.pageName,
+            destinationPathname: joinChallengeNextStepPath,
           },
         },
       });
@@ -218,12 +223,17 @@ class JoinChallengeButton extends React.Component {
     renderLog('JoinChallengeButton');  // Set LOG_RENDER_EVENTS to log all renders
     const { classes } = this.props;
     const { voterIsChallengeParticipant } = this.state;
+    // console.log('JoinChallengeButton render voterIsChallengeParticipant: ', voterIsChallengeParticipant);
     // const { challengeSEOFriendlyPath, challengeWeVoteId } = this.state;
     // console.log('JoinChallengeButton render challengeSEOFriendlyPath: ', challengeSEOFriendlyPath, ', challengeWeVoteId: ', challengeWeVoteId);
     let buttonText;
     if (voterIsChallengeParticipant) {
-      buttonText = 'Invite more friends';
-    } if (this.props.inChallengeList) {
+      if (this.props.inChallengeList) {
+        buttonText = 'Invite';
+      } else {
+        buttonText = 'Invite more friends';
+      }
+    } else if (this.props.inChallengeList) {
       buttonText = 'Join';
     } else {
       buttonText = 'Join Challenge';

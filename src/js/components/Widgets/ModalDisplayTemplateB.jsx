@@ -11,7 +11,7 @@ import { renderLog } from '../../common/utils/logging';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 
 class ModalDisplayTemplateB extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.state = {
     };
@@ -216,6 +216,16 @@ export const templateBStyles = (theme) => ({
   },
   radioChecked: {
     color: DesignTokenColors.primary600,
+  },
+  tooltipPaper: {
+    backgroundColor: DesignTokenColors.neutral900,
+  },
+  tooltipArrow: {
+    color: DesignTokenColors.neutral900,
+    translate: '40px 0px',
+  },
+  tooltipLink: {
+    color: DesignTokenColors.primary200,
   },
 });
 

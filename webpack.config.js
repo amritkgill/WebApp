@@ -30,7 +30,8 @@ if (major < 13) {
   console.log(`Node version is: ${process.version}`);
 }
 if (useRealCerts) console.log('useRealCerts in webpack.config.js ', useRealCerts);
-// console.log('key: ', fs.readFileSync(`./${source}/cert/wevotedeveloper.com.crt`).toString());
+// console.log('crt: ', fs.readFileSync(`./${source}/cert/wevotedeveloper.com.crt`).toString());
+// console.log('key: ', fs.readFileSync(`./${source}/cert/wevotedeveloper.com_key.txt`).toString());
 
 module.exports = (env, argv) => ({
   entry: path.resolve(__dirname, `./${source}/index.jsx`),
@@ -94,6 +95,9 @@ module.exports = (env, argv) => ({
     path: path.resolve(__dirname, './build'),
     filename: isWebApp ? '[name].[contenthash].js' : 'bundle.js',
     publicPath: isWebApp ? '/' : undefined,
+  },
+  infrastructureLogging: {
+    level: 'verbose',
   },
   // source-map is for OpenReplay
   devtool: 'source-map',

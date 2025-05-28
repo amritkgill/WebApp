@@ -175,7 +175,7 @@ function fileRewriterForCordova (path, versions) {
     } else if (dummySubstituteFiles.includes(path)) {
       const cordovaPath = path.replace('.jsx', 'Cordova.jsx');
       fs.rename(cordovaPath, path, (err2) => {
-        if (err2) console.log(`remame file ERROR: ${err}`);
+        if (err2) console.log(`rename file ERROR: ${err}`);
       });
       fs.remove(cordovaPath);
     } else {

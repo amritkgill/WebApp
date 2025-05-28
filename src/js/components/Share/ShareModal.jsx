@@ -189,6 +189,17 @@ class ShareModal extends Component {
   render () {
     renderLog('ShareModal');  // Set LOG_RENDER_EVENTS to log all renders
     // console.log('ShareModal render');
+
+    // 3/20/25 we need to upgrade from '@mui/material';
+    // "@mui/base has been deprecated and has been replaced by Base UI. We strongly recommend using the new package instead."
+    // import Dialog from '@base-ui-components/react/dialog' instead of '@mui/material';
+    // In the meantime, the following hack mostly undoes problem caused by
+    // node_modules/@mui/base/legacy/unstable_useModal/ModalManager.js handleContainer()
+    //    container.style.paddingRight = "".concat(getPaddingRight(container) + scrollbarSize, "px");
+    const bodyElement = document.querySelector('body');
+    bodyElement.style.removeProperty('overflow');       // 3/20/25 remove mysteriously added  'style="padding-right: 15px; overflow: hidden;"'
+    bodyElement.style.removeProperty('padding-right');
+
     const { location: { pathname } } = window;
     const { classes } = this.props;
     const {

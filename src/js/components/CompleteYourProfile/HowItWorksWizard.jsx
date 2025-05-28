@@ -6,7 +6,7 @@ import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HowItWorksStep from './Step';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 
-const crossIcon = normalizedImagePath('../../../img/global/icons/cross.svg');
+const crossIcon = normalizedImagePath('../../../img/global/svg-icons/cross.svg');
 
 
 const HowItWorksWizard = ({ steps, activeStep }) => {

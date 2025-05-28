@@ -1,22 +1,21 @@
-import React, { Suspense } from 'react';
 import { Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-// import JoinChallengeButton from './JoinChallengeButton';
+import React, { Suspense } from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
-const JoinChallengeButton = React.lazy(() => import(/* webpackChunkName: 'JoinChallengeButton' */ '../../components/Challenge/JoinChallengeButton'));
+const JoinChallengeButton = React.lazy(() => import(/* webpackChunkName: 'JoinChallengeButton' */ './JoinChallengeButton'));
 
-const JoinChallengeAndLearnMoreButtons = ({ challengeWeVoteId, classes, inChallengeList }) => {
-  return (
-    <JoinChallengeButtonWrapper>
-      <Suspense fallback={<></>}>
-        <JoinChallengeButton
-          // challengeSEOFriendlyPath={challengeSEOFriendlyPathForDisplay}
-          challengeWeVoteId={challengeWeVoteId}
-          inChallengeList={inChallengeList}
-        />
-      </Suspense>
+const JoinChallengeAndLearnMoreButtons = ({ challengeBasePath, challengeWeVoteId, classes, inChallengeList }) => (
+  <JoinChallengeButtonWrapper>
+    <Suspense fallback={<></>}>
+      <JoinChallengeButton
+        challengeWeVoteId={challengeWeVoteId}
+        inChallengeList={inChallengeList}
+      />
+    </Suspense>
+    <Link to={challengeBasePath}>
       <Button
         classes={{ root: classes.learnMoreButton }}
         color="secondary"
@@ -25,9 +24,9 @@ const JoinChallengeAndLearnMoreButtons = ({ challengeWeVoteId, classes, inChalle
       >
         Learn More
       </Button>
-    </JoinChallengeButtonWrapper>
-  );
-};
+    </Link>
+  </JoinChallengeButtonWrapper>
+);
 
 const styles = () => ({
   joinChallengeButton: {
@@ -62,6 +61,7 @@ const JoinChallengeButtonWrapper = styled('div')`
 `;
 
 JoinChallengeAndLearnMoreButtons.propTypes = {
+  challengeBasePath: PropTypes.string,
   challengeWeVoteId: PropTypes.string,
   classes: PropTypes.object.isRequired,
   inChallengeList: PropTypes.bool,

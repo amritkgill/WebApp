@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import colors from '../Style/Colors';
 import normalizedImagePath from '../../utils/normalizedImagePath';
 
-const closeIcon = normalizedImagePath('../../../img/global/icons/cross.svg');
+const closeIcon = normalizedImagePath('../../../img/global/svg-icons/cross.svg');
 const searchIcon = normalizedImagePath('../../../img/global/svg-icons/search.svg');
 
 class SearchBase extends React.Component {
@@ -41,6 +41,7 @@ class SearchBase extends React.Component {
         {!this.state.searchText && <SearchIcon />}
         <SearchInput
           type="search"
+          id="searchCandidate"
           placeholder={this.props.placeholder}
           value={this.state.searchText}
           onBlur={this.props.onBlur}

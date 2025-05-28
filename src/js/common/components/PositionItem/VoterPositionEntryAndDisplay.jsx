@@ -64,7 +64,7 @@ function VoterPositionEntryAndDisplay ({ classes }) {
   //   console.log('Edit voter logic will go here');
   // };
 
-  const handleSetOpinonClick = () => {
+  const handleSetOpinionClick = () => {
     setVoterOpinion(opinion);
   };
 
@@ -159,7 +159,7 @@ function VoterPositionEntryAndDisplay ({ classes }) {
               </>
             )}
         </VoterAvatar>
-        <VoterEdit onClick={handleSetOpinonClick}>
+        <VoterEdit onClick={handleSetOpinionClick}>
           <EditIcon />
         </VoterEdit>
       </VoterAvatarDisplayContainer>

@@ -202,6 +202,8 @@ class ChallengeCardList extends Component {
                 <JoinedButtonsOuterWrapper>
                   <JoinedButtonsInnerWrapper>
                     <JoinChallengeAndLearnMoreButtons
+                      challengeBasePath={this.getChallengeBasePath(oneChallenge.challenge_we_vote_id)}
+                      challengeWeVoteId={oneChallenge.challenge_we_vote_id}
                       inChallengeList={inChallengeList}
                     />
                   </JoinedButtonsInnerWrapper>
@@ -209,25 +211,6 @@ class ChallengeCardList extends Component {
               </ChallengeCardForListVerticalWrapper>
             );
           })}
-          {/*
-          {!!(numberDisplayed && (searchText || showAllEndorsements || showThisYear || showUpcomingEndorsements)) && (
-            <StartAChallengeWrapper>
-              <Link className="u-link-color" to="/start-a-challenge">
-                Start a challenge
-                {(searchText && searchText.length > 0) && (
-                  <>
-                    {' '}
-                    related to
-                    {' '}
-                    &quot;
-                    {searchText}
-                    &quot;
-                  </>
-                )}
-              </Link>
-            </StartAChallengeWrapper>
-          )}
-          */}
           {!!(challengeList &&
             challengeList.length > 1 &&
             numberToDisplay < challengeList.length) &&
@@ -246,27 +229,6 @@ class ChallengeCardList extends Component {
               {!(numberDisplayed) && (
                 <ChallengesNotAvailableToShow>
                   No challenges match.
-                  {/*
-                  {!!(searchText || showAllEndorsements || showThisYear || showUpcomingEndorsements) && (
-                    <>
-                      {' '}
-                      <Link className="u-link-color" to="/start-a-challenge">
-                        Start a challenge
-                        {(searchText && searchText.length > 0) && (
-                          <>
-                            {' '}
-                            related to
-                            {' '}
-                            &quot;
-                            {searchText}
-                            &quot;
-                          </>
-                        )}
-                      </Link>
-                      .
-                    </>
-                  )}
-                  */}
                 </ChallengesNotAvailableToShow>
               )}
             </div>
@@ -309,6 +271,9 @@ const ChallengeCardForListVerticalWrapper = styled('div')`
   max-width: 250px;
   margin-right: 5px;
   margin-bottom: 20px;
+  @media (max-width: 600px) {
+    margin-bottom: 80px;
+  }
 `;
 
 const JoinedButtonsInnerWrapper = styled('div')`

@@ -306,7 +306,7 @@ class HeaderNotificationMenu extends Component {
           open={menuOpen}
           onClose={this.handleClose}
           elevation={2}
-           anchorEl={anchorEl}
+          anchorEl={anchorEl}
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'right',

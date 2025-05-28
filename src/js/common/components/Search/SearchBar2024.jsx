@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { blurTextFieldAndroid, focusTextFieldAndroid } from '../../utils/cordovaUtils';
 import { renderLog } from '../../utils/logging';
 import SearchBase from './SearchBase';
 import VoterStore from '../../../stores/VoterStore';
-import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 /* eslint-disable jsx-a11y/control-has-associated-label  */
 class SearchBar2024 extends Component {
@@ -16,7 +17,7 @@ class SearchBar2024 extends Component {
       searchString: '',
     };
 
-    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleSearchBarKeyPress = this.handleSearchBarKeyPress.bind(this);
     this.updateResults = this.updateResults.bind(this);
     this.clearQuery = this.clearQuery.bind(this);
   }
@@ -58,32 +59,38 @@ class SearchBar2024 extends Component {
     }
   }
 
-  
- handleKeyPress = () => {
-  if (this.timer) {
-    clearTimeout(this.timer);
-  }
-  this.timer = setTimeout(() => {
-    const { searchString } = this.state;
-    if (searchString.length === 0) {
-      return;
+  handleSearchBarKeyPress = () => {
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
-    this.props.searchFunction(searchString);
-    if(this.props.trackSearch){
-    const dataLayerObject = {
-      event: 'searchKeyword',
-      searchKeyword: searchString,
-      user:{
-        voterWeVoteId: VoterStore.getVoterWeVoteId()
+    this.timer = setTimeout(() => {
+      const { searchString } = this.state;
+      if (searchString.length === 0) {
+        return;
       }
-    };
-    //console.log(dataLayerObject)
-    TagManager.dataLayer({dataLayer: dataLayerObject});
-  }
-  }, 3000);
-  const { searchString } = this.state;
-  this.props.searchFunction(searchString);
-};
+      this.props.searchFunction(searchString);
+      // if(this.props.trackSearch){
+      const dataLayerObject = {
+        event: 'searchKeyword',
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        pageDetails: {
+          pageType: page.pageType,
+          pageName: page.pageName,
+          pathname: currentPathname,
+        },
+        searchString,
+      };
+      // console.log(dataLayerObject)
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+    }, this.props.searchUpdateDelayTime);
+    const { searchString } = this.state;
+    this.props.searchFunction(searchString);
+  };
 
   clearQuery () {
     this.props.clearFunction();
@@ -108,7 +115,7 @@ class SearchBar2024 extends Component {
           id="search_input"
           placeholder={placeholder}
           value={searchString}
-          onKeyDown={this.handleKeyPress}
+          onKeyDown={this.handleSearchBarKeyPress}
           onChange={this.updateResults}
           onFocus={() => focusTextFieldAndroid('SearchBar2024')}
           onBlur={blurTextFieldAndroid}

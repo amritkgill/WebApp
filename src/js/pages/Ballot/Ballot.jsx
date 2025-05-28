@@ -1513,10 +1513,20 @@ class Ballot extends Component {
                                                 <div className="ballot_filter_btns">
                                                   <Badge
                                                     badgeContent={ballotItemsByFilterType.length}
-                                                    classes={{ badge: classes.badge, colorPrimary: classes.badgeColorPrimary }}
+                                                    classes={{
+                                                      badge: classes.badge,
+                                                      colorPrimary: classes.badgeColorPrimary,
+                                                      root: classes.badgeRoot,
+                                                    }}
                                                     color={(oneTypeOfBallotItem === raceLevelFilterType && !isSearching) ? 'primary' : 'default'}
                                                     id={`ballotBadgeDesktop-${oneTypeOfBallotItem}`}
                                                     invisible={ballotItemsByFilterType.length === 0}
+                                                    onFocus={(e) => {
+                                                      e.currentTarget.classList.add(classes.badgeFocused);
+                                                    }}
+                                                    onBlur={(e) => {
+                                                      e.currentTarget.classList.remove(classes.badgeFocused);
+                                                    }}
                                                   >
                                                     {ballotChip}
                                                   </Badge>
@@ -1740,6 +1750,13 @@ const styles = (theme) => ({
     '@media print': {
       color: theme.palette.primary.main,
     },
+  },
+  badgeFocused: {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: '2px',
+  },
+  badgeRoot: {
+    display: 'inline-block', // This ensures the focus outline wraps around the entire badge
   },
   unselectedBadgeColorPrimary: {
     background: 'rgba(0, 0, 0, .2)',

@@ -1,14 +1,14 @@
 import { Close, Search } from '@mui/icons-material';
 import { IconButton, InputBase } from '@mui/material';
-import styled from 'styled-components';
 import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
-import sortBy from 'lodash-es/sortBy';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import BallotActions from '../../actions/BallotActions';
 import OrganizationActions from '../../actions/OrganizationActions';
 import { blurTextFieldAndroid, focusTextFieldAndroid, isAndroidSizeWide } from '../../common/utils/cordovaUtils';
+import { isAndroid } from '../../common/utils/isCordovaOrWebApp';
 import BallotStore from '../../stores/BallotStore';
 import OrganizationStore from '../../stores/OrganizationStore';
 import ballotSearchPriority from '../../utils/ballotSearchPriority';
@@ -67,7 +67,7 @@ class FilterBaseSearch extends Component {
     this.organizationStoreListener.remove();
   }
 
-  handleSearch (event) { // eslint-disable-line consistent-return
+  handleSearch (event) {
     // if search bar always open, isSearching is toggled only when input is given text is cleared with 'x' button
     if (this.props.alwaysOpen && event.target.value && !this.props.isSearching) {
       this.toggleSearch();
@@ -100,6 +100,7 @@ class FilterBaseSearch extends Component {
       // console.log('sortedFiltered:', sortedFiltered);
       return this.props.onFilterBaseSearch(searchText, sortedFiltered.length ? sortedFiltered : []);
     }, delayBeforeSearchExecution);
+    return [];
   }
 
   onBallotStoreChange () {
@@ -129,51 +130,47 @@ class FilterBaseSearch extends Component {
 
     const searchWords = search.toLowerCase().match(/\b(\w+)\b/g) || [];
 
-    return this.props.allItems
-      .map((item) => {
-        // If no candidate list, return item as-is. If removed creates filter error
-        if (!item.candidate_list || item.candidate_list.length === 0) {
-          return item;
-        }
-        const filteredCandidates = item.candidate_list.filter(candidate =>
-          searchWords.every((searchWord) =>
-            candidate.ballot_item_display_name.toLowerCase().includes(searchWord),
+    return this.props.allItems.map((item) => {
+      // If no candidate list, return item as-is. If removed creates filter error
+      if (!item.candidate_list || item.candidate_list.length === 0) {
+        return item;
+      }
+      const filteredCandidates = item.candidate_list.filter(
+        (candidate) => searchWords.every(
+          (searchWord) => candidate.ballot_item_display_name.toLowerCase().includes(searchWord),
+        ),
+      );
+      const candidateMatchFound = filteredCandidates.length > 0;
+      const ballotItemNameMatch = searchWords.every(
+        (searchWord) => item.ballot_item_display_name.toLowerCase().includes(searchWord),
+      );
 
-          ),
-        );
-
-        const candidateMatchFound = filteredCandidates.length > 0;
-        const ballotItemNameMatch = searchWords.every((searchWord) =>
-          item.ballot_item_display_name.toLowerCase().includes(searchWord)
-
-        );
-
-        let searchResults;
-        if (opinionsAndBallotItemsSearchMode) {
-          searchResults = opinionsAndBallotItemsSearchPriority(search, item);
-        } else if (positionSearchMode) {
-          searchResults = positionSearchPriority(search, item);
-        } else if (voterGuidePositionSearchMode) {
-          searchResults = voterGuidePositionSearchPriority(search, item);
-        } else {
-          const ignoreDescriptionFields = addVoterGuideMode;
-          searchResults = ballotSearchPriority(search, item, ignoreDescriptionFields);
-        }
-        return {
-          ...item,
-          ...searchResults,
-          candidate_list: filteredCandidates,
-          candidateMatchFound,
-          foundInSearchWords: candidateMatchFound || ballotItemNameMatch,
-        };
-      })
-      .filter((item) => {
-        // Keep items that have matching candidates or match ballot item name and have a search priority
-        return (item.foundInSearchWords && item.searchPriority > 0) ||
-          (item.candidate_list && item.candidate_list.length > 0);
-      })
+      let searchResults;
+      if (opinionsAndBallotItemsSearchMode) {
+        searchResults = opinionsAndBallotItemsSearchPriority(search, item);
+      } else if (positionSearchMode) {
+        searchResults = positionSearchPriority(search, item);
+      } else if (voterGuidePositionSearchMode) {
+        searchResults = voterGuidePositionSearchPriority(search, item);
+      } else {
+        const ignoreDescriptionFields = addVoterGuideMode;
+        searchResults = ballotSearchPriority(search, item, ignoreDescriptionFields);
+      }
+      return {
+        ...item,
+        ...searchResults,
+        candidate_list: filteredCandidates,
+        candidateMatchFound,
+        foundInSearchWords: candidateMatchFound || ballotItemNameMatch,
+      };
+    }).filter(
+      // Keep items that have matching candidates or match ballot item name and have a search priority
+      (item) => (item.foundInSearchWords && item.searchPriority > 0) ||
+          (item.candidate_list && item.candidate_list.length > 0),
+    ).sort(
       // Sort by priority level, descending order
-      .sort((a, b) => b.searchPriority - a.searchPriority);
+      (a, b) => b.searchPriority - a.searchPriority,
+    );
   };
 
   toggleSearch = () => {
@@ -221,6 +218,12 @@ class FilterBaseSearch extends Component {
     }
   }
 
+  bigAndroidClick = (isSearching, alwaysOpen) => {
+    // console.log('bigAndroidClick ------------------');
+    if (isAndroid() && !isSearching && !alwaysOpen) {
+      this.toggleSearch();
+    }
+  }
 
   render () {
     const { alwaysOpen, classes, isSearching, searchTextLarge, theme } = this.props;
@@ -238,40 +241,48 @@ class FilterBaseSearch extends Component {
     }
     // console.log('FilterBaseSearch render');
     return (
-      <SearchWrapper
-        brandBlue={theme.palette.primary.main}
-        isSearching={isSearching}
-        searchTextLarge={searchTextLarge}
-        // searchOpen={isSearching || alwaysOpen}
-      >
-        <IconButton
-          classes={{ root: classes.iconButtonRoot }}
-          onClick={!alwaysOpen ? this.toggleSearch : undefined}
-          size="large"
-          aria-label="Search Button"
-        >
-          <Search classes={{ root: searchIconClasses }} />
-        </IconButton>
-        <Separator isSearching={isSearching} alwaysOpen={alwaysOpen} />
-        <InputBase
-          classes={{ input: inputBaseInputClasses, root: inputBaseRootClasses }}
-          inputRef={(input) => { this.searchInput = input; }}
-          onChange={this.handleSearch}
-          value={searchText}
-          onFocus={focusTextFieldAndroid}
-          onBlur={blurTextFieldAndroid}
-          placeholder="Search"
-        />
-        <Closer
+      <BigAndroidClickableTarget id="androidClickableTarget" onClick={() => this.bigAndroidClick(isSearching, alwaysOpen)}>
+        <SearchWrapper
+          brandBlue={theme.palette.primary.main}
           isSearching={isSearching}
-          onClick={(isSearching || !alwaysOpen) ? this.toggleSearch : undefined}
-          showCloser={isSearching}
+          searchTextLarge={searchTextLarge}
+          // searchOpen={isSearching || alwaysOpen}
         >
-          <IconButton classes={{ root: classes.iconButtonRoot }} size="large">
-            <Close classes={{ root: classes.closeIconRoot }} />
+          <IconButton
+            classes={{ root: classes.iconButtonRoot }}
+            id="searchIcon"
+            onClick={(!isAndroid() && !alwaysOpen) ? this.toggleSearch : undefined}
+            size="large"
+            aria-label="Search Button"
+            tabIndex={0}
+          >
+            <Search classes={{ root: searchIconClasses }} />
           </IconButton>
-        </Closer>
-      </SearchWrapper>
+          <Separator isSearching={isSearching} alwaysOpen={alwaysOpen} />
+          <InputBase
+            classes={{ input: inputBaseInputClasses, root: inputBaseRootClasses }}
+            id="searchInput"
+            inputRef={(input) => { this.searchInput = input; }}
+            onChange={this.handleSearch}
+            value={searchText}
+            onFocus={() => focusTextFieldAndroid('FilterBaseSearch')}
+            onBlur={blurTextFieldAndroid}
+            placeholder="Search"
+            tabIndex={isSearching ? 0 : -1}
+          />
+          <Closer
+            id="searchCloseButton"
+            isSearching={isSearching}
+            onClick={(isSearching || !alwaysOpen) ? this.toggleSearch : undefined}
+            showCloser={isSearching}
+            tabIndex={isSearching ? 0 : -1}
+          >
+            <IconButton classes={{ root: classes.iconButtonRoot }} size="large">
+              <Close classes={{ root: classes.closeIconRoot }} />
+            </IconButton>
+          </Closer>
+        </SearchWrapper>
+      </BigAndroidClickableTarget>
     );
   }
 }
@@ -395,6 +406,13 @@ const Separator = styled('div', {
   // width: 1px;
   // background: rgba(0, 0, 0, .3);
 `));
+
+const BigAndroidClickableTarget = styled.div`
+  padding: ${() => (isAndroid() ? '10px' : '')};
+  position: ${() => (isAndroid() ? 'relative' : '')};
+  top: ${() => (isAndroid() ? '-10px' : '')};
+`;
+/* For diagnosis: background-color: ${() => (isAndroid() ? 'lightgoldenrodyellow' : '')}; */
 
 const SearchWrapper = styled('div', {
   shouldForwardProp: (prop) => !['isSearching', 'brandBlue', 'searchTextLarge'].includes(prop),
