@@ -2,20 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import TagManager from "react-gtm-module";
-import {
-  convertStateTextToStateCode,
-  stateCodeMap,
-} from "../../common/utils/addressFunctions";
+import { convertStateTextToStateCode, stateCodeMap } from "../../common/utils/addressFunctions";
 import lookupPageNameAndPageTypeDict from "../../utils/lookupPageNameAndPageTypeDict";
 import VoterStore from "../../stores/VoterStore";
 // React functional component example
-export default function FooterCandidateList() {
+export default function FooterCandidateList () {
   const stateNameList = Object.values(stateCodeMap);
   let stateCode;
   let stateNamePhrase;
   let stateNamePhraseLowerCase;
 
-  function handleClick(linkTo) {
+  function handleClick (linkTo) {
     const {
       location: { pathname: currentPathname },
     } = window;
@@ -23,10 +20,11 @@ export default function FooterCandidateList() {
     const destinationPage = lookupPageNameAndPageTypeDict(linkTo);
 
     const dataLayerObject = {
-      // You can name this variable anything, e.g., 'dataToPus
       event: "click",
       userDetails: {
         voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
       },
       pageDetails: {
         pageType: page.pageType,
