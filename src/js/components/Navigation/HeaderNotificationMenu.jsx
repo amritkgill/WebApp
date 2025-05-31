@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
-import TagManager from 'react-gtm-module';
 import ActivityActions from '../../actions/ActivityActions';
 import apiCalming from '../../common/utils/apiCalming';
 import { isIOSAppOnMac, setIconBadgeMessageCount } from '../../common/utils/cordovaUtils';
@@ -275,10 +274,10 @@ onSettingsClick = (currentPathname) => {
     const { activityNoticeIdListNotSeen } = this.state;
     ActivityActions.activityNoticeListRetrieve([], activityNoticeIdListNotSeen);
     ActivityActions.activityListRetrieve();
-    
+
     const { location: { pathname: currentPathname } } = window;
     const page = lookupPageNameAndPageTypeDict(currentPathname);
-    
+
     TagManager.dataLayer({
       dataLayer: {
         event: 'click',
@@ -297,7 +296,7 @@ onSettingsClick = (currentPathname) => {
         },
       },
     });
-    
+
     this.setState({
       anchorEl: event.currentTarget,
       menuOpen: true,
