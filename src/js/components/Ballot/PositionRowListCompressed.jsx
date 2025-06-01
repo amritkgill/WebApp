@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import FriendActions from '../../actions/FriendActions';
 import OrganizationActions from '../../actions/OrganizationActions';
 import LoadingWheel from '../../common/components/Widgets/LoadingWheel';
@@ -20,7 +21,6 @@ import IssueStore from '../../stores/IssueStore';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import MeasureStore from '../../stores/MeasureStore';
 import OrganizationStore from '../../stores/OrganizationStore';
-import TagManager from 'react-gtm-module';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import VoterStore from '../../stores/VoterStore';
 import LazyImage from '../../common/components/LazyImage';
@@ -38,72 +38,12 @@ class PositionRowListCompressed extends Component {
     super(props);
     this.state = {
       filteredPositionList: [],
-      filteredPositionListLength: 0,
+      // filteredPositionListLength: 0,
       numberOfImagesToDisplay: STARTING_NUMBER_OF_IMAGES_TO_DISPLAY,
       numberOfNamesToDisplay: STARTING_NUMBER_OF_NAMES_TO_DISPLAY,
-      supportPositionListLength: 0,
+      // supportPositionListLength: 0,
     };
   }
-  handleTalkingAboutClick = () => {
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
-    const dataLayerObject = {
-      event: 'clickTalkingAbout',
-      candidateDetails: {
-        candidateName: this.props.candidateName,
-        candidateWeVoteId: this.props.ballotItemWeVoteId,
-      },
-      destinationDetails: {
-        destinationPageName: currentPage.pageName,
-        destinationPageType: "CandidateEndorsementModal",
-        destinationPathname: currentPathname,
-      },
-      endorsementDetails: {
-        endorsementCount: this.getEndorsementCount(),
-        interactionType: "click_talking_about",
-        organizationCount: this.getOrganizationCount(),
-        talkingAboutText: this.getTalkingAboutText(),
-      },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort?.() || 'unknown',
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
-    };
-
-    TagManager.dataLayer({dataLayer: dataLayerObject});
-    console.log('Talking about click tracked');
-  };
-  // Helper methods for the dataLayer
-  getEndorsementCount = () => {
-    const { positionListFromFriendsHasBeenRetrieved } = this.props;
-    return positionListFromFriendsHasBeenRetrieved ? positionListFromFriendsHasBeenRetrieved.length : 0;
-  };
-
-  getOrganizationCount = () => {
-    const { positionListFromFriendsHasBeenRetrieved } = this.props;
-    if (!positionListFromFriendsHasBeenRetrieved) return 0;
-
-    const uniqueOrgs = new Set(
-      positionListFromFriendsHasBeenRetrieved.map(position => position.speaker_we_vote_id)
-    );
-    return uniqueOrgs.size;
-  };
-
-  getTalkingAboutText = () => {
-    const { candidateName } = this.props;
-    const endorsementCount = this.getEndorsementCount();
-
-    if (endorsementCount === 0) return '';
-    if (endorsementCount === 1) return `is talking about ${candidateName}`;
-    return `are talking about ${candidateName}`;
-  };
 
   componentDidMount () {
     // console.log('PositionRowListCompressed componentDidMount');
@@ -150,9 +90,58 @@ class PositionRowListCompressed extends Component {
     if (this.positionItemTimer) clearTimeout(this.positionItemTimer);
   }
 
-  onBallotStoreChange () {
-    // console.log('PositionRowListCompressed onBallotStoreChange');
-    this.onCachedPositionsChange();
+  handleTalkingAboutClick = () => {
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      event: 'clickTalkingAbout',
+      candidateDetails: {
+        candidateName: this.props.candidateName,
+        candidateWeVoteId: this.props.ballotItemWeVoteId,
+      },
+      destinationDetails: {
+        destinationPageName: currentPage.pageName,
+        destinationPageType: 'CandidateEndorsementModal',
+        destinationPathname: currentPathname,
+      },
+      endorsementDetails: {
+        endorsementCount: this.getEndorsementCount(),
+        interactionType: 'click_talking_about',
+        organizationCount: this.getOrganizationCount(),
+        talkingAboutText: this.getTalkingAboutText(),
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort?.() || 'unknown',
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+    console.log('Talking about click tracked');
+  };
+
+  onClickShowOrganizationModalWithBallotItemInfoAndPositions () {
+    const { ballotItemWeVoteId } = this.props;
+    AppObservableStore.setOrganizationModalBallotItemWeVoteId(ballotItemWeVoteId);
+    AppObservableStore.setShowOrganizationModal(true);
+  }
+
+  onClickShowOrganizationModalWithPositions () {
+    this.handleTalkingAboutClick();
+    const { ballotItemWeVoteId } = this.props;
+    // console.log(ballotItemWeVoteId)
+    // console.log('onClickShowOrganizationModalWithPositions, ballotItemWeVoteId:', ballotItemWeVoteId);
+    AppObservableStore.setOrganizationModalBallotItemWeVoteId(ballotItemWeVoteId);
+    AppObservableStore.setShowOrganizationModal(true);
+    AppObservableStore.setHideOrganizationModalBallotItemInfo(true);
   }
 
   onCandidateStoreChange () {
@@ -202,24 +191,32 @@ class PositionRowListCompressed extends Component {
     this.onCachedPositionsChange();
   }
 
-  onClickShowOrganizationModalWithPositions () {
-    this.handleTalkingAboutClick();
-    const { ballotItemWeVoteId } = this.props;
-    // console.log(ballotItemWeVoteId)
-    // console.log('onClickShowOrganizationModalWithPositions, ballotItemWeVoteId:', ballotItemWeVoteId);
-    AppObservableStore.setOrganizationModalBallotItemWeVoteId(ballotItemWeVoteId);
-    AppObservableStore.setShowOrganizationModal(true);
-    AppObservableStore.setHideOrganizationModalBallotItemInfo(true);
-  }
+  getTalkingAboutText = () => {
+    const { candidateName } = this.props;
+    const endorsementCount = this.getEndorsementCount();
 
-  onClickShowOrganizationModalWithBallotItemInfoAndPositions () {
-    const { ballotItemWeVoteId } = this.props;
-    AppObservableStore.setOrganizationModalBallotItemWeVoteId(ballotItemWeVoteId);
-    AppObservableStore.setShowOrganizationModal(true);
-  }
+    if (endorsementCount === 0) return '';
+    if (endorsementCount === 1) return `is talking about ${candidateName}`;
+    return `are talking about ${candidateName}`;
+  };
+
+  getOrganizationCount = () => {
+    const { positionListFromFriendsHasBeenRetrieved } = this.props;
+    if (!positionListFromFriendsHasBeenRetrieved) return 0;
+
+    const uniqueOrgs = new Set(
+      positionListFromFriendsHasBeenRetrieved.map((position) => position.speaker_we_vote_id),
+    );
+    return uniqueOrgs.size;
+  };
+
+  getEndorsementCount = () => {
+    const { positionListFromFriendsHasBeenRetrieved } = this.props;
+    return positionListFromFriendsHasBeenRetrieved ? positionListFromFriendsHasBeenRetrieved.length : 0;
+  };
 
   onPositionListUpdate = (allCachedPositionsForThisBallotItem) => {
-    const { showInfoOnly, showOppose, showOpposeDisplayNameIfNoSupport, showSupport } = this.props;
+    const { showInfoOnly, showOppose, showSupport } = this.props;
     const organizationsVoterIsFollowing = OrganizationStore.getOrganizationsVoterIsFollowing();
     // eslint-disable-next-line arrow-body-style
     let filteredPositionList = allCachedPositionsForThisBallotItem.map((position) => {
@@ -250,13 +247,10 @@ class PositionRowListCompressed extends Component {
       });
     });
 
-    if (showOpposeDisplayNameIfNoSupport) {
-      let supportPositionList = JSON.parse(JSON.stringify(filteredPositionList));
-      supportPositionList = limitToShowSupport(supportPositionList);
-      this.setState({
-        supportPositionListLength: supportPositionList.length,
-      });
-    }
+    // if (showOpposeDisplayNameIfNoSupport) {
+    //   let supportPositionList = JSON.parse(JSON.stringify(filteredPositionList));
+    //   supportPositionList = limitToShowSupport(supportPositionList);
+    // }
 
     if (showInfoOnly) {
       filteredPositionList = limitToShowInfoOnly(filteredPositionList);
@@ -275,7 +269,7 @@ class PositionRowListCompressed extends Component {
     // console.log('PositionRowListCompressed onPositionListUpdate, filteredPositionList:', filteredPositionList);
     this.setState({
       filteredPositionList,
-      filteredPositionListLength: filteredPositionList.length,
+      // filteredPositionListLength: filteredPositionList.length,
     });
   }
 
@@ -306,7 +300,7 @@ class PositionRowListCompressed extends Component {
     //   showOpposeDisplayNameIfNoSupport, showSupport,
     // } = this.props;
     const {
-      filteredPositionList, filteredPositionListLength, numberOfImagesToDisplay, numberOfNamesToDisplay,
+      filteredPositionList, numberOfImagesToDisplay, numberOfNamesToDisplay,
       // supportPositionListLength,
     } = this.state;
     renderLog('PositionRowListCompressed');  // Set LOG_RENDER_EVENTS to log all renders
@@ -362,7 +356,11 @@ class PositionRowListCompressed extends Component {
               </>
             ) : (
               <>
-                See endorsements from {filteredPositionList.length} advocates, like:
+                See endorsements from
+                {' '}
+                {filteredPositionList.length}
+                {' '}
+                advocates, like:
               </>
             )}
             <br />
@@ -450,13 +448,16 @@ class PositionRowListCompressed extends Component {
     );
   }
 }
+
 PositionRowListCompressed.propTypes = {
   ballotItemWeVoteId: PropTypes.string.isRequired,
+  candidateName: PropTypes.string,
+  firstInstance: PropTypes.bool,
+  positionListFromFriendsHasBeenRetrieved: PropTypes.array,
   showInfoOnly: PropTypes.bool,
   showOppose: PropTypes.bool,
-  showOpposeDisplayNameIfNoSupport: PropTypes.bool,
+  // showOpposeDisplayNameIfNoSupport: PropTypes.bool,
   showSupport: PropTypes.bool,
-  firstInstance: PropTypes.bool,
 };
 
 const styles = () => ({
