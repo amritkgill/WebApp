@@ -125,7 +125,7 @@ class PositionRowListCompressed extends Component {
 
     TagManager.dataLayer({ dataLayer: dataLayerObject });
 
-    console.log('Talking about click tracked');
+    // console.log('Talking about click tracked');
   };
 
   onClickShowOrganizationModalWithBallotItemInfoAndPositions () {
