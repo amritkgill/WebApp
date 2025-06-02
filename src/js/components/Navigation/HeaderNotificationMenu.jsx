@@ -259,6 +259,8 @@ class HeaderNotificationMenu extends Component {
         event: 'click',
         userDetails: {
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
+          stateCode: VoterStore.getVoterStateCode(),
+          userCohort: VoterStore.getAnalyticsUserCohort(),
         },
         pageDetails: {
           pageType: page.pageType,
