@@ -10,6 +10,7 @@ import { isAndroid, isCordova } from '../../utils/isCordovaOrWebApp';
 import { renderLog } from '../../utils/logging';
 import politicianListToSentenceString from '../../utils/politicianListToSentenceString';
 import { androidTwitterClickHandler, generateQuoteForSharing, generateSharingLink } from './shareButtonCommon';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class ShareOnTwitterButton extends Component {
   constructor (props) {
@@ -84,16 +85,24 @@ class ShareOnTwitterButton extends Component {
 
   saveActionShareButton = () => {
     CampaignSupporterActions.shareButtonClicked(true);
+
+    // datalayer for Twitter
+    const { shareType, campaignXWeVoteId } = this.props;
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'ShareBallotTwitterClick',
       shareDetails: {
         platform: 'Twitter',
-        campaignXWeVoteId: this.props.campaignXWeVoteId || null,
+        shareType: shareType || 'ballotWithChoices',
+        campaignXWeVoteId: campaignXWeVoteId || null,
       },
       pageDetails: {
-        pageName: 'ShareBallotModal',
-        pathname: window.location.pathname,
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
       },
       timestamp: new Date().toISOString(),
     });
@@ -148,6 +157,7 @@ class ShareOnTwitterButton extends Component {
 ShareOnTwitterButton.propTypes = {
   campaignXNewsItemWeVoteId: PropTypes.string,
   campaignXWeVoteId: PropTypes.string,
+  shareType: PropTypes.string,
   mobileMode: PropTypes.bool,
 };
 
