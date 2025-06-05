@@ -2,12 +2,14 @@ import { Edit } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import daysUntil from '../../common/utils/daysUntil';
 import { renderLog } from '../../common/utils/logging';
 import stringContains from '../../common/utils/stringContains';
 import AppObservableStore from '../../common/stores/AppObservableStore';
 import BallotStore from '../../stores/BallotStore';
 import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import {
   BallotAddress,
   ClickBlockWrapper,
@@ -63,6 +65,26 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
     this.setState({
       textForMapSearch: VoterStore.getTextForMapSearch(),
     });
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const dataLayerObject = {
+      event: 'click',
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      ballotAddressDetails: {
+        address: VoterStore.getTextForMapSearch(),
+      },
+    };
+    console.log('dataLayerObject:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   showSelectBallotModalChooseElection = () => {
@@ -172,9 +194,10 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
                             tabIndex={0}
                             role="button"
                             onKeyDown={(event) => {
-                              if (event.key === 'Enter') this.showSelectBallotModalEditAddress()
-                              }}
-                            className={linksOff ? '' : 'u-link-color'}>
+                              if (event.key === 'Enter') this.showSelectBallotModalEditAddress();
+                            }}
+                            className={linksOff ? '' : 'u-link-color'}
+                          >
                             {textForMapSearch}
                           </span>
                         </BallotAddress>
