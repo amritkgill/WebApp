@@ -97,22 +97,46 @@ class HeaderNotificationMenu extends Component {
     }
   }
 
-  onSettingsClick = () => {
-    this.handleClose();
-    historyPush('/settings/notifications');
-  }
+
+onSettingsClick = (currentPathname) => {
+  const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+  const destinationPage = lookupPageNameAndPageTypeDict('/settings/notifications');
+  TagManager.dataLayer({
+    dataLayer: {
+      event: 'clickSettingsButton', // Added detailed event name
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName,
+        destinationPageType: destinationPage.pageType,
+        destinationPathname: '/settings/notifications',
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    },
+  });
+  this.handleClose();
+  historyPush('/settings/notifications');
+}
 
   generateMenuItemList = (allActivityNotices) => {
     const { classes } = this.props;
     const voterWeVoteId = VoterStore.getVoterWeVoteId();
     const menuItemList = [];
+    const { location: { pathname: currentPathname } } = window; // Get path here
     menuItemList.push(
       <MenuItem
         className={classes.menuItemClicked}
         data-toggle="dropdown"
         id="notificationsHeader"
         key="notificationsHeader"
-        onClick={this.onSettingsClick}
+        onClick={() => this.onSettingsClick(currentPathname)}
       >
         <NotificationsHeaderWrapper>
           <NotificationsTitle>
@@ -250,10 +274,10 @@ class HeaderNotificationMenu extends Component {
     const { activityNoticeIdListNotSeen } = this.state;
     ActivityActions.activityNoticeListRetrieve([], activityNoticeIdListNotSeen);
     ActivityActions.activityListRetrieve();
-    
+
     const { location: { pathname: currentPathname } } = window;
     const page = lookupPageNameAndPageTypeDict(currentPathname);
-    
+
     TagManager.dataLayer({
       dataLayer: {
         event: 'click',
@@ -272,7 +296,7 @@ class HeaderNotificationMenu extends Component {
         },
       },
     });
-    
+
     this.setState({
       anchorEl: event.currentTarget,
       menuOpen: true,
