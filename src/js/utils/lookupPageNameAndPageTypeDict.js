@@ -115,6 +115,9 @@ function calculatePageNameAndPageTypeDict (path) {
   } else if (path.startsWith('/news')) {
     settingsPageName = 'News';
     settingsPageType = 'news';
+  } else if (path.startsWith('/value/')) {
+    settingsPageName = 'IssuePage';
+    settingsPageType = 'issue';
   } else if (isPoliticianSEOFriendlyURL(path)) {
     // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
     settingsPageType = 'politician';

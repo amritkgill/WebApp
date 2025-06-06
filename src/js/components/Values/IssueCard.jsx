@@ -147,13 +147,19 @@ class IssueCard extends Component {
     const { location: { pathname: currentPathname } } = window;
     const { issue } = this.state;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPathname = this.getIssueLink();
+    const { destinationPageName, destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
+
     TagManager.dataLayer({
       dataLayer: {
-        event: 'issueClick',
+        event: 'action',
         pageDetails: {
           pageName,
           pageType,
           pathname: currentPathname,
+        },
+        actionDetails: {
+          buttonId: 'valueListLink',
         },
         userDetails: {
           stateCode: VoterStore.getVoterStateCode(),
@@ -165,6 +171,11 @@ class IssueCard extends Component {
           consideredRight: issue.considered_right,
           topicName: issue.issue_name,
           topicWeVoteId: issue.issue_we_vote_id,
+        },
+        destinationDetails: {
+          destinationPageName,
+          destinationPageType,
+          destinationPathname,
         },
       },
     });
@@ -611,7 +622,5 @@ const OrganizationImage = styled('img', {
   width: 32px;
   z-index: ${200 - organizationImageCount};
 `));
-
-
 
 export default IssueCard;
