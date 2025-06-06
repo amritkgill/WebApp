@@ -122,23 +122,29 @@ class PositionRowListCompressed extends Component {
     // Add candidate or measure details based on ballotItemWeVoteId
     if (ballotItemWeVoteId.includes('cand')) {
       const candidate = CandidateStore.getCandidateByWeVoteId(ballotItemWeVoteId);
+
+      // console.log('Candidate object structure:', candidate);
+      // console.log('Available candidate properties:', candidate ? Object.keys(candidate) : 'No candidate found');
+
       dataLayerObject.candidateDetails = {
         candidateWeVoteId: ballotItemWeVoteId,
-        candidateName: candidate ? candidate.ballot_item_display_name : '',
+        candidateName: candidate ? CandidateStore.getCandidateName(ballotItemWeVoteId) : '',
         // Add other properties from spreadsheet as available:
-        // image: candidate ? candidate.candidate_photo_url : '',
-        // officeName: candidate ? candidate.contest_office_name : '',
-        // politicalParty: candidate ? candidate.party : '',
-        // stateCode: candidate ? candidate.state_code : '',
+        image: candidate ? candidate.candidate_photo_url_medium : '',
+        officeName: candidate ? candidate.contest_office_name : '',
+        politicalParty: candidate ? candidate.party : '',
+        stateCode: candidate ? candidate.state_code : '',
       };
+      // console.log('Final candidateDetails for analytics:', dataLayerObject.candidateDetails);
     } else if (ballotItemWeVoteId.includes('meas')) {
       dataLayerObject.measureDetails = {
         measureWeVoteId: ballotItemWeVoteId,
         measureName: MeasureStore.getMeasureName(ballotItemWeVoteId),
         // stateCode: // Add if available
       };
+      // console.log('Final measureDetails for analytics:', dataLayerObject.measureDetails);
     }
-
+    // console.log('Complete dataLayerObject being sent to analytics:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     // console.log('Talking about click tracked');
@@ -226,18 +232,46 @@ class PositionRowListCompressed extends Component {
   };
 
   getOrganizationCount = () => {
-    const { positionListFromFriendsHasBeenRetrieved } = this.props;
-    if (!positionListFromFriendsHasBeenRetrieved) return 0;
-
+    const { ballotItemWeVoteId } = this.props;
+    // Get all positions for this ballot item
+    let allCachedPositionsForThisBallotItem;
+    if (ballotItemWeVoteId.includes('cand')) {
+      allCachedPositionsForThisBallotItem = CandidateStore.getAllCachedPositionsByCandidateWeVoteId(ballotItemWeVoteId);
+    } else if (ballotItemWeVoteId.includes('meas')) {
+      allCachedPositionsForThisBallotItem = MeasureStore.getAllCachedPositionsByMeasureWeVoteId(ballotItemWeVoteId);
+    }
+    if (!allCachedPositionsForThisBallotItem) return 0;
+    // Get friend organization IDs
+    const friendOrgIds = FriendStore.currentFriendsOrganizationWeVoteIDList();
+    if (!friendOrgIds || friendOrgIds.length === 0) return 0;
+    // Filter positions to only include friend organizations
+    const friendPositions = allCachedPositionsForThisBallotItem.filter(
+      (position) => friendOrgIds.includes(position.speaker_we_vote_id),
+    );
     const uniqueOrgs = new Set(
-      positionListFromFriendsHasBeenRetrieved.map((position) => position.speaker_we_vote_id),
+      friendPositions.map((position) => position.speaker_we_vote_id),
     );
     return uniqueOrgs.size;
   };
 
   getEndorsementCount = () => {
-    const { positionListFromFriendsHasBeenRetrieved } = this.props;
-    return positionListFromFriendsHasBeenRetrieved ? positionListFromFriendsHasBeenRetrieved.length : 0;
+    const { ballotItemWeVoteId } = this.props;
+    // Get all positions for this ballot item
+    let allCachedPositionsForThisBallotItem;
+    if (ballotItemWeVoteId.includes('cand')) {
+      allCachedPositionsForThisBallotItem = CandidateStore.getAllCachedPositionsByCandidateWeVoteId(ballotItemWeVoteId);
+    } else if (ballotItemWeVoteId.includes('meas')) {
+      allCachedPositionsForThisBallotItem = MeasureStore.getAllCachedPositionsByMeasureWeVoteId(ballotItemWeVoteId);
+    }
+    if (!allCachedPositionsForThisBallotItem) return 0;
+    // Get friend organization IDs
+    const friendOrgIds = FriendStore.currentFriendsOrganizationWeVoteIDList();
+    if (!friendOrgIds || friendOrgIds.length === 0) return 0;
+    // Filter positions to only include friend organizations
+    const friendPositions = allCachedPositionsForThisBallotItem.filter(
+      (position) => friendOrgIds.includes(position.speaker_we_vote_id),
+    );
+    return friendPositions.length;
   };
 
   onPositionListUpdate = (allCachedPositionsForThisBallotItem) => {
@@ -477,7 +511,6 @@ class PositionRowListCompressed extends Component {
 PositionRowListCompressed.propTypes = {
   ballotItemWeVoteId: PropTypes.string.isRequired,
   firstInstance: PropTypes.bool,
-  positionListFromFriendsHasBeenRetrieved: PropTypes.array,
   showInfoOnly: PropTypes.bool,
   showOppose: PropTypes.bool,
   showSupport: PropTypes.bool,
