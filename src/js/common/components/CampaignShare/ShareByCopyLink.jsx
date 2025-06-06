@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import CampaignSupporterActions from '../../actions/CampaignSupporterActions';
 import { renderLog } from '../../utils/logging';
 import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
 import CampaignStore from '../../stores/CampaignStore';
+import VoterStore from '../../../stores/VoterStore';
 import { generateSharingLink } from './shareButtonCommon';
 import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
@@ -113,11 +115,15 @@ class ShareByCopyLink extends Component {
         pageType: page.pageType,
         pathname: currentPathname,
       },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
       timestamp: new Date().toISOString(),
     };
     console.log('DataLayer for copy link:', dataLayerObject);
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {

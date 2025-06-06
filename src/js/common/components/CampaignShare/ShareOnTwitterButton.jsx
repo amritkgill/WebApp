@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { TwitterShareButton } from 'react-share';
 import styled from 'styled-components';
+import VoterStore from '../../../stores/VoterStore';
 import CampaignSupporterActions from '../../actions/CampaignSupporterActions';
 import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
 import CampaignStore from '../../stores/CampaignStore';
@@ -103,6 +104,11 @@ class ShareOnTwitterButton extends Component {
         pageName: page.pageName,
         pageType: page.pageType,
         pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
       },
       timestamp: new Date().toISOString(),
     });

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
+import VoterStore from '../../stores/VoterStore';
 import { renderLog } from '../../common/utils/logging';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import { openSnackbar } from '../../common/components/Widgets/SnackNotifier';
@@ -78,6 +79,11 @@ class ShareModalOption extends Component {
       pageDetails: {
         pageName: 'ShareModal',
         pathname: window.location.pathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
       },
       timestamp: new Date().toISOString(),
     });
