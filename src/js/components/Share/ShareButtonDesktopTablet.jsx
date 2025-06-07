@@ -3,6 +3,7 @@ import { Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import AnalyticsActions from '../../actions/AnalyticsActions';
 import ShareActions from '../../common/actions/ShareActions';
@@ -12,6 +13,7 @@ import { renderLog } from '../../common/utils/logging';
 import stringContains from '../../common/utils/stringContains';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 class ShareButtonDesktopTablet extends Component {
   constructor (props) {
@@ -52,6 +54,42 @@ class ShareButtonDesktopTablet extends Component {
     const googleCivicElectionId = 0;
     let kindOfShare = 'BALLOT';
     let whatAndHowMuchToShare;
+
+    // Add debug logging
+    console.log('Share button clicked');
+    console.log('Current pathname:', window.location.pathname);
+    console.log('VoterWeVoteId:', VoterStore.getVoterWeVoteId());
+
+    // Add dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    
+    const dataLayerObject = {
+      event: 'shareClick',
+      userDetails: {
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+      shareDetails: {
+        kindOfShare,
+        withOpinions: withOpinionsModified,
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: 'ShareModal',
+        destinationPageType: 'share',
+        destinationPathname: currentPathname,
+      },
+    };
+    
+    console.log('Pushing to dataLayer:', dataLayerObject);
+    TagManager.dataLayer({
+      dataLayer: dataLayerObject,
+    });
+
     if (candidateShare) {
       kindOfShare = 'CANDIDATE';
       if (withOpinionsModified) {
