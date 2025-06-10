@@ -8,7 +8,7 @@ import { renderLog } from '../../common/utils/logging';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { ImportContactsOutlined, AccountBoxRounded, Lock, SecurityRounded, CampaignRounded, PeopleAltRounded, TextsmsRounded, ExitToAppRounded  } from '@mui/icons-material';
-
+import TagManager from 'react-gtm-module';
 
 const SettingsAccountLevelChip = React.lazy(() => import(/* webpackChunkName: 'SettingsAccountLeveLChip' */ '../Settings/SettingsAccountLevelChip'));
 
@@ -72,8 +72,17 @@ export default class SettingsPersonalSideBar extends Component {
   }
 
   voterSignOut = () => {
+    // GTM dataLayer for Sign Out
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'settings_click',
+        settings_section: 'Sign Out',
+      },
+    });
+  
+    // Existing sign-out logic
     VoterSessionActions.voterSignOut();
-  }
+  };
 
   isOrganization (organizationType) {
     return organizationType === NONPROFIT_501C3 || organizationType === NONPROFIT_501C4 ||
@@ -103,12 +112,24 @@ export default class SettingsPersonalSideBar extends Component {
               'SettingsItem__summary__item-container '}
             >
               <BorderBottomContainer>
-                <Link to="/settings/profile" className="SettingsItem__summary__item">
-                  <ImportContactsIcon isActive={String(editMode) === 'contact'} />
-                  <LinkSpan isActive={String(editMode) === 'contacts'}>
-                    Import Contacts
-                  </LinkSpan>
-                </Link>
+              <Link 
+                to="/settings/contacts"
+                className="SettingsItem__summary__item"
+                onClick={() => {
+                  // dataLayer for contacts 
+                  TagManager.dataLayer({
+                    dataLayer: {
+                      event: 'settings_click',
+                      settings_section: 'Import Contacts',
+                    },
+                  });
+                }}
+              >
+                <ImportContactsIcon isActive={String(editMode) === 'contact'} />
+                <LinkSpan isActive={String(editMode) === 'contacts'}>
+                  Import Contacts
+                </LinkSpan>
+              </Link>
               </BorderBottomContainer>
             </div>
           )}
@@ -119,20 +140,44 @@ export default class SettingsPersonalSideBar extends Component {
             //   'SettingsItem__summary__item-container '}
             // >
             <LinkContainer isActive={String(editMode) === 'profile'}>
-              <div>
-                <Link to="/settings/profile" className="SettingsItem__summary__item">
-                  <ProfileIcon isActive={String(editMode) === 'profile'} />
-                  <LinkSpan isActive={String(editMode) === 'profile'}>
-                    Name &amp; Photo
-                  </LinkSpan>
-                </Link>
-              </div>
-            </LinkContainer>
-          )}
+            <div>
+              <Link
+                to="/settings/profile"
+                className="SettingsItem__summary__item"
+                onClick={() => {
+                  // dataLayer for Name & Photo
+                  TagManager.dataLayer({
+                    dataLayer: {
+                      event: 'settings_click',
+                      settings_section: 'Name & Photo',
+                    },
+                  });
+                }}
+              >
+                <ProfileIcon isActive={String(editMode) === 'profile'} />
+                <LinkSpan isActive={String(editMode) === 'profile'}>
+                  Name &amp; Photo
+                </LinkSpan>
+              </Link>
+            </div>
+          </LinkContainer>
+        )}
 
           <LinkContainer isActive={String(editMode) === 'account'}>
             <div>
-              <Link to="/settings/account" className="SettingsItem__summary__item" id="securityAndSignIn">
+            <Link
+              to="/settings/securityAndSignIn"
+              className="SettingsItem__summary__item"
+              onClick={() => {
+                // dataLayer for Security & Sign In
+                TagManager.dataLayer({
+                  dataLayer: {
+                    event: 'settings_click',
+                    settings_section: 'Security & Sign In',
+                  },
+                });
+              }}
+            >
                 <SecurityIcon isActive={String(editMode) === 'account'} />
                 <LinkSpan isActive={String(editMode) === 'account'}>
                   {isSignedIn ?
@@ -146,7 +191,19 @@ export default class SettingsPersonalSideBar extends Component {
           {(isSignedIn) && (
             <LinkContainer isActive={String(editMode) === 'yourdata'}>
               <div>
-                <Link to="/settings/yourdata" className="SettingsItem__summary__item" id="yourData">
+              <Link
+              to="/settings/yourdata"
+              className="SettingsItem__summary__item"
+              onClick={() => {
+                // dataLayer for Privacy & Data
+                TagManager.dataLayer({
+                  dataLayer: {
+                    event: 'settings_click',
+                    settings_section: 'Privacy & Data',
+                  },
+                });
+              }}
+            >
                   <PrivacyIcon isActive={String(editMode) === 'yourdata'} />
                   <LinkSpan isActive={String(editMode) === 'yourdata'}>
                     Privacy &amp; Data
@@ -158,7 +215,19 @@ export default class SettingsPersonalSideBar extends Component {
 
           <LinkContainer isActive={String(editMode) === 'notifications'}>
             <div>
-              <Link to="/settings/notifications" className="SettingsItem__summary__item" id="settingsNotifications">
+            <Link
+              to="/settings/notifications"
+              className="SettingsItem__summary__item"
+              onClick={() => {
+                // dataLayer for Notifications
+                TagManager.dataLayer({
+                  dataLayer: {
+                    event: 'settings_click',
+                    settings_section: 'Notifications',
+                  },
+                });
+              }}
+            >
                 <NotificationsIcon isActive={String(editMode) === 'notifications'} />
                 <LinkSpan isActive={String(editMode) === 'notifications'}>
                   Notifications
@@ -170,7 +239,19 @@ export default class SettingsPersonalSideBar extends Component {
           {alwaysTrue && (/* {!isOnPartnerUrl && ( */
             <LinkContainer isActive={String(editMode) === 'friends'}>
               <div>
-                <Link to="/friends" className="SettingsItem__summary__item" id="settingsFriends">
+              <Link
+              to="/friends"
+              className="SettingsItem__summary__item"
+              onClick={() => {
+                // dataLayer for friends
+                TagManager.dataLayer({
+                  dataLayer: {
+                    event: 'settings_click',
+                    settings_section: 'Friends',
+                  },
+                });
+              }}
+            >
                   <FriendsIcon isActive={String(editMode) === 'friends'} />
                   <LinkSpan isActive={String(editMode) === 'friends'}>
                     Friends
@@ -183,7 +264,19 @@ export default class SettingsPersonalSideBar extends Component {
           {(isSignedIn && alwaysTrue/* && !isOnPartnerUrl */) && (
             <LinkContainer isActive={String(editMode) === 'discuss'}>
               <div>
-                <Link to="/news" className="SettingsItem__summary__item" id="settingsDiscuss">
+              <Link
+              to="/news"
+              className="SettingsItem__summary__item"
+              onClick={() => {
+                // dataLayer for Discuss
+                TagManager.dataLayer({
+                  dataLayer: {
+                    event: 'settings_click',
+                    settings_section: 'Discuss',
+                  },
+                });
+              }}
+            >
                   <DiscussIcon isActive={String(editMode) === 'discuss'} />
                   <LinkSpan isActive={String(editMode) === 'discuss'}>
                     Discuss
