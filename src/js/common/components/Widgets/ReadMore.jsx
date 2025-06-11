@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import TruncateMarkup from 'react-truncate-markup';
 import styled from 'styled-components';
 import { renderLog } from '../../utils/logging';
+import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
+import VoterStore from '../../../stores/VoterStore';
 
 export default class ReadMore extends Component {
   constructor (...args) {
@@ -27,6 +30,43 @@ export default class ReadMore extends Component {
   toggleLines (event) {
     event.preventDefault();
     const { readMore } = this.state;
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const {
+      eventName = 'clickShowMoreAboutPolitician',
+      politicianIdShowMore,
+      politicianNameShowMore,
+    } = this.props;
+
+    console.log("Right here!",readMore, politicianNameShowMore, politicianIdShowMore);
+
+    TagManager.dataLayer({
+    dataLayer: {
+      event: 'click',
+      actionDetails: {
+        actionType: 'showMore',
+        buttonId: eventName
+        },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      politicianDetails: {
+        politicianWeVoteId: politicianIdShowMore,
+        politicianName: politicianNameShowMore,
+//         politicianStateCode: politician.state_code,
+       },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    },
+    });
+    console.log("✅ GTM dataLayer after push:", window.dataLayer);
+    console.log("Right here!", currentPathname, currentPage);
     if (readMore && this.props.onShowMoreAlternateFunction) {
       this.props.onShowMoreAlternateFunction();
     } else {
@@ -162,6 +202,9 @@ ReadMore.propTypes = {
   numberOfLines: PropTypes.number,
   onShowMoreAlternateFunction: PropTypes.func,
   textToDisplay: PropTypes.node.isRequired,
+  eventName: PropTypes.string,
+  politicianIdShowMore: PropTypes.string,
+  politicianNameShowMore: PropTypes.string,
 };
 
 const ReadMoreCollapsedWrapper = styled('span')`
