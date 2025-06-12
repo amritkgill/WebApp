@@ -1,4 +1,5 @@
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import { renderLog } from '../../common/utils/logging';
 import VoterConstants from '../../constants/VoterConstants';
 import AppObservableStore from '../../common/stores/AppObservableStore';
@@ -6,6 +7,7 @@ import BallotStore from '../../stores/BallotStore';
 import SupportStore from '../../stores/SupportStore';
 import VoterStore from '../../stores/VoterStore';
 import HowItWorksWizard from './HowItWorksWizard';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const SignInModal = React.lazy(() => import(/* webpackChunkName: 'SignInModal' */ '../../common/components/SignIn/SignInModal'));
 
@@ -183,12 +185,75 @@ class CompleteYourProfile2024 extends Component {
   }
 
   openHowItWorksModal = () => {
+    // console.log('openHowItWorksModal called');
+
     AppObservableStore.setShowHowItWorksModal(true);
+
+    // Add dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'howWeVoteWorksStep',
+      },
+      event: 'action',
+      destinationDetails: {
+        destinationPageName: currentPage.pageName,
+        destinationPageType: 'HowItWorksModal', // Use same pageType as current page
+        destinationPathname: currentPathname,
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+
+    // console.log('openHowItWorksModal dataLayer:', dataLayerObject);
+
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   openPersonalizedScoreIntroModal = () => {
-    // console.log('Opening modal');
+    // console.log('openPersonalizedScoreIntroModal called');
     AppObservableStore.setShowPersonalizedScoreIntroModal(true);
+    // Add dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'yourPersonalizedScoreStep',
+      },
+      event: 'action',
+      destinationDetails: {
+        destinationPageName: currentPage.pageName,
+        destinationPageType: 'PersonalizedScoreIntroModal',
+        destinationPathname: currentPathname,
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+
+    // console.log('openPersonalizedScoreIntroModal dataLayer:', dataLayerObject);
+
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   goToNextIncompleteStep = () => {
@@ -221,6 +286,45 @@ class CompleteYourProfile2024 extends Component {
 
   toggleShowSignInModal = () => {
     const { showSignInModal } = this.state;
+
+    // console.log('toggleShowSignInModal called, current state:', showSignInModal);
+
+    const voterIsSignedIn = VoterStore.getVoterIsSignedIn();
+
+    // Only track dataLayer when opening the modal (not closing)
+    if (!showSignInModal && !voterIsSignedIn) {
+      // Add dataLayer tracking
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'openModal',
+          buttonId: 'SignInToSaveStep',
+        },
+        event: 'action',
+        destinationDetails: {
+          destinationPageName: currentPage.pageName,
+          destinationPageType: 'SignInModal',
+          destinationPathname: currentPathname,
+        },
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+        userDetails: {
+          stateCode: VoterStore.getVoterStateCode(),
+          userCohort: VoterStore.getAnalyticsUserCohort(),
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+      };
+
+      // console.log('toggleShowSignInModal dataLayer:', dataLayerObject);
+
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+    }
+
     this.setState({
       showSignInModal: !showSignInModal,
     });

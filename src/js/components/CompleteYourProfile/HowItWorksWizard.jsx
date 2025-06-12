@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import Colors from '../../common/components/Style/Colors';
 import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HowItWorksStep from './Step';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const crossIcon = normalizedImagePath('../../../img/global/svg-icons/cross.svg');
 
@@ -14,7 +17,40 @@ const HowItWorksWizard = ({ steps, activeStep }) => {
 
   const hideHowItWorksWizard = () => {
     setShowHowItWorksWizard(false);
+
+    // console.log('HowItWorksWizard props:', { steps, activeStep });
+    // dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    // console.log('Current pathname:', currentPathname);
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'close',
+        buttonId: 'CloseHowItWorksWizard',
+      },
+      event: 'action',
+      pageDetails: {
+        PageName: currentPage.pageName,
+        PageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+    if (activeStep !== undefined) {
+      dataLayerObject.actionDetails.activeStep = activeStep;
+      // console.log('Active step when closing:', activeStep);
+    }
+    // console.log('DataLayer object being sent:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+    // console.log('DataLayer tracking completed for HowItWorksWizard close');
   };
+
 
   return showHowItWorksWizard && (
     <HowItWorksContainer>
