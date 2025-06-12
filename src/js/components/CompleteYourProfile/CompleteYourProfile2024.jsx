@@ -114,10 +114,6 @@ class CompleteYourProfile2024 extends Component {
     } else {
       this.setItemNotComplete(stepIdSignInToSave);
     }
-    this.setState({
-      howItWorksWatched,
-      personalizedScoreIntroCompleted,
-    }, () => this.sortSteps());
   }
 
   setItemComplete (stepItemIdToMarkComplete) {
@@ -156,21 +152,13 @@ class CompleteYourProfile2024 extends Component {
     const voterOpposesListLength = SupportStore.getVoterOpposesListLength();
     const voterSupportsListLength = SupportStore.getVoterSupportsListLength();
     const ballotItemChoicesCount = voterOpposesListLength + voterSupportsListLength;
-    let stepIdHowItWorks = 1;
-    let stepIdPersonalizedScore = 2;
-    let stepIdSignInToSave = 3;
-    if (ballotItemChoicesCount >= 4 && !voterIsSignedIn) {
-      stepIdSignInToSave = 1;
-      stepIdHowItWorks = 2;
-      stepIdPersonalizedScore = 3;
-    }
     this.setState({
-      stepIdHowItWorks,
-      stepIdPersonalizedScore,
-      stepIdSignInToSave,
+      stepIdHowItWorks: 1,
+      stepIdPersonalizedScore: 2,
+      stepIdSignInToSave: 3,
       steps: [
         {
-          id: stepIdHowItWorks,
+          id: 1,
           title: 'How WeVote works',
           buttonText: '',
           completed: false,
@@ -180,7 +168,7 @@ class CompleteYourProfile2024 extends Component {
           width: '33.33%',
         },
         {
-          id: stepIdPersonalizedScore,
+          id: 2,
           title: 'Your personalized score',
           buttonText: '',
           completed: false,
@@ -190,7 +178,7 @@ class CompleteYourProfile2024 extends Component {
           width: '33.33%',
         },
         {
-          id: stepIdSignInToSave,
+          id: 3,
           title: voterIsSignedIn ? 'Your ballot choices and settings are saved' : 'Sign in or join to save your ballot choices/settings',
           buttonText: voterIsSignedIn ? '' : 'Sign up to save choices',
           completed: false,
@@ -200,7 +188,9 @@ class CompleteYourProfile2024 extends Component {
           width: '33.33%',
         },
       ],
-    }, () => this.setCompletedStatus());
+    }, () => {
+      this.setCompletedStatus();
+    });
   }
 
   openHowItWorksModal = () => {
@@ -279,13 +269,9 @@ class CompleteYourProfile2024 extends Component {
     if (goToNextIncompleteStepForced) {
       this.goToNextIncompleteStep();
     }
-    this.setState({
-      goToNextIncompleteStepForced: false,
-    });
   }
 
   goToStep = (stepId) => {
-    this.sortSteps();
     this.setState({
       activeStep: stepId,
     });
@@ -334,7 +320,6 @@ class CompleteYourProfile2024 extends Component {
   }
 
   previousStep () {
-    this.sortSteps();
     const { steps } = this.state;
     const currentIndex = steps.map((oneStep) => oneStep.id).indexOf(this.state.activeStep);
     if (currentIndex >= 1) {
@@ -345,7 +330,6 @@ class CompleteYourProfile2024 extends Component {
   }
 
   nextStep () {
-    this.sortSteps();
     const { steps } = this.state;
     const currentIndex = steps.map((e) => e.id).indexOf(this.state.activeStep);
     if (steps[currentIndex + 1]) {
@@ -353,33 +337,6 @@ class CompleteYourProfile2024 extends Component {
         activeStep: steps[currentIndex + 1].id,
       });
     }
-  }
-
-  sortSteps () {
-    function compare (a, b) {
-      const itemA = a;
-      const itemB = b;
-
-      let comparison = 0;
-      if (itemA.id > itemB.id) {
-        comparison = 1;
-      } else if (itemA.id < itemB.id) {
-        comparison = -1;
-      }
-      return comparison;
-    }
-
-    const completed = this.state.steps.filter((oneStep) => oneStep.completed);
-    const notCompleted = this.state.steps.filter((oneStep) => !oneStep.completed);
-
-    if (completed) {
-      completed.sort(compare);
-    }
-    if (notCompleted) {
-      notCompleted.sort(compare);
-    }
-    const all = [...completed, ...notCompleted];
-    this.setState({ steps: all }, () => this.goToNextIncompleteStepIfForced());
   }
 
   render () {
