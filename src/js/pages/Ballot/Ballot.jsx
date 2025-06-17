@@ -1381,7 +1381,7 @@ class Ballot extends Component {
     let numberOfBallotItemsDisplayed = 0;
     let showLoadingText = true;
     let searchTextString = '';
-    const showCompleteYourProfile = true;
+    const showCompleteYourProfile = isWebApp();
     let paddingTop = '';
     if (isIPadMini()) {
       paddingTop = '18%';
