@@ -1,32 +1,31 @@
 import { Launch } from '@mui/icons-material';
 import { Button, FormControl, FormControlLabel, InputAdornment, Radio, RadioGroup, TextField } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
-import TagManager from 'react-gtm-module';
 import { GoogleReCaptcha, GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import TagManager from 'react-gtm-module';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import AnalyticsActions from '../../actions/AnalyticsActions';
 import DonateActions from '../../common/actions/DonateActions';
 import DonationListForm from '../../common/components/Donation/DonationListForm';
+import DonorboxCordova from '../../common/components/Donation/DonorboxCordova';
 import DonorboxEmbed from '../../common/components/Donation/DonorboxEmbed';
-import InjectedCheckoutForm from '../../common/components/Donation/InjectedCheckoutForm';
 import standardBoxShadow from '../../common/components/Style/standardBoxShadow';
 import OpenExternalWebSite from '../../common/components/Widgets/OpenExternalWebSite';
 import DonateStore from '../../common/stores/DonateStore';
 import initializejQuery from '../../common/utils/initializejQuery';
+import { isWebApp } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import { Section } from '../../components/Welcome/sectionStyles';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
-import $ajax from '../../utils/service';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import $ajax from '../../utils/service';
 
-const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
+// const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
 
 
 class Donate extends Component {
@@ -43,7 +42,7 @@ class Donate extends Component {
       joining: true,
       preDonation: true,
       okToDonateWithoutAuth: true,
-      showWaiting: false,
+      // showWaiting: false,
       value: '7.00',
     };
 
@@ -109,7 +108,7 @@ class Donate extends Component {
   }
 
   /*
-  An enter keystroke in the react-bootstrap InputGroup, (or in the original react "input-group",)
+  An enter keystroke in the react-bootstrap InputGroup, (or in the original react "input-group")
   causes a page reload, and you lose context.  So swallow the 'Enter' keystroke event while in
   the InputGroup.
   */
@@ -129,7 +128,7 @@ class Donate extends Component {
     console.log('onSuccessfulDonation in Donate ------------------------------');
     console.log('Donation store changed in Donate, Checkout form removed');
     this.setState({
-      showWaiting: true,
+      // showWaiting: true,
       preDonation: false,
     });
   }
@@ -230,7 +229,7 @@ class Donate extends Component {
   render () {
     renderLog('Donate');  // Set LOG_RENDER_EVENTS to log all renders
     const { classes } = this.props;
-    const { isC4Donation, isSignedin, joining, showWaiting, value, isMonthly, preDonation, okToDonateWithoutAuth } = this.state;
+    const { isC4Donation, isSignedin, joining, value, isMonthly, preDonation, okToDonateWithoutAuth } = this.state;
 
     // Default donation goes to c3, unless we specify a donation to the c4
     let c3DonationHtml = '';
@@ -267,7 +266,7 @@ class Donate extends Component {
                 <InnerWrapper>
                   <DonorboxWrapper>
                     <Suspense fallback={<div>Loading...</div>}>
-                      <DonorboxEmbed />
+                      {isWebApp() ? <DonorboxEmbed /> : <DonorboxCordova />}
                     </Suspense>
                   </DonorboxWrapper>
                 </InnerWrapper>
@@ -400,7 +399,7 @@ class Donate extends Component {
                             </ContributeGridItemJoin>
                           </ContributeGridSection>
                         </ContributeGridWrapper>
-                        <PaymentWrapper joining={joining}>
+                        {/* <PaymentWrapper joining={joining}>
                           <PaymentCenteredWrapper>
                             <Elements stripe={stripePromise}>
                               <InjectedCheckoutForm
@@ -411,7 +410,7 @@ class Donate extends Component {
                               />
                             </Elements>
                           </PaymentCenteredWrapper>
-                        </PaymentWrapper>
+                        </PaymentWrapper> */}
                       </>
                     ) : (
                       <ReCaptchaFailed>
@@ -592,12 +591,12 @@ const DonateDescriptionContainer = styled('div')`
   }
 `;
 
-const PaymentWrapper  = styled('div', {
-  shouldForwardProp: (prop) => !['joining'].includes(prop),
-})(({ joining }) => (`
-  display: ${joining ? '' : 'none'};
-  text-align: center;
-`));
+// const PaymentWrapper  = styled('div', {
+//   shouldForwardProp: (prop) => !['joining'].includes(prop),
+// })(({ joining }) => (`
+//   display: ${joining ? '' : 'none'};
+//   text-align: center;
+// `));
 
 const ReCaptchaFailed  = styled('div')`
   text-align: center;
@@ -613,18 +612,18 @@ const DonateCaveat = styled('p')`
   font-style: italic;
 `;
 
-const PaymentCenteredWrapper  = styled('div')(({ theme }) => (`
-  width: 500px;
-  ${theme.breakpoints.down('sm')} {
-    width: 300px;
-  }
-  display: inline-block;
-  background-color: rgb(246, 244,246);
-  box-shadow: ${standardBoxShadow('medium')};
-  border: 2px solid darkgrey;
-  border-radius: 3px;
-  padding: 8px;
-`));
+// const PaymentCenteredWrapper  = styled('div')(({ theme }) => (`
+//   width: 500px;
+//   ${theme.breakpoints.down('sm')} {
+//     width: 300px;
+//   }
+//   display: inline-block;
+//   background-color: rgb(246, 244,246);
+//   box-shadow: ${standardBoxShadow('medium')};
+//   border: 2px solid darkgrey;
+//   border-radius: 3px;
+//   padding: 8px;
+// `));
 
 
 const ContributeGridWrapper = styled('div')(({ theme }) => (`

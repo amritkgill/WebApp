@@ -139,11 +139,11 @@ function fileRewriterForCordova (path, versions) {
     newValue = newValue.replace(/(.*?)u-show-mobile(.*?)>/, '$1$2 style={uShowMobile()}>\n');
     newValue = newValue.replace(/(.*?)u-show-desktop-tablet(.*?)>/, '$1$2 style={uShowDesktopTablet()}>\n');
     // Remove Donate from Cordova -- Stripe causes problems and is not allowed in the app store
-    if (path.includes('App.js')) {
-      newValue = newValue.replace(/^.*?Donate.*?\n/gim, '');
-      newValue = newValue.replace(/^(\s*).*?\/pay-to-promote.*?\n/gim, '$1{/* Removed /pay-to-promote for Cordova */}\n');
-      newValue = newValue.replace(/^import CampaignSupportPayToPromote.*?\n/gim, '// Removed Import CampaignSupportPayToPromote*\n');
-    }
+    // if (path.includes('App.js')) {
+    //   newValue = newValue.replace(/^.*?Donate.*?\n/gim, '');
+    //   newValue = newValue.replace(/^(\s*).*?\/pay-to-promote.*?\n/gim, '$1{/* Removed /pay-to-promote for Cordova */}\n');
+    //   newValue = newValue.replace(/^import CampaignSupportPayToPromote.*?\n/gim, '// Removed Import CampaignSupportPayToPromote*\n');
+    // }
     // Set is Cordova true in index.jsx
     if (path.endsWith('index.jsx')) {
       newValue = newValue.replace(/isIndexCordova = false;/g, 'isIndexCordova = true;');
@@ -166,7 +166,7 @@ function fileRewriterForCordova (path, versions) {
     ];
     const dummySubstituteFiles = [
       './srcCordova/js/common/components/CampaignSupport/PayToPromoteProcess.jsx',
-      './srcCordova/js/pages/More/Donate.jsx',
+      // './srcCordova/js/pages/More/Donate.jsx',
     ];
 
     if (deleteFiles.includes(path)) {

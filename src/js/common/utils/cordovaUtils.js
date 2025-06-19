@@ -66,7 +66,7 @@ export function dumpScreenAndDeviceFields () {
 // IMPORTANT:  The HTML5 window.history, is very different from the react-router V5 history, don't use window.history!
 export function historyPush (route) {
   if (webAppConfig.LOG_ROUTING) {
-    console.log(`historyPush ******** ${route} *******`);
+    console.log(`historyPush ---> ${route} <---`);
   }
   global.weVoteGlobalHistory.push(route);
 }
@@ -237,7 +237,6 @@ export function isDeviceZoomed () {
   return false;
 }
 
-
 // 3.5" screen iPhones
 export function isIPhone3p5in () {
   if (isIOS()) {
@@ -385,8 +384,8 @@ export function isIPadMini () {
 
 export function hasDynamicIsland () {
   if (isIOS() && !isIOSAppOnMac() &&
-    // 14 Pro       14 Pro Max    15           15 Plus        15 Pro        15 Pro Max
-    ['iPhone15,2', 'iPhone15,3', 'iPhone15,4', 'iPhone15,5', 'iPhone16,1', 'iPhone16,2'].includes(window.device.model)) {
+    // 14 Pro       14 Pro Max    15           15 Plus        15 Pro        15 Pro Max    16 Pro (6.3)  16 Pro Max    16 PM (6.9)   16 Plus(6.7)
+    ['iPhone15,2', 'iPhone15,3', 'iPhone15,4', 'iPhone15,5', 'iPhone16,1', 'iPhone16,2', 'iPhone17,1', 'iPhone17,2', 'iPhone17,3', 'iPhone17,4'].includes(window.device.model)) {
     logMatch('iPhone 14 Pro or 14 Pro Max or 15*, Dynamic Island Sized Header', true);
     return true;
   }

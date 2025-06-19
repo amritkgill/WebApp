@@ -158,6 +158,7 @@ class App extends Component {
     this.setShowReadyHeavy = this.setShowReadyHeavy.bind(this);
     this.bypass2FA = this.bypass2FA.bind(this);
     this.localIsCordova();
+    this.localIsAndroid = this.localIsAndroid.bind(this);
   }
 
   // See https://reactjs.org/docs/error-boundaries.html
@@ -363,6 +364,11 @@ class App extends Component {
     return cordova !== undefined;
   }
 
+  localIsAndroid () {
+    const { platform } = window.device || '';
+    return this.localIsCordova() && platform !== 'iOS';
+  }
+
   render () {
     renderLog('App');
     const { hideHeader, showReadyLight, enableFullStory } = this.state;
@@ -492,7 +498,7 @@ class App extends Component {
                   <Route path="/candidate/:candidate_we_vote_id/:organization_we_vote_id" exact component={OrganizationVoterGuideCandidate} />
                   <Route path="/candidate/:candidate_we_vote_id" exact component={Candidate} />
                   <Route path="/challenges/" exact component={ChallengesHomeLoader} />
-                  <Route path="/donate" component={(isNotWeVoteMarketingSite || this.localIsCordova()) ? ReadyRedirect : Donate} />
+                  <Route path="/donate" component={(isNotWeVoteMarketingSite || this.localIsAndroid()) ? ReadyRedirect : Donate} />
                   <Route path="/facebook_invitable_friends" component={FacebookInvitableFriends} />
                   <Route path="/findfriends/:set_up_page" exact component={FindFriendsRoot} />
                   <Route path="/findfriends" exact><FindFriendsRoot /></Route>
@@ -532,7 +538,7 @@ class App extends Component {
                   <Route path="/more/alerts" component={ElectionReminder} />
                   <Route path="/more/attributions" component={Attributions} />
                   <Route path="/more/credits" component={Credits} />
-                  <Route path="/more/donate" component={(isNotWeVoteMarketingSite || this.localIsCordova()) ? ReadyRedirect : Donate} />
+                  <Route path="/more/donate" component={(isNotWeVoteMarketingSite || this.localIsAndroid()) ? ReadyRedirect : Donate} />
                   <Route path="/more/elections" component={Elections} />
                   <Route path="/more/extensionsignin" component={ExtensionSignIn} />
                   <Route path="/more/facebooklandingprocess" component={FacebookLandingProcess} />
