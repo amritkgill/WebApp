@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import { Link } from 'react-router-dom';
+import TagManager from 'react-gtm-module';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import VoterSessionActions from '../../actions/VoterSessionActions';
 import VoterStore from '../../stores/VoterStore';
@@ -8,7 +9,6 @@ import { renderLog } from '../../common/utils/logging';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { ImportContactsOutlined, AccountBoxRounded, Lock, SecurityRounded, CampaignRounded, PeopleAltRounded, TextsmsRounded, ExitToAppRounded  } from '@mui/icons-material';
-import TagManager from 'react-gtm-module';
 
 const SettingsAccountLevelChip = React.lazy(() => import(/* webpackChunkName: 'SettingsAccountLeveLChip' */ '../Settings/SettingsAccountLevelChip'));
 
@@ -70,14 +70,36 @@ export default class SettingsPersonalSideBar extends Component {
       isOnPartnerUrl: AppObservableStore.isOnPartnerUrl(),
     });
   }
-
-  voterSignOut = () => {
-    // GTM dataLayer for Sign Out
+// helper function 
+  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate' }) => {
     TagManager.dataLayer({
       dataLayer: {
-        event: 'settings_click',
-        settings_section: 'Sign Out',
+        event: 'action',
+        actionDetails: {
+          actionType,
+          buttonId,
+        },
+        ...(destinationPath && {
+          destinationDetails: {
+            destinationPath,
+          },
+        }),
+        pageDetails: {
+          pageTitle: document.title,
+          pagePath: window.location.pathname,
+        },
+        userDetails: {
+          isSignedIn: VoterStore.getVoterIsSignedIn(),
+          voterId: VoterStore.getVoterId(),
+        },
       },
+    });
+  };
+  
+  voterSignOut = () => {
+    this.fireSettingsGTMEvent({
+      buttonId: 'signOutPersonalSidebar',
+      actionType: 'signOut',  // Sign Out is not a navigation, it's an action
     });
   
     // Existing sign-out logic
@@ -111,25 +133,20 @@ export default class SettingsPersonalSideBar extends Component {
               'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
               'SettingsItem__summary__item-container '}
             >
-              <BorderBottomContainer>
-              <Link 
-                to="/settings/contacts"
-                className="SettingsItem__summary__item"
-                onClick={() => {
-                  // dataLayer for contacts 
-                  TagManager.dataLayer({
-                    dataLayer: {
-                      event: 'settings_click',
-                      settings_section: 'Import Contacts',
-                    },
-                  });
-                }}
-              >
-                <ImportContactsIcon isActive={String(editMode) === 'contact'} />
-                <LinkSpan isActive={String(editMode) === 'contacts'}>
-                  Import Contacts
-                </LinkSpan>
-              </Link>
+              <BorderBottomContainer id="personalSettingsContacts">
+                <Link 
+                  to="/settings/contacts"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsContacts',
+                    destinationPath: '/settings/contacts',
+                  })}
+                >
+                  <ImportContactsIcon isActive={String(editMode) === 'contact'} />
+                  <LinkSpan isActive={String(editMode) === 'contacts'}>
+                    Import Contacts
+                  </LinkSpan>
+                </Link>
               </BorderBottomContainer>
             </div>
           )}
@@ -139,20 +156,15 @@ export default class SettingsPersonalSideBar extends Component {
             //   'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
             //   'SettingsItem__summary__item-container '}
             // >
-            <LinkContainer isActive={String(editMode) === 'profile'}>
-            <div>
+          <LinkContainer isActive={String(editMode) === 'profile'}>
+            <div id="personalSettingsPhoto">
               <Link
                 to="/settings/profile"
                 className="SettingsItem__summary__item"
-                onClick={() => {
-                  // dataLayer for Name & Photo
-                  TagManager.dataLayer({
-                    dataLayer: {
-                      event: 'settings_click',
-                      settings_section: 'Name & Photo',
-                    },
-                  });
-                }}
+                onClick={() => this.fireSettingsGTMEvent({
+                  buttonId: 'personalSettingsPhoto',
+                  destinationPath: '/settings/profile',
+                })}
               >
                 <ProfileIcon isActive={String(editMode) === 'profile'} />
                 <LinkSpan isActive={String(editMode) === 'profile'}>
@@ -164,25 +176,22 @@ export default class SettingsPersonalSideBar extends Component {
         )}
 
           <LinkContainer isActive={String(editMode) === 'account'}>
-            <div>
-            <Link
-              to="/settings/securityAndSignIn"
-              className="SettingsItem__summary__item"
-              onClick={() => {
-                // dataLayer for Security & Sign In
-                TagManager.dataLayer({
-                  dataLayer: {
-                    event: 'settings_click',
-                    settings_section: 'Security & Sign In',
-                  },
-                });
-              }}
-            >
+            <div id="personalSettingsSecurity">
+              <Link
+                to="/settings/securityAndSignIn"
+                className="SettingsItem__summary__item"
+                onClick={() => this.fireSettingsGTMEvent({
+                  buttonId: 'personalSettingsSecurity',
+                  destinationPath: '/settings/securityAndSignIn',
+                })}
+              >
                 <SecurityIcon isActive={String(editMode) === 'account'} />
                 <LinkSpan isActive={String(editMode) === 'account'}>
-                  {isSignedIn ?
-                    <span>Security & Sign In</span> :
-                    <span>Sign In</span> }
+                  {isSignedIn ? (
+                    <span>Security & Sign In</span>
+                  ) : (
+                    <span>Sign In</span>
+                  )}
                 </LinkSpan>
               </Link>
             </div>
@@ -190,20 +199,15 @@ export default class SettingsPersonalSideBar extends Component {
 
           {(isSignedIn) && (
             <LinkContainer isActive={String(editMode) === 'yourdata'}>
-              <div>
-              <Link
-              to="/settings/yourdata"
-              className="SettingsItem__summary__item"
-              onClick={() => {
-                // dataLayer for Privacy & Data
-                TagManager.dataLayer({
-                  dataLayer: {
-                    event: 'settings_click',
-                    settings_section: 'Privacy & Data',
-                  },
-                });
-              }}
-            >
+              <div id="personalSettingsPrivacy">
+                <Link
+                  to="/settings/yourdata"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsPrivacy',
+                    destinationPath: '/settings/yourdata',
+                  })}
+                >
                   <PrivacyIcon isActive={String(editMode) === 'yourdata'} />
                   <LinkSpan isActive={String(editMode) === 'yourdata'}>
                     Privacy &amp; Data
@@ -212,46 +216,35 @@ export default class SettingsPersonalSideBar extends Component {
               </div>
             </LinkContainer>
           )}
-
-          <LinkContainer isActive={String(editMode) === 'notifications'}>
-            <div>
-            <Link
-              to="/settings/notifications"
-              className="SettingsItem__summary__item"
-              onClick={() => {
-                // dataLayer for Notifications
-                TagManager.dataLayer({
-                  dataLayer: {
-                    event: 'settings_click',
-                    settings_section: 'Notifications',
-                  },
-                });
-              }}
-            >
-                <NotificationsIcon isActive={String(editMode) === 'notifications'} />
-                <LinkSpan isActive={String(editMode) === 'notifications'}>
-                  Notifications
-                </LinkSpan>
-              </Link>
-            </div>
-          </LinkContainer>
+            <LinkContainer isActive={String(editMode) === 'notifications'}>
+              <div id="personalSettingsNotifs">
+                <Link
+                  to="/settings/notifications"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsNotifs',
+                    destinationPath: '/settings/notifications',
+                  })}
+                >
+                  <NotificationsIcon isActive={String(editMode) === 'notifications'} />
+                  <LinkSpan isActive={String(editMode) === 'notifications'}>
+                    Notifications
+                  </LinkSpan>
+                </Link>
+              </div>
+            </LinkContainer>
 
           {alwaysTrue && (/* {!isOnPartnerUrl && ( */
             <LinkContainer isActive={String(editMode) === 'friends'}>
-              <div>
-              <Link
-              to="/friends"
-              className="SettingsItem__summary__item"
-              onClick={() => {
-                // dataLayer for friends
-                TagManager.dataLayer({
-                  dataLayer: {
-                    event: 'settings_click',
-                    settings_section: 'Friends',
-                  },
-                });
-              }}
-            >
+              <div id="personalSettingsFriends">
+                <Link
+                  to="/friends"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsFriends',
+                    destinationPath: '/friends',
+                  })}
+                >
                   <FriendsIcon isActive={String(editMode) === 'friends'} />
                   <LinkSpan isActive={String(editMode) === 'friends'}>
                     Friends
@@ -263,20 +256,15 @@ export default class SettingsPersonalSideBar extends Component {
 
           {(isSignedIn && alwaysTrue/* && !isOnPartnerUrl */) && (
             <LinkContainer isActive={String(editMode) === 'discuss'}>
-              <div>
-              <Link
-              to="/news"
-              className="SettingsItem__summary__item"
-              onClick={() => {
-                // dataLayer for Discuss
-                TagManager.dataLayer({
-                  dataLayer: {
-                    event: 'settings_click',
-                    settings_section: 'Discuss',
-                  },
-                });
-              }}
-            >
+              <div id="personalSettingsDiscuss">
+                <Link
+                  to="/news"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsDiscuss',
+                    destinationPath: '/news',
+                  })}
+                >
                   <DiscussIcon isActive={String(editMode) === 'discuss'} />
                   <LinkSpan isActive={String(editMode) === 'discuss'}>
                     Discuss
