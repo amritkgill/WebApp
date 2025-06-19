@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import Colors from '../../common/components/Style/Colors';
 import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HowItWorksStep from './Step';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const crossIcon = normalizedImagePath('../../../img/global/svg-icons/cross.svg');
 
@@ -12,9 +15,41 @@ const crossIcon = normalizedImagePath('../../../img/global/svg-icons/cross.svg')
 const HowItWorksWizard = ({ steps, activeStep }) => {
   const [showHowItWorksWizard, setShowHowItWorksWizard] = useState(true);
 
-  const hideHowItWorksWizard = () => {
+  const hideHowItWorksWizard = (buttonId) => {
     setShowHowItWorksWizard(false);
+    // console.log('HowItWorksWizard props:', { steps, activeStep });
+    // dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    // console.log('Current pathname:', currentPathname);
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'close',
+        buttonId,
+      },
+      event: 'action',
+      pageDetails: {
+        PageName: 'HowItWorksWizard',
+        PageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+    };
+    if (activeStep !== undefined) {
+      dataLayerObject.actionDetails.activeStep = activeStep;
+      // console.log('Active step when closing:', activeStep);
+    }
+    // console.log('DataLayer object being sent:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+    // console.log('DataLayer tracking completed for HowItWorksWizard close');
   };
+
 
   return showHowItWorksWizard && (
     <HowItWorksContainer>
@@ -27,7 +62,10 @@ const HowItWorksWizard = ({ steps, activeStep }) => {
             See how to turn your values into voting decisions!
           </span>
         </p>
-        <HowItWorksCrossIconContainer onClick={hideHowItWorksWizard}>
+        <HowItWorksCrossIconContainer
+          id="CloseHowItWorksWizard"
+          onClick={() => hideHowItWorksWizard('CloseHowItWorksWizard')}
+        >
           <img src={crossIcon} alt="Close" style={{ filter: 'brightness(1.9)' }} />
         </HowItWorksCrossIconContainer>
       </HowItWorksHeader>
