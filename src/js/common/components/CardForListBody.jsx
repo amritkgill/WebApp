@@ -90,7 +90,7 @@ function CardForListBody (props) {
                     <LaunchIconWrapper>
                       <Suspense fallback={<></>}>
                         <OpenExternalWebSite
-                          linkIdAttribute="openPoliticianPage"
+                          linkIdAttribute="openCandidateInNewTab"
                           url={politicianDetailsURL}
                           target="_blank"
                           className="open-web-site open-web-site__no-right-padding"
@@ -109,6 +109,14 @@ function CardForListBody (props) {
                           destinationPageName={destinationPage.pageName}
                           destinationPageType={destinationPage.pageType}
                           trackingOn
+                          candidateDetails={{
+                            candidateWeVoteId: candidateWeVoteId || politicianWeVoteId,
+                            candidateName: ballotItemDisplayName,
+                            officeName,
+                            politicianWeVoteId,
+                            politicalParty,
+                            stateCode,
+                          }}
                         />
                       </Suspense>
                     </LaunchIconWrapper>

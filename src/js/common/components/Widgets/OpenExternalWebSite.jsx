@@ -11,7 +11,7 @@ import stringContains from '../../utils/stringContains';
 
 export default class OpenExternalWebSite extends Component {
   sendExternalLinkInfoToGTM = () => {
-    const { destinationPageName, destinationPageType, linkIdAttribute, pageName, pageType, trackingOn, url } = this.props;
+    const { candidateDetails, destinationPageName, destinationPageType, linkIdAttribute, pageName, pageType, trackingOn, url } = this.props;
     if (trackingOn) {
       const { location: { pathname: currentPathname } } = window;
       const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
@@ -23,9 +23,11 @@ export default class OpenExternalWebSite extends Component {
       // console.log('External link clicked:', this.props.url);
       const dataLayerObj = {
         actionDetails: {
+          actionType: 'navigate',
           buttonId: linkIdAttribute,
+          ...(candidateDetails && { candidateDetails }),
         },
-        event: 'click',
+        event: 'action',
         destinationDetails: {
           destinationPageName: destinationPageName || destinationPageNameLocalBackup,
           destinationPageType: destinationPageType || destinationPageTypeLocalBackup,
@@ -34,7 +36,7 @@ export default class OpenExternalWebSite extends Component {
         pageDetails: {
           pageName: pageName || pageNameLocalBackup,
           pageType: pageType || pageTypeLocalBackup,
-          pathname: window.location.pathname,
+          pathname: currentPathname,
         },
         userDetails: {
           stateCode: VoterStore.getVoterStateCode(),
@@ -114,4 +116,12 @@ OpenExternalWebSite.propTypes = {
   title: PropTypes.string,
   trackingOn: PropTypes.bool,
   url: PropTypes.string.isRequired,
+  candidateDetails: PropTypes.shape({
+    candidateWeVoteId: PropTypes.string,
+    candidateName: PropTypes.string,
+    officeName: PropTypes.string,
+    politicianWeVoteId: PropTypes.string,
+    politicalParty: PropTypes.string,
+    stateCode: PropTypes.string,
+  }),
 };
