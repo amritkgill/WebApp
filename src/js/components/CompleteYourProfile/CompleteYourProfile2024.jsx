@@ -308,6 +308,8 @@ class CompleteYourProfile2024 extends Component {
   }
 
   toggleShowSignInModal = () => {
+    // Refactor to use:
+    // AppObservableStore.setShowSignInModal(
     const { showSignInModal } = this.state;
 
     // console.log('toggleShowSignInModal called, current state:', showSignInModal);

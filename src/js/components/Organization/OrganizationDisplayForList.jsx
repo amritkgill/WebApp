@@ -186,13 +186,13 @@ class OrganizationDisplayForList extends Component {
       <OrganizationDisplayForListWrapper>
         <OrganizationDetailsWrapper>
           <OrganizationLogoWrapper>
-            <Link to={voterGuideLink} className="u-no-underline">
+            <Link id="organizationDisplayLogo" to={voterGuideLink} className="u-no-underline">
               {organizationLogo}
             </Link>
           </OrganizationLogoWrapper>
           <div>
             <NameAndTwitter>
-              <Link to={voterGuideLink}>
+              <Link id="organizationDisplayName" to={voterGuideLink}>
                 <OrganizationName>{organizationName}</OrganizationName>
               </Link>
               {twitterHandle && (
