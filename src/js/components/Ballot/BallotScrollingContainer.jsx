@@ -269,6 +269,13 @@ class BallotScrollingContainer extends Component {
                     firstInstance={isFirstBallotItem}
                   />
                 </PositionRowListOneWrapper>
+                <PositionRowListOneWrapper>
+                  <PositionRowListCompressed
+                    ballotItemWeVoteId={oneCandidate.we_vote_id}
+                    showOppose
+                    firstInstance={isFirstBallotItem}
+                  />
+                </PositionRowListOneWrapper>
               </PositionRowListInnerWrapper>
             </PositionRowListOuterWrapper>
           </CandidateContainer>

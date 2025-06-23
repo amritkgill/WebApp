@@ -14,6 +14,7 @@ import apiCalming from '../../common/utils/apiCalming';
 import { renderLog } from '../../common/utils/logging';
 import AppObservableStore from '../../common/stores/AppObservableStore';
 import { limitToShowInfoOnly, limitToShowOppose, limitToShowSupport, orderByTwitterFollowers, orderByWrittenComment } from '../../common/utils/orderByPositionFunctions';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import BallotStore from '../../stores/BallotStore';
 import CandidateStore from '../../stores/CandidateStore';
 import FriendStore from '../../stores/FriendStore';
@@ -219,7 +220,7 @@ class PositionRowListCompressed extends Component {
   }
 
   getTalkingAboutText = () => {
-    const { ballotItemWeVoteId } = this.props;
+    const { ballotItemWeVoteId, showOppose, showSupport } = this.props;
     let itemName = '';
 
     if (ballotItemWeVoteId.includes('cand')) {
@@ -230,9 +231,16 @@ class PositionRowListCompressed extends Component {
     }
 
     const endorsementCount = this.getEndorsementCount();
-    if (endorsementCount === 0) return '';
-    if (endorsementCount === 1) return `is talking about ${itemName}`;
-    return `are talking about ${itemName}`;
+    if (showOppose) {
+      if (endorsementCount === 1) return `opposes ${itemName}`;
+      return `oppose ${itemName}`;
+    } else if (showSupport) {
+      if (endorsementCount === 1) return `supports ${itemName}`;
+      return `support ${itemName}`;
+    } else {
+      if (endorsementCount === 1) return `is talking about ${itemName}`;
+      return `are talking about ${itemName}`;
+    }
   };
 
   getOrganizationCount = () => {
@@ -244,6 +252,7 @@ class PositionRowListCompressed extends Component {
     } else if (ballotItemWeVoteId.includes('meas')) {
       allCachedPositionsForThisBallotItem = MeasureStore.getAllCachedPositionsByMeasureWeVoteId(ballotItemWeVoteId);
     }
+    // console.log('getOrganizationCount, allCachedPositionsForThisBallotItem.length:', allCachedPositionsForThisBallotItem.length);
     if (!allCachedPositionsForThisBallotItem) return 0;
     // Get friend organization IDs
     const friendOrgIds = FriendStore.currentFriendsOrganizationWeVoteIDList();
@@ -275,6 +284,7 @@ class PositionRowListCompressed extends Component {
     const friendPositions = allCachedPositionsForThisBallotItem.filter(
       (position) => friendOrgIds.includes(position.speaker_we_vote_id),
     );
+    // console.log('getEndorsementCount, friendPositions.length:', friendPositions.length);
     return friendPositions.length;
   };
 
@@ -358,10 +368,9 @@ class PositionRowListCompressed extends Component {
   };
 
   render () {
-    // const {
-    //   ballotItemWeVoteId, showInfoOnly, showOppose, showOpposeDisplayName,
-    //   showOpposeDisplayNameIfNoSupport, showSupport,
-    // } = this.props;
+    const {
+      showOppose, showSupport,
+    } = this.props;
     const {
       filteredPositionList, numberOfImagesToDisplay, numberOfNamesToDisplay,
       // supportPositionListLength,
@@ -400,11 +409,7 @@ class PositionRowListCompressed extends Component {
       if (remainingCount > 0) {
         talkingAboutText += ` and ${remainingCount} ${remainingCount === 1 ? 'other' : 'others'}`;
       }
-      if (candidateName && numberOfNamesDisplayed === 1) {
-        talkingAboutText += ` is talking about ${candidateName}`;
-      } else {
-        talkingAboutText += ` are talking about ${candidateName}`;
-      }
+      talkingAboutText += ` ${this.getTalkingAboutText()}`;
     }
     let filteredPositionListTooltip = <></>;
     let onePositionNameCount = 1;
@@ -447,10 +452,51 @@ class PositionRowListCompressed extends Component {
         </Tooltipstyle>
       );
     }
+    const endorsementCount = filteredPositionList.length;
+    const endorsementNetworkCount = 0; // TODO: Get this from the API
     return (
       <CandidateEndorsementsWrapper>
         <CandidateEndorsementsContainer data-modal-trigger>
-          <CandidateEndorsementPhotos onClick={() => this.onClickShowOrganizationModalWithPositions('CandidateEndorsementPhotos')}>
+          <CandidateEndorsementCount>
+            {(endorsementCount > 0) && (
+              <EndorsementCountDiv>
+                {showOppose && (
+                  <ShowOpposeSpan
+                    id="candidateEndorsementCountOppose"
+                    onClick={() => this.onClickShowOrganizationModalWithPositions('candidateEndorsementCountOppose')}
+                  >
+                    {endorsementCount}
+                    {' '}
+                    Oppose
+                  </ShowOpposeSpan>
+                )}
+                {showSupport && (
+                  <ShowSupportSpan
+                    id="candidateEndorsementCountSupport"
+                    onClick={() => this.onClickShowOrganizationModalWithPositions('candidateEndorsementCountSupport')}
+                  >
+                    {endorsementCount}
+                    {' '}
+                    Support
+                  </ShowSupportSpan>
+                )}
+              </EndorsementCountDiv>
+            )}
+            {(endorsementNetworkCount > 0 && (showOppose || showSupport)) && (
+              <EndorsementCountDiv
+                id={`candidateEndorsementNetworkCount${showOppose && 'Oppose'}${showSupport && 'Support'}`}
+                onClick={() => this.onClickShowOrganizationModalWithPositions(`candidateEndorsementNetworkCount${showOppose && 'Oppose'}${showSupport && 'Support'}`)}
+              >
+                {endorsementCount}
+                {' '}
+                You Know
+              </EndorsementCountDiv>
+            )}
+          </CandidateEndorsementCount>
+          <CandidateEndorsementPhotos
+            id={`candidateEndorsementPhotos${showOppose && 'Oppose'}${showSupport && 'Support'}`}
+            onClick={() => this.onClickShowOrganizationModalWithPositions(`candidateEndorsementPhotos${showOppose && 'Oppose'}${showSupport && 'Support'}`)}
+          >
             {filteredPositionList.map((onePosition) => {
               // console.log('numberOfPositionItemsDisplayed:', numberOfPositionItemsDisplayed, ', numberOfImagesToDisplay:', numberOfImagesToDisplay);
               // console.log('onePosition:', onePosition);
@@ -493,14 +539,15 @@ class PositionRowListCompressed extends Component {
           </CandidateEndorsementPhotos>
           <OverlayTrigger overlay={filteredPositionListTooltip} placement="top" delay={{ show: 750 }}>
             <CandidateEndorsementText
-                onClick={() => {
-                  if (filteredPositionList && filteredPositionList.length === 0) {
-                    this.onClickShowOrganizationModalWithBallotItemInfoAndPositions('CandidateEndorsementText');
-                  } else {
-                    this.onClickShowOrganizationModalWithPositions('CandidateEndorsementText');
-                  }
-                }}
-                className="u-link-underline-on-hover"
+              className="u-link-underline-on-hover"
+              id={`candidateEndorsementText${showOppose && 'Oppose'}${showSupport && 'Support'}`}
+              onClick={() => {
+                if (filteredPositionList && filteredPositionList.length === 0) {
+                  this.onClickShowOrganizationModalWithBallotItemInfoAndPositions(`candidateEndorsementText${showOppose && 'Oppose'}${showSupport && 'Support'}`);
+                } else {
+                  this.onClickShowOrganizationModalWithPositions(`candidateEndorsementText${showOppose && 'Oppose'}${showSupport && 'Support'}`);
+                }
+              }}
             >
               {talkingAboutText}
               {!!(talkingAboutText) && <>&hellip;</>}
@@ -551,6 +598,13 @@ const CandidateEndorsementContainer = styled('div')(({ theme }) => (`
   }
 `));
 
+const CandidateEndorsementCount = styled('div')`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+`;
+
 const CandidateEndorsementPhotos = styled('div')`
   align-items: center;
   cursor: pointer;
@@ -579,13 +633,28 @@ const CandidateEndorsementsWrapper = styled('div')`
   width: 275px;
 `;
 
+const EndorsementCountDiv = styled('div')`
+  margin-bottom: 8px;
+  margin-right: 24px;
+`;
+
+const OneOrganizationName = styled('span')`
+`;
+
+const ShowOpposeSpan = styled('span')`
+  color: ${DesignTokenColors.alert400};
+  font-weight: 500;
+`;
+
+const ShowSupportSpan = styled('span')`
+  color: ${DesignTokenColors.confirmation400};
+  font-weight: 500;
+`;
+
 const Tooltipstyle = styled(Tooltip)`
   .tooltip-inner {
     max-width: 475px;
   }
-`;
-
-const OneOrganizationName = styled('span')`
 `;
 
 export default withTheme(withStyles(styles)(PositionRowListCompressed));
