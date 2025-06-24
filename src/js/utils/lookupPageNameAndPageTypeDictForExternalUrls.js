@@ -49,12 +49,27 @@ function calculatePageNameAndPageTypeDictForExternalUrls (path) {
   } else if (/^\/[^/\s]+$/.test(path)) {
     pageName = 'TwitterHandleLanding';
     pageType = 'twitterHandleLanding';
-  } else if (path.startsWith('https://instagram.com')) {
+  } else if (path.startsWith('https://instagram.com') || path.includes('instagram.com')) {
     pageName = 'InstagramProfile';
     pageType = 'socialMedia';
-  } else if (path.startsWith('https://x.com')) {
-    pageName = 'InstagramProfile';
+  } else if (path.startsWith('https://x.com') || path.includes('twitter.com')) { // Includes old Twitter domains
+    pageName = 'XTwitterProfile'; // Corrected name for X/Twitter
     pageType = 'socialMedia';
+  } else if (path.startsWith('https://www.youtube.com') || path.includes('youtube.com')) {
+    pageName = 'YouTubeChannel';
+    pageType = 'videoPlatform';
+  } else if (path.startsWith('https://www.wikipedia.org') || path.includes('wikipedia.org')) {
+    pageName = 'WikipediaPage';
+    pageType = 'encyclopedia';
+  } else if (path.startsWith('https://www.bing.com/search') || path.includes('bing.com/search')) {
+    pageName = 'BingSearchResults';
+    pageType = 'searchEngine';
+  } else if (path.startsWith('https://www.google.com/search') || path.includes('google.com/search')) {
+    pageName = 'GoogleSearchResults';
+    pageType = 'searchEngine';
+  } else if (path.includes('.')) { // not sure if this will error but trying to connect to personal websites
+    pageName = 'PersonalWebsite';
+    pageType = 'personalWebsite';
   }
   return {
     pageName,

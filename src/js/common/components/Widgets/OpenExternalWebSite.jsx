@@ -42,7 +42,7 @@ export default class OpenExternalWebSite extends Component {
           voterWeVoteId: VoterStore.getVoterWeVoteId(),
         },
       };
-      // console.log('Sending dataLayerObj to GTM:', dataLayerObj);
+      //console.log('Sending dataLayerObj to GTM:', dataLayerObj);
       TagManager.dataLayer({ dataLayer: dataLayerObj });
     }
   }
