@@ -148,7 +148,7 @@ class IssueCard extends Component {
     const { issue } = this.state;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPathname = this.getIssueLink();
-    const { destinationPageName, destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
+    const { pageName: destinationPageName, pageType: destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
 
     TagManager.dataLayer({
       dataLayer: {
