@@ -274,6 +274,31 @@ class HowItWorks extends Component {
     this.setState({ selectedStepIndex: selectedStepIndex - 1 });
   };
 
+  getTitleIdFromIndex (stepIndex) {
+    const {
+      selectedCategoryIndex,
+      forVoterSteps,
+      forOrganizationsSteps,
+      forCampaignsSteps,
+    } = this.state;
+
+    let steps = {};
+    if (selectedCategoryIndex === 0) {
+      steps = forVoterSteps;
+    } else if (selectedCategoryIndex === 1) {
+      steps = forOrganizationsSteps;
+    } else if (selectedCategoryIndex === 2) {
+      steps = forCampaignsSteps;
+    }
+
+    const step = Object.values(steps).find((stepObj) => stepObj.index === stepIndex);
+    if (step && step.titleId) {
+      return step.titleId;
+    } else {
+      return '';
+    }
+  }
+
   switchToDifferentCategoryFunction = (selectedCategoryIndex) => {
     let getStartedMode = 'getStartedForVoters';
     // let getStartedUrl = '/ballot';
@@ -295,6 +320,8 @@ class HowItWorks extends Component {
   sendHowItWorksSlideEvent (stepIndex) {
     const { location: { pathname: currentPathname } } = window;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
+    const titleId = this.getTitleIdFromIndex(stepIndex);
+
     TagManager.dataLayer({
       dataLayer: {
         event: 'action',
@@ -304,8 +331,8 @@ class HowItWorks extends Component {
           pathname: currentPathname,
         },
         actionDetails: {
+          buttonId: titleId,
           eventType: 'slideChange',
-          stepIndex,
         },
         userDetails: {
           stateCode: VoterStore.getVoterStateCode(),

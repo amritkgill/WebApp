@@ -52,6 +52,7 @@ class HowItWorksModal extends Component {
         },
         actionDetails: {
           buttonId: 'profileCloseHowItWorksModal',
+          actionType: 'closeModal',
         },
         userDetails: {
           stateCode: VoterStore.getVoterStateCode(),
