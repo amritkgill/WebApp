@@ -507,6 +507,13 @@ class SettingsVerifySecretCode extends Component {
       return null;
     }
 
+    let sentTo = voterPhoneNumber || voterEmailAddress;
+    // Parambatur.Narayanasami@wevoteeducation.org  6/25/25: Long names were making the dialog horizont123ally scrollable
+    if (voterEmailAddress.length > 25) {
+      const pieces = voterEmailAddress.split('@');
+      sentTo = `${pieces[0]}@\n${pieces[1]}`;
+    }
+
     return (
       <Dialog
         id="codeVerificationDialog"
@@ -536,7 +543,7 @@ class SettingsVerifySecretCode extends Component {
           <TextContainer>
             <Title condensed={condensed}>Code Verification</Title>
             <Subtitle>A 6-digit code has been sent to</Subtitle>
-            <PhoneSubtitle>{voterPhoneNumber || voterEmailAddress}</PhoneSubtitle>
+            <PhoneSubtitle>{sentTo}</PhoneSubtitle>
 
             {(voterEmailAddress) ? (
               <Subtitle>If you haven&apos;t received the code in 30 seconds, please check your spam folder and mark the email as &apos;Not Spam&apos;.</Subtitle>
