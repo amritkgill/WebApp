@@ -83,7 +83,7 @@ class SettingsVerifySecretCode extends Component {
     if (this.state.incorrectSecretCodeEntered !== nextState.incorrectSecretCodeEntered) return true;
     if (this.state.numberOfTriesRemaining !== nextState.numberOfTriesRemaining) return true;
     if (this.state.secretCodeVerified !== nextState.secretCodeVerified) return true;
-    if (this.state.voterEmailAddress !== nextState.voterEmailAddress) return true;
+    if (this.state?.voterEmailAddress !== nextState?.voterEmailAddress) return true;
     if (this.state.voterMustRequestNewCode !== nextState.voterMustRequestNewCode) return true;
     if (this.state.voterPhoneNumber !== nextState.voterPhoneNumber) return true;
     if (this.state.voterSecretCodeRequestsLocked !== nextState.voterSecretCodeRequestsLocked) return true;
@@ -509,7 +509,7 @@ class SettingsVerifySecretCode extends Component {
 
     let sentTo = voterPhoneNumber || voterEmailAddress;
     // Parambatur.Narayanasami@wevoteeducation.org  6/25/25: Long names were making the dialog horizont123ally scrollable
-    if (voterEmailAddress.length > 25) {
+    if (voterEmailAddress && voterEmailAddress.length > 25) {
       const pieces = voterEmailAddress.split('@');
       sentTo = `${pieces[0]}@\n${pieces[1]}`;
     }
