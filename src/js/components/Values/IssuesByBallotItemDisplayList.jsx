@@ -1,8 +1,11 @@
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import { renderLog } from '../../common/utils/logging';
 import IssueStore from '../../stores/IssueStore';
+import VoterStore from '../../stores/VoterStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import signInModalGlobalState from '../../common/components/Widgets/signInModalGlobalState';
 import ValueNameWithPopoverDisplay from './ValueNameWithPopoverDisplay';
@@ -139,12 +142,38 @@ class IssuesByBallotItemDisplayList extends Component {
   };
 
   handleExpandIssues = () => {
-    const { expandIssues, totalLengthOfIssuesToRenderList } = this.state;
+    const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId, ballotItemDisplayName } = this.state;
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    // dataLayer
+    const dataLayerObject = {
+      event: 'ShowMoreValuesClick',
+      context: {
+        ballotItemDisplayName,
+        ballotItemWeVoteId,
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: {
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
     this.setState({
       expandIssues: !expandIssues,
       currentNumberOfIssuesToDisplay: totalLengthOfIssuesToRenderList,
     });
   };
+
+
 
   handleHideIssues = () => {
     const { defaultNumberOfIssuesToDisplay } = this.state;
