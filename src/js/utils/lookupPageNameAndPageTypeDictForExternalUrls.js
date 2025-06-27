@@ -21,56 +21,89 @@ const pageNameAndTypeSimpleDictForExternalUrls = {
   },
 };
 
-// TODO Update to recognize social sites, and other regular places we send people
-function calculatePageNameAndPageTypeDictForExternalUrls (path) {
-  // If it's a WeVote URL, use the existing function
-  if (path.startsWith('/') || path.includes('wevote.us')) {
-    return lookupPageNameAndPageTypeDict(path);
-  }
+/**
+ * Takes a path to a page, or a full URL, but not a URL to wevote like https://wevote.us/ballot
+ * TODO Update to recognize social sites, and other regular places we send people
+ * @param pathOrURL
+ * @returns {{pageName: string, pageType: string}}
+ */
+function calculatePageNameAndPageTypeDict (pathOrURL) {
   // console.log("gtmPageNameAndType, path:", path);
-  let pageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having pageName being identical to settingsPageType will save us grief in the future.
+  let pageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having pageName being identical to pageType will save us grief in the future.
   let pageType = 'notSet';
 
-  if (path.includes('/more/about')) {
-    pageName = 'WeVoteTeam';
-    pageType = 'about';
-  } else if (path.includes('/more/credits')) {
-    pageName = 'WeVoteCredits';
-    pageType = 'about';
-  } else if (path.startsWith('/ballot')) {
+  if (pathOrURL.includes('/-/')) {
+    pageName = 'OpinionSource';
+    pageType = 'reference';
+  } else if (pathOrURL.startsWith('/ballot')) {
     pageName = 'Ballot';
     pageType = 'ballot';
-  } else if (path.endsWith('/cs/')) {
+  } else if (pathOrURL.startsWith('/candidate/')) {
+    pageName = 'Candidate';
+    pageType = 'candidate';
+  } else if (pathOrURL.startsWith('/measure/')) {
+    pageName = 'Measure';
+    pageType = 'measure';
+  } else if (pathOrURL.startsWith('/voterguide/')) {
+    pageName = 'OrganizationVoterGuide';
+    pageType = 'organizationVoterGuide';
+  } else if (pathOrURL.endsWith('/cs/')) {
     pageName = 'CampaignsHomeLoader';
     pageType = 'candidate';
-  } else if (isPoliticianSEOFriendlyURL(path)) {
-    pageType = 'politician';
+  } else if (isChallengeSEOFriendlyURL(pathOrURL)) {
+    // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
+    if (pathOrURL.endsWith('join-challenge')) {
+      pageName = 'ChallengeInviteFriendsJoin';
+    } else if (pathOrURL.endsWith('customize-message')) {
+      pageName = 'ChallengeInviteCustomizeMessage';
+    } else if (pathOrURL.endsWith('invite-friends')) {
+      pageName = 'ChallengeInviteFriends';
+    } else if (pathOrURL.endsWith('edit')) {
+      pageName = 'ChallengeStartEditAll';
+    } else {
+      pageName = 'ChallengeHomePage';
+    }
+    pageType = 'challenge';
+  } else if (pathOrURL.startsWith('/friends')) {
+    pageName = 'Friends';
+    pageType = 'friends';
+  } else if (pathOrURL.startsWith('/news')) {
+    pageName = 'News';
+    pageType = 'news';
+  } else if (pathOrURL.startsWith('/value/')) {
+    pageName = 'IssuePage';
+    pageType = 'issue';
+  } else if (isPoliticianSEOFriendlyURL(pathOrURL)) {
+    // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
     pageName = 'PoliticianDetailsPage';
-  } else if (/^\/[^/\s]+$/.test(path)) {
+    pageType = 'politician';
+  } else if (/^\/[^/\s]+$/.test(pathOrURL)) {
     pageName = 'TwitterHandleLanding';
-    pageType = 'twitterHandleLanding';
-  } else if (path.startsWith('https://instagram.com') || path.includes('instagram.com')) {
-    pageName = 'InstagramProfile';
-    pageType = 'socialMedia';
-  } else if (path.startsWith('https://x.com') || path.includes('twitter.com')) { // Includes old Twitter domains
-    pageName = 'XTwitterProfile'; // Corrected name for X/Twitter
-    pageType = 'socialMedia';
-  } else if (path.startsWith('https://www.youtube.com') || path.includes('youtube.com')) {
-    pageName = 'YouTubeChannel';
-    pageType = 'videoPlatform';
-  } else if (path.startsWith('https://www.wikipedia.org') || path.includes('wikipedia.org')) {
-    pageName = 'WikipediaPage';
-    pageType = 'encyclopedia';
-  } else if (path.startsWith('https://www.bing.com/search') || path.includes('bing.com/search')) {
-    pageName = 'BingSearchResults';
-    pageType = 'searchEngine';
-  } else if (path.startsWith('https://www.google.com/search') || path.includes('google.com/search')) {
-    pageName = 'GoogleSearchResults';
-    pageType = 'searchEngine';
-  } else if (path.includes('.')) { // not sure if this will error but trying to connect to personal websites
-    pageName = 'PersonalWebsite';
-    pageType = 'personalWebsite';
+    pageType = 'endorser';  // Changed from 'twitterHandleLanding' to 'endorser'
   }
+
+  if (pathOrURL.startsWith('https//' || 'http://')) {
+    if (pathOrURL.startsWith('https://instagram.com')) {
+      pageName = 'InstagramProfile';
+      pageType = 'socialMedia';
+    } else if (pathOrURL.startsWith('https://x.com') || pathOrURL.startsWith('https://twitter.com')) { // Includes old Twitter domains
+      pageName = 'XTwitterProfile'; // Corrected name for X/Twitter
+      pageType = 'socialMedia';
+    } else if (pathOrURL.startsWith('https://www.youtube.com')) {
+      pageName = 'YouTubeChannel';
+      pageType = 'videoPlatform';
+    } else if (pathOrURL.startsWith('https://www.wikipedia.org')) {
+      pageName = 'WikipediaPage';
+      pageType = 'encyclopedia';
+    } else if (pathOrURL.startsWith('https://www.bing.com/search')) {
+      pageName = 'BingSearchResults';
+      pageType = 'searchEngine';
+    } else if (pathOrURL.startsWith('https://www.google.com/search')) {
+      pageName = 'GoogleSearchResults';
+      pageType = 'searchEngine';
+    }
+  }
+
   return {
     pageName,
     pageType,
