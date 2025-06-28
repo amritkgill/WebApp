@@ -139,6 +139,7 @@ class OfficeItemCompressed extends Component {
               showMoreId={`officeItemCompressedShowMoreFooter-${officeWeVoteId}`}
               showMoreButtonsLink={showAllCandidates ? this.showLessCandidates : this.showAllCandidates}
               showMoreCustomText={showAllCandidates ? 'show fewer candidates' : `show all ${totalNumberOfCandidates} candidates`}
+              officeWeVoteId={officeWeVoteId}
             />
           </Suspense>
         )}

@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../stores/VoterStore';
+import OfficeStore from '../../stores/OfficeStore';
 
 class ShowMoreButtons extends React.Component {
   handleShowMoreClick = () => {
@@ -39,6 +40,17 @@ class ShowMoreButtons extends React.Component {
         voterWeVoteId: VoterStore.getVoterWeVoteId(),
       },
     };
+
+    const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};
+
+    if (this.props.officeWeVoteId) {
+      // const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};
+      dataLayerPayload.officeDetails = {
+        officeWeVoteId: this.props.officeWeVoteId,
+        officeName: officeData.ballot_item_display_name || '',
+        stateCode: officeData.state_code || '',
+      };
+    }
     TagManager.dataLayer({ dataLayer: dataLayerPayload });
     showMoreButtonsLink();
   };
