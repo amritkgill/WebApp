@@ -451,7 +451,7 @@ export function getAndroidSize () {
 
   androidPixels = width * height;
 
-  const ua = navigator.userAgent;
+  // const ua = navigator.userAgent;
   // console.log('Phone user agent: ', ua);
   // console.log('Phone device model: ', window.device.model);
   // console.log('Phone device viewport: ', height, width, scale);
