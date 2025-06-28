@@ -89,7 +89,7 @@ function calculatePageNameAndPageTypeDict (path) {
   let settingsPageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having settingsPageName being identical to settingsPageType will save us grief in the future.
   let settingsPageType = 'notSet';
 
-  if (path && (path.includes('http') || path.includes('https')) && !path.includes('wevote.us')) {
+  if (pathOrURL.includes('/-/')) {
     settingsPageName = 'OpinionSource';
     settingsPageType = 'reference';
   } else if (path.startsWith('/ballot')) {
