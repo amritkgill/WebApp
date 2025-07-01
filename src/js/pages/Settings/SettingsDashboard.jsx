@@ -199,6 +199,7 @@ export default class SettingsDashboard extends Component {
     const { editMode } = this.state;
     switch (editMode) {
       case 'account':
+      case 'securityAndSignIn':
         settingsComponentToDisplayDesktop = <SignInOptionsPanel externalUniqueId="domainDesktop" />;
         settingsComponentToDisplayMobile = <SignInOptionsPanel externalUniqueId="domainMobile" />;
         break;
