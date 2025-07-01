@@ -2,13 +2,13 @@ import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import TagManager from 'react-gtm-module';
+import styled from 'styled-components';
+import { ImportContactsOutlined, AccountBoxRounded, Lock, SecurityRounded, CampaignRounded, PeopleAltRounded, TextsmsRounded, ExitToAppRounded  } from '@mui/icons-material';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import VoterSessionActions from '../../actions/VoterSessionActions';
 import VoterStore from '../../stores/VoterStore';
 import { renderLog } from '../../common/utils/logging';
-import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
-import { ImportContactsOutlined, AccountBoxRounded, Lock, SecurityRounded, CampaignRounded, PeopleAltRounded, TextsmsRounded, ExitToAppRounded  } from '@mui/icons-material';
 
 const SettingsAccountLevelChip = React.lazy(() => import(/* webpackChunkName: 'SettingsAccountLeveLChip' */ '../Settings/SettingsAccountLevelChip'));
 
@@ -69,10 +69,11 @@ export default class SettingsPersonalSideBar extends Component {
     this.setState({
       isOnPartnerUrl: AppObservableStore.isOnPartnerUrl(),
     });
-  } 
-// helper functions 
-  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate' }) => {
-    const { isSignedIn} = this.state;
+  }
+
+  // helper functions
+  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null }) => {
+    const { isSignedIn } = this.state;
 
     TagManager.dataLayer({
       dataLayer: {
@@ -92,6 +93,7 @@ export default class SettingsPersonalSideBar extends Component {
         },
         userDetails: {
           isSignedIn,
+          ...(voterWeVoteId && { voterWeVoteId }),
         },
       },
     });
@@ -101,8 +103,9 @@ export default class SettingsPersonalSideBar extends Component {
     this.fireSettingsGTMEvent({
       buttonId: 'signOutPersonalSidebar',
       actionType: 'signOut',  // Sign Out is not a navigation, it's an action
+      voterWeVoteId: VoterStore.getLinkedOrganizationWeVoteId(),
     });
-  
+
     // Existing sign-out logic
     VoterSessionActions.voterSignOut();
   };
@@ -122,7 +125,6 @@ export default class SettingsPersonalSideBar extends Component {
     const showSettingsInDevelopment = false; // If developing any of the new settings, change this to true
     const isOnPartnerUrlAndNotAdmin = isOnPartnerUrl && !voterIsAdminForThisUrl;
     const alwaysTrue = true; // A temp fix for https://wevoteusa.atlassian.net/browse/WV-168
-    const pigsCanFly = false;
 
     return (
       <div className="card">
@@ -135,7 +137,7 @@ export default class SettingsPersonalSideBar extends Component {
               'SettingsItem__summary__item-container '}
             >
               <BorderBottomContainer id="personalSettingsContacts">
-                <Link 
+                <Link
                   to="/settings/contacts"
                   className="SettingsItem__summary__item"
                   onClick={() => this.fireSettingsGTMEvent({
@@ -144,7 +146,7 @@ export default class SettingsPersonalSideBar extends Component {
                   })}
                 >
                   <ImportContactsIcon isActive={String(editMode) === 'contacts'} />
-                  <LinkSpan isActive={String(editMode) === 'contacts'} >
+                  <LinkSpan isActive={String(editMode) === 'contacts'}>
                     Import Contacts
                   </LinkSpan>
                 </Link>
@@ -153,10 +155,10 @@ export default class SettingsPersonalSideBar extends Component {
           )}
 
           {isSignedIn && (
-            // <div className={String(editMode) === 'profile' ?
-            //   'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
-            //   'SettingsItem__summary__item-container '}
-            // >
+          // <div className={String(editMode) === 'profile' ?
+          //   'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
+          //   'SettingsItem__summary__item-container '}
+          // >
           <LinkContainer isActive={String(editMode) === 'profile'}>
             <div id="personalSettingsPhoto">
               <Link
@@ -174,7 +176,7 @@ export default class SettingsPersonalSideBar extends Component {
               </Link>
             </div>
           </LinkContainer>
-        )}
+          )}
 
           <LinkContainer isActive={String(editMode) === 'account'}>
             <div id="personalSettingsSecurity">
@@ -217,23 +219,23 @@ export default class SettingsPersonalSideBar extends Component {
               </div>
             </LinkContainer>
           )}
-            <LinkContainer isActive={String(editMode) === 'notifications'}>
-              <div id="personalSettingsNotifs">
-                <Link
+          <LinkContainer isActive={String(editMode) === 'notifications'}>
+            <div id="personalSettingsNotifs">
+              <Link
                   to="/settings/notifications"
                   className="SettingsItem__summary__item"
                   onClick={() => this.fireSettingsGTMEvent({
                     buttonId: 'personalSettingsNotifs',
                     destinationPath: '/settings/notifications',
                   })}
-                >
-                  <NotificationsIcon isActive={String(editMode) === 'notifications'} />
-                  <LinkSpan isActive={String(editMode) === 'notifications'}>
-                    Notifications
-                  </LinkSpan>
-                </Link>
-              </div>
-            </LinkContainer>
+              >
+                <NotificationsIcon isActive={String(editMode) === 'notifications'} />
+                <LinkSpan isActive={String(editMode) === 'notifications'}>
+                  Notifications
+                </LinkSpan>
+              </Link>
+            </div>
+          </LinkContainer>
 
           {alwaysTrue && (/* {!isOnPartnerUrl && ( */
             <LinkContainer isActive={String(editMode) === 'friends'}>
