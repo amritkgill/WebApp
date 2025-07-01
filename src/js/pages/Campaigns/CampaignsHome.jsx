@@ -24,6 +24,8 @@ import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
 import RepresentativeStore from '../../stores/RepresentativeStore';
 import VoterStore from '../../stores/VoterStore';
+import TagManager from 'react-gtm-module';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const CandidateListRoot = React.lazy(() => import(/* webpackChunkName: 'CandidateListRoot' */ '../../components/CandidateListRoot/CandidateListRoot'));
 const CampaignListRoot = React.lazy(() => import(/* webpackChunkName: 'CampaignListRoot' */ '../../common/components/CampaignListRoot/CampaignListRoot'));
@@ -76,6 +78,7 @@ class CampaignsHome extends Component {
       representativeListTimeStampOfChange: 0,
       searchText: '',
       stateCode: '',
+      dataLayerSent: false,
     };
   }
 
@@ -214,6 +217,40 @@ class CampaignsHome extends Component {
         }
       }
       window.scrollTo(0, 0);
+    }
+
+    if (!this.state.dataLayerSent && VoterStore.getVoterWeVoteId()) {
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+      const { match: { params: { state_candidates_phrase: stateCandidatesPhrase } } } = this.props;
+      
+      let urlStateCode = '';
+      if (stateCandidatesPhrase) {
+        let stateName = stateCandidatesPhrase.replace('-candidates', '').replace('-politicians-list', '');
+        stateName = stateName.replaceAll('-', ' ');
+        urlStateCode = convertStateTextToStateCode(stateName);
+        if (urlStateCode.toLowerCase() === 'na') {
+          urlStateCode = 'all';
+        }
+      }
+      
+      TagManager.dataLayer({
+        dataLayer: {
+          event: 'landing',
+          pageDetails: {
+            pageName: currentPage.pageName,
+            pageType: currentPage.pageType,
+            pathname: currentPathname,
+            stateCode: urlStateCode,
+          },
+          userDetails: {
+            stateCode: VoterStore.getVoterStateCode(),
+            userCohort: VoterStore.getAnalyticsUserCohort(),
+            voterWeVoteId: VoterStore.getVoterWeVoteId(),
+          },
+        },
+      });
+      this.setState({ dataLayerSent: true });
     }
   }
 
