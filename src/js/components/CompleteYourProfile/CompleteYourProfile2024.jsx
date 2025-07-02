@@ -51,6 +51,14 @@ class CompleteYourProfile2024 extends Component {
         stateCode: VoterStore.getVoterStateCode(),
         userCohort: VoterStore.getAnalyticsUserCohort(),
         voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        linkedPoliticianWeVoteId: VoterStore.getLinkedOrganizationWeVoteId(),
+        signInMethod: (() => {
+          if (VoterStore.getVoterIsSignedInWithEmail()) return 'email';
+          if (VoterStore.getVoterIsSignedInWithFacebook()) return 'facebook';
+          if (VoterStore.getVoterIsSignedInWithTwitter()) return 'twitter';
+          return 'none';
+        })(),
+        userStatus: VoterStore.getVoterIsSignedIn() ? 'signedIn' : 'notSignedIn',
       },
     };
     // console.log('CompleteYourProfile2024 component loaded:', dataLayerObject);
