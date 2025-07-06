@@ -39,9 +39,10 @@ function calculatePageNameAndPageTypeDictForExternalUrls (pathOrURL) {
   let pageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having pageName being identical to pageType will save us grief in the future.
   let pageType = 'notSet';
 
-  if (pathOrURL.includes('/-/')) {
-    pageName = 'OpinionSource';
-    pageType = 'reference';
+  if (isPoliticianSEOFriendlyURL(pathOrURL)) {
+    // We need this more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
+    pageName = 'PoliticianDetailsPage';
+    pageType = 'politician';
   } else if (pathOrURL.startsWith('/ballot')) {
     pageName = 'Ballot';
     pageType = 'ballot';
@@ -80,10 +81,6 @@ function calculatePageNameAndPageTypeDictForExternalUrls (pathOrURL) {
   } else if (pathOrURL.startsWith('/value/')) {
     pageName = 'IssuePage';
     pageType = 'issue';
-  } else if (isPoliticianSEOFriendlyURL(pathOrURL)) {
-    // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
-    pageName = 'PoliticianDetailsPage';
-    pageType = 'politician';
   } else if (/^\/[^/\s]+$/.test(pathOrURL)) {
     pageName = 'TwitterHandleLanding';
     pageType = 'endorser';  // Changed from 'twitterHandleLanding' to 'endorser'

@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import { renderLog } from '../../common/utils/logging';
+import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
+import PoliticianStore from '../../common/stores/PoliticianStore';
 import VoterStore from '../../stores/VoterStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import signInModalGlobalState from '../../common/components/Widgets/signInModalGlobalState';
@@ -142,7 +144,7 @@ class IssuesByBallotItemDisplayList extends Component {
   };
 
   handleExpandIssues = (buttonId) => {
-    const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId, ballotItemDisplayName } = this.state;
+    const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId } = this.state;
     const { location: { pathname: currentPathname } } = window;
     const page = lookupPageNameAndPageTypeDict(currentPathname);
     // dataLayer
@@ -152,10 +154,6 @@ class IssuesByBallotItemDisplayList extends Component {
         actionType: 'showMore',
         buttonId,
       },
-      context: {
-        ballotItemDisplayName,
-        ballotItemWeVoteId,
-      },
       pageDetails: {
         pageName: page.pageName,
         pageType: page.pageType,
@@ -163,7 +161,15 @@ class IssuesByBallotItemDisplayList extends Component {
       },
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
+    let candidate = {};
+    if (ballotItemWeVoteId.includes('cand')) {
+      dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(ballotItemWeVoteId);
+      candidate = CandidateStore.getCandidateByWeVoteId(ballotItemWeVoteId);
+    }
+    if (candidate && candidate.politician_we_vote_id) {
+      // Note that there is no guarantee that the politician data has been retrieved from the API server yet.
+      dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(candidate.politician_we_vote_id);
+    }
     TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     this.setState({
