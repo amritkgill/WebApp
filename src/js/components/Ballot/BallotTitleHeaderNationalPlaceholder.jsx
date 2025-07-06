@@ -110,11 +110,7 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
           buttonId,
         },
         event: 'action',
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
         pageDetails: {
           pageName: page.pageName,
           pageType: page.pageType,

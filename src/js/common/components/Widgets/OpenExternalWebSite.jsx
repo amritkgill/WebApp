@@ -23,7 +23,7 @@ export default class OpenExternalWebSite extends Component {
       const destinationPageNameLocalBackup = destinationPage.pageName;
       const destinationPageTypeLocalBackup = destinationPage.pageType;
       // console.log('External link clicked:', this.props.url);
-      const dataLayerObj = {
+      const dataLayerObject = {
         actionDetails: {
           actionType: 'navigate',
           buttonId: linkIdAttribute,
@@ -39,37 +39,16 @@ export default class OpenExternalWebSite extends Component {
           pageType: pageType || pageTypeLocalBackup,
           pathname: currentPathname,
         },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
       };
       if (candidateWeVoteId) {
-        const candidate = CandidateStore.getCandidateByWeVoteId(candidateWeVoteId);
-        if (candidate) {
-          dataLayerObj.candidateDetails = {
-            candidateWeVoteId: candidate.we_vote_id,
-            candidateName: candidate.ballot_item_display_name,
-            candidateTwitterHandle: candidate.twitter_handle,
-            candidatePoliticalParty: candidate.party,
-            contestOfficeWeVoteId: candidate.contest_office_we_vote_id,
-          };
-        }
+        dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(candidateWeVoteId);
       }
       if (politicianWeVoteId) {
-        const politician = PoliticianStore.getPoliticianByWeVoteId(politicianWeVoteId);
-        if (politician) {
-          dataLayerObj.politicianDetails = {
-            politicianWeVoteId: politician.we_vote_id,
-            politicianName: politician.politician_name,
-            politicianTwitterHandle: politician.twitter_handle,
-            politicianPoliticalParty: politician.political_party,
-          };
-        }
+        dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(politicianWeVoteId);
       }
-      // console.log('Sending dataLayerObj to GTM:', dataLayerObj);
-      TagManager.dataLayer({ dataLayer: dataLayerObj });
+      // console.log('Sending dataLayerObject to GTM:', dataLayerObject);
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
     }
   }
 

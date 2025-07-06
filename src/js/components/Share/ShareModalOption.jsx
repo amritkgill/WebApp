@@ -63,6 +63,7 @@ class ShareModalOption extends Component {
 
   copyLink = () => {
     // console.log('ShareModalOption copyLink');
+    const { location: { pathname: currentPathname } } = window;
     openSnackbar({ message: 'Copied!' });
     this.setState({
       copyLinkCopied: true,
@@ -78,16 +79,11 @@ class ShareModalOption extends Component {
       },
       pageDetails: {
         pageName: 'ShareModal',
-        pathname: window.location.pathname,
+        pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
-      timestamp: new Date().toISOString(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-    console.log('DataLayer for ShareModal Copy Link:', dataLayerObject);
+    // console.log('DataLayer for ShareModal Copy Link:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 

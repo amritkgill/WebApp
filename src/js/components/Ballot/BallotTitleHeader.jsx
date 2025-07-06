@@ -136,11 +136,7 @@ class BallotTitleHeader extends Component {
           buttonId,
         },
         event: 'action',
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
         pageDetails: {
           pageName: page.pageName,
           pageType: page.pageType,
@@ -154,7 +150,7 @@ class BallotTitleHeader extends Component {
           },
         },
       };
-      console.log('dataLayerObject:', dataLayerObject);
+      // console.log('dataLayerObject:', dataLayerObject);
       TagManager.dataLayer({ dataLayer: dataLayerObject });
 
       AppObservableStore.setShowSelectBallotModal(showSelectBallotModal, showEditAddress);

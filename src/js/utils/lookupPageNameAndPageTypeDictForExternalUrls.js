@@ -91,25 +91,25 @@ function calculatePageNameAndPageTypeDictForExternalUrls (pathOrURL) {
 
   if (pathOrURL.startsWith('https//') || pathOrURL.startsWith('http://')) {
     if (pathOrURL.startsWith('https://instagram.com')) {
-      pageName = 'InstagramProfile';
+      pageName = 'Instagram';
       pageType = 'socialMedia';
     } else if (pathOrURL.startsWith('https://x.com') || pathOrURL.startsWith('https://twitter.com')) { // Includes old Twitter domains
-      pageName = 'XTwitterProfile'; // Corrected name for X/Twitter
+      pageName = 'XTwitter'; // Corrected name for X/Twitter
       pageType = 'socialMedia';
     } else if (pathOrURL.startsWith('https://www.youtube.com')) {
-      pageName = 'YouTubeChannel';
+      pageName = 'YouTube';
       pageType = 'videoPlatform';
     } else if (pathOrURL.startsWith('https://www.wikipedia.org')) {
-      pageName = 'WikipediaPage';
+      pageName = 'Wikipedia';
       pageType = 'encyclopedia';
     } else if (pathOrURL.startsWith('https://www.bing.com/search')) {
-      pageName = 'BingSearchResults';
+      pageName = 'BingSearch';
       pageType = 'searchEngine';
     } else if (pathOrURL.startsWith('https://www.google.com/search')) {
-      pageName = 'GoogleSearchResults';
+      pageName = 'GoogleSearch';
       pageType = 'searchEngine';
     } else if (pathOrURL.includes('projects.propublica.org/nonprofits/organizations')) {
-      pageName = 'WeVoteBudget';
+      pageName = 'Propublica';
       pageType = 'donation';
     }
   }

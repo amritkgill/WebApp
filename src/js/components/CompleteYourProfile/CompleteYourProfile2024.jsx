@@ -47,19 +47,7 @@ class CompleteYourProfile2024 extends Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        linkedPoliticianWeVoteId: VoterStore.getLinkedOrganizationWeVoteId(),
-        signInMethod: (() => {
-          if (VoterStore.getVoterIsSignedInWithEmail()) return 'email';
-          if (VoterStore.getVoterIsSignedInWithFacebook()) return 'facebook';
-          if (VoterStore.getVoterIsSignedInWithTwitter()) return 'twitter';
-          return 'none';
-        })(),
-        userStatus: VoterStore.getVoterIsSignedIn() ? 'signedIn' : 'notSignedIn',
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // console.log('CompleteYourProfile2024 component loaded:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
@@ -240,15 +228,9 @@ class CompleteYourProfile2024 extends Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
     // console.log('openHowItWorksModal dataLayer:', dataLayerObject);
-
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
@@ -275,15 +257,9 @@ class CompleteYourProfile2024 extends Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
     // console.log('openPersonalizedScoreIntroModal dataLayer:', dataLayerObject);
-
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
@@ -346,15 +322,9 @@ class CompleteYourProfile2024 extends Component {
           pageType: currentPage.pageType,
           pathname: currentPathname,
         },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
       };
-
       // console.log('toggleShowSignInModal dataLayer:', dataLayerObject);
-
       TagManager.dataLayer({ dataLayer: dataLayerObject });
     }
 

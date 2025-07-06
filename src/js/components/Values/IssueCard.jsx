@@ -143,43 +143,34 @@ class IssueCard extends Component {
     this.addToIssueFollowersAdjustment(-1);
   }
 
-  handleIssueClick = () => {
+  handleIssueClick = (buttonId) => {
     const { location: { pathname: currentPathname } } = window;
     const { issue } = this.state;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPathname = this.getIssueLink();
     const { pageName: destinationPageName, pageType: destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          buttonId: 'valueListLink',
-          actionType: 'navigate', // By AnujaL
-        },
-        event: 'action',
-        pageDetails: {
-          pageName,
-          pageType,
-          pathname: currentPathname,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        topicDetails: {
-          consideredLeft: issue.considered_left,
-          consideredRight: issue.considered_right,
-          topicName: issue.issue_name,
-          topicWeVoteId: issue.issue_we_vote_id,
-        },
-        destinationDetails: {
-          destinationPageName,
-          destinationPageType,
-          destinationPathname,
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'navigate',
+        buttonId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+      destinationDetails: {
+        destinationPageName,
+        destinationPageType,
+        destinationPathname,
+      },
+    };
+    if (issue.issue_we_vote_id) {
+      dataLayerObject.topicDetails = IssueStore.getAnalyticsIssueDetails(issue.issue_we_vote_id);
+    }
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
 
   addToIssueFollowersAdjustment (value) {
@@ -402,10 +393,11 @@ class IssueCard extends Component {
                     <span>
                       {includeLinkToIssue ? (
                         <Link
-                              to={this.getIssueLink}
-                              className="u-no-underline"
-                              tabIndex={-1}
-                              onClick={this.handleIssueClick}
+                          id={`issueIconClick-${issueWeVoteId}`}
+                          to={this.getIssueLink}
+                          className="u-no-underline"
+                          tabIndex={-1}
+                          onClick={() => this.handleIssueClick(`issueIconClick-${issueWeVoteId}`)}
                         >
                           {issueImage}
                         </Link>
@@ -419,10 +411,11 @@ class IssueCard extends Component {
                 </IssueImage>
                 <>
                   {includeLinkToIssue ? (
-                    <Link id="valueListLink"
-                          to={this.getIssueLink}
-                          className="u-link-color"
-                          onClick={this.handleIssueClick}
+                    <Link
+                      id="issueNameClick"
+                      to={this.getIssueLink}
+                      className="u-link-color"
+                      onClick={() => this.handleIssueClick(`issueNameClick-${issueWeVoteId}`)}
                     >
                       {issueNameAndCount}
                     </Link>
@@ -455,6 +448,8 @@ class IssueCard extends Component {
           <IssueCardDescription>
             <Suspense fallback={<></>}>
               <ReadMore
+                buttonId="clickShowMoreAboutIssue"
+                issueWeVoteId={issueWeVoteId}
                 textToDisplay={issueDescription}
                 numberOfLines={numberOfLines}
               />
@@ -465,9 +460,10 @@ class IssueCard extends Component {
           <OverlayTrigger overlay={linkedOrganizationsTooltip} placement="top">
             <span>
               {includeLinkToIssue ? (
-                <Link id="issueAdvocatesLink"
-                      to={this.getIssueLink}
-                      onClick={this.handleIssueClick} // By AnujaL
+                <Link
+                  id="issueAdvocatesLink"
+                  to={this.getIssueLink}
+                  onClick={() => this.handleIssueClick(`issueAdvocatesLink-${issueWeVoteId}`)}
                 >
                   {issueAdvocates}
                 </Link>

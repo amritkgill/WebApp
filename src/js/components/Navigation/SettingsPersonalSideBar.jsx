@@ -72,38 +72,32 @@ export default class SettingsPersonalSideBar extends Component {
   }
 
   // helper functions
-  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null }) => {
-    const { isSignedIn } = this.state;
-
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'action',
-        actionDetails: {
-          actionType,
-          buttonId,
-        },
-        ...(destinationPath && {
-          destinationDetails: {
-            destinationPath,
-          },
-        }),
-        pageDetails: {
-          pageTitle: document.title,
-          pagePath: window.location.pathname,
-        },
-        userDetails: {
-          isSignedIn,
-          ...(voterWeVoteId && { voterWeVoteId }),
-        },
+  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate' }) => {
+    const { location: { pathname: currentPathname } } = window;
+    const dataLayerObject = {
+      event: 'action',
+      actionDetails: {
+        actionType,
+        buttonId,
       },
-    });
+      ...(destinationPath && {
+        destinationDetails: {
+          destinationPath,
+        },
+      }),
+      pageDetails: {
+        pageTitle: document.title,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
 
   voterSignOut = () => {
     this.fireSettingsGTMEvent({
       buttonId: 'signOutPersonalSidebar',
       actionType: 'signOut',  // Sign Out is not a navigation, it's an action
-      voterWeVoteId: VoterStore.getLinkedOrganizationWeVoteId(),
     });
 
     // Existing sign-out logic

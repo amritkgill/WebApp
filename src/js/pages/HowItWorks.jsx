@@ -321,26 +321,20 @@ class HowItWorks extends Component {
     const { location: { pathname: currentPathname } } = window;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const titleId = this.getTitleIdFromIndex(stepIndex);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'action',
-        pageDetails: {
-          pageName,
-          pageType,
-          pathname: currentPathname,
-        },
-        actionDetails: {
-          buttonId: titleId,
-          eventType: 'slideChange',
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'slideChange',
+        buttonId: titleId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   howItWorksGetStarted () {

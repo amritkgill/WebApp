@@ -313,26 +313,19 @@ class PoliticianDetailsPage extends Component {
       if (politician && politician.politician_we_vote_id) {
         // console.log('Politician Details retrieved, Adding DataLayer...');
         const { location: { pathname: currentPathname } } = window;
-        const politicianState = politician.state_code || 'na';
-        const dataLayerObj = {
+        const dataLayerObject = {
           event: 'landing',
-          userDetails: {
-            stateCode: VoterStore.getVoterStateCode(),
-            userCohort: VoterStore.getAnalyticsUserCohort(),
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
-          politicianDetails: {
-            politicianWeVoteId: politician.politician_we_vote_id,
-            politicianName: politician.politician_name,
-            politicianState,
-          },
+          userDetails: VoterStore.getAnalyticsUserDetails(),
           pageDetails: {
             pageName: this.constructor.name, // name of page from constructor itself
             pageType: 'politician', // in which page we are currently
             pathname: currentPathname,
           },
         };
-        TagManager.dataLayer({ dataLayer: dataLayerObj });
+        if (politician.politician_we_vote_id) {
+          dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(politician.politician_we_vote_id);
+        }
+        TagManager.dataLayer({ dataLayer: dataLayerObject });
         // Set the flag to true so that it runs just once
         this.setState({
           dataLayerSent: true,

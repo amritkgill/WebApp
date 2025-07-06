@@ -32,6 +32,7 @@ import PositionPublicToggle from '../../PositionItem/PositionPublicToggle';
 import PositionStatementModal from '../PositionStatementModal'; // eslint-disable-line import/no-cycle
 import ShareButtonDropDown from '../ShareButtonDropdown';
 import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
+import CandidateStore from '../../../stores/CandidateStore';
 
 const HelpWinOrDefeatModal = React.lazy(() => import(/* webpackChunkName: 'HelpWinOrDefeatModal' */ '../../../common/components/CampaignSupport/HelpWinOrDefeatModal')); // eslint-disable-line import/no-cycle
 
@@ -265,6 +266,7 @@ class ItemActionBar extends PureComponent {
 
   openHelpWinOrDefeatModal = (isHelpWinOrHelpDefeat, buttonId = '') => {
     const { politicianWeVoteId } = this.props;
+    const { ballotItemWeVoteId } = this.state;
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
 
@@ -274,11 +276,7 @@ class ItemActionBar extends PureComponent {
         buttonId,
       },
       event: 'action',
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
       pageDetails: {
         pageName: currentPage.pageName,
         pageType: currentPage.pageType,
@@ -290,17 +288,13 @@ class ItemActionBar extends PureComponent {
         destinationPathname: currentPathname,
       },
     };
+    if (ballotItemWeVoteId.includes('cand')) {
+      dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(ballotItemWeVoteId);
+    }
     if (politicianWeVoteId) {
-      const politician = PoliticianStore.getPoliticianByWeVoteId(politicianWeVoteId);
-      dataLayerObject.politicianDetails = {
-        politicalParty: politician.political_party,
-        politicianName: politician.politician_name,
-        politicianStateCode: politician.state_code,
-        politicianWeVoteId: politician.we_vote_id,
-      };
+      dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(politicianWeVoteId);
     }
     TagManager.dataLayer({ dataLayer: dataLayerObject });
-    // const { ballotItemWeVoteId } = this.props;
     // console.log('openHelpWinOrDefeatModal ballotItemWeVoteId: ', ballotItemWeVoteId);
     this.setState({
       helpWinOrDefeatModalOpen: true,
@@ -1094,7 +1088,7 @@ class ItemActionBar extends PureComponent {
 }
 ItemActionBar.propTypes = {
   ballotItemDisplayName: PropTypes.string,
-  ballotItemWeVoteId: PropTypes.string.isRequired,
+  ballotItemWeVoteId: PropTypes.string,
   buttonsOnly: PropTypes.bool,
   classes: PropTypes.object,
   commentButtonHide: PropTypes.bool,

@@ -115,14 +115,9 @@ class ShareByCopyLink extends Component {
         pageType: page.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
-      timestamp: new Date().toISOString(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-    console.log('DataLayer for copy link:', dataLayerObject);
+    // console.log('DataLayer for copy link:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 

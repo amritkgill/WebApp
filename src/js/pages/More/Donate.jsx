@@ -67,24 +67,18 @@ class Donate extends Component {
     window.scrollTo(0, 0);
     window.addEventListener('resize', this.handleResize);
 
-    const currentPathname = window.location.pathname;
+    const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'landing',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      event: 'landing',
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
       },
-    });
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   componentDidUpdate () {

@@ -69,6 +69,16 @@ class IssueStore extends ReduceStore {
     return this.getIssuesFromListOfWeVoteIds(allIssueKeys, includeOrganizationsCount);
   }
 
+  getAnalyticsIssueDetails (issueWeVoteId) {
+    const issue = this.getIssueByWeVoteId(issueWeVoteId);
+    return {
+      consideredLeft: issue.considered_left,
+      consideredRight: issue.considered_right,
+      topicName: issue.issue_name,
+      topicWeVoteId: issueWeVoteId,
+    };
+  }
+
   areIssuesFollowedLoadedFromAPIServer () {
     return this.getState().issuesFollowedLoadedFromAPIServer;
   }

@@ -25,8 +25,8 @@ class HowItWorksModal extends Component {
     this.closeHowItWorksModal = this.closeHowItWorksModal.bind(this);
   }
 
-  closeHowItWorksModal () {
-    this.sendHowItWorksCloseEvent();
+  closeHowItWorksModal (buttonId) {
+    this.sendHowItWorksCloseEvent(buttonId);
     // const { howItWorksWatched } = this.state;
     // const minimumStepIndexForCompletion = 1; // Was 2, but even opening it should get rid of the tickler
     const alwaysMarkedWatched = true;
@@ -39,28 +39,23 @@ class HowItWorksModal extends Component {
     this.props.toggleFunction(pathname);
   }
 
-  sendHowItWorksCloseEvent () {
+  sendHowItWorksCloseEvent (buttonId) {
     const { location: { pathname: currentPathname } } = window;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'action',
-        pageDetails: {
-          pageName,
-          pageType,
-          pathname: currentPathname,
-        },
-        actionDetails: {
-          buttonId: 'profileCloseHowItWorksModal',
-          actionType: 'closeModal',
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'closeModal',
+        buttonId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {
@@ -84,7 +79,7 @@ class HowItWorksModal extends Component {
           <IconButton
             aria-label="Close"
             className={classes.closeButton}
-            onClick={this.closeHowItWorksModal}
+            onClick={() => this.closeHowItWorksModal('profileCloseHowItWorksModal')}
             id="profileCloseHowItWorksModal"
             size="large"
           >

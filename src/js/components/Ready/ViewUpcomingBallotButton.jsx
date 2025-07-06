@@ -72,30 +72,25 @@ class ViewUpcomingBallotButton extends React.Component {
       const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
       const destinationPathname = '/ballot';
       const destinationPage = lookupPageNameAndPageTypeDict(destinationPathname);
-      TagManager.dataLayer({
-        dataLayer: {
-          actionDetails: {
-            actionType: 'navigate',
-            buttonId: 'viewUpcomingBallotButton',
-          },
-          event: 'action',
-          userDetails: {
-            stateCode: VoterStore.getVoterStateCode(),
-            userCohort: VoterStore.getAnalyticsUserCohort(),
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
-          destinationDetails: {
-            destinationPageName: destinationPage.pageName,
-            destinationPageType: destinationPage.pageType,
-            destinationPathname,
-          },
-          pageDetails: {
-            pageName: currentPage.pageName,
-            pageType: currentPage.pageType,
-            pathname: currentPathname,
-          },
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'navigate',
+          buttonId: 'viewUpcomingBallotButton',
         },
-      });
+        event: 'action',
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+        destinationDetails: {
+          destinationPageName: destinationPage.pageName,
+          destinationPageType: destinationPage.pageType,
+          destinationPathname,
+        },
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
       this.props.goToBallotFunction();
     }
   }

@@ -186,26 +186,20 @@ class ShareModal extends Component {
   closeShareModal = (buttonId = '') => {
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          actionType: 'close',
-          buttonId,
-        },
-        event: 'action',
-        pageDetails: {
-          pageName: 'ShareModal',
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'closeModal',
+        buttonId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName: 'ShareModal',
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     this.props.closeShareModal(currentPathname);
   }

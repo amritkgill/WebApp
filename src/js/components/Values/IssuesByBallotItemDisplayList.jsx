@@ -141,13 +141,17 @@ class IssuesByBallotItemDisplayList extends Component {
     }
   };
 
-  handleExpandIssues = () => {
+  handleExpandIssues = (buttonId) => {
     const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId, ballotItemDisplayName } = this.state;
     const { location: { pathname: currentPathname } } = window;
     const page = lookupPageNameAndPageTypeDict(currentPathname);
     // dataLayer
     const dataLayerObject = {
-      event: 'ShowMoreValuesClick',
+      event: 'action',
+      actionDetails: {
+        actionType: 'showMore',
+        buttonId,
+      },
       context: {
         ballotItemDisplayName,
         ballotItemWeVoteId,
@@ -157,12 +161,7 @@ class IssuesByBallotItemDisplayList extends Component {
         pageType: page.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-      },
-      timestamp: new Date().toISOString(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
 
     TagManager.dataLayer({ dataLayer: dataLayerObject });
@@ -172,8 +171,6 @@ class IssuesByBallotItemDisplayList extends Component {
       currentNumberOfIssuesToDisplay: totalLengthOfIssuesToRenderList,
     });
   };
-
-
 
   handleHideIssues = () => {
     const { defaultNumberOfIssuesToDisplay } = this.state;
@@ -270,7 +267,7 @@ class IssuesByBallotItemDisplayList extends Component {
                       {(currentNumberOfIssuesToDisplay < totalLengthOfIssuesToRenderList) && (
                         <MoreWrapper
                           id="issuesByBallotItemDisplayListMoreIssues"
-                          onClick={this.handleExpandIssues}
+                          onClick={() => this.handleExpandIssues('issuesByBallotItemDisplayListMoreIssues')}
                         >
                           show more
                         </MoreWrapper>

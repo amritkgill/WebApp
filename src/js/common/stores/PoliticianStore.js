@@ -52,6 +52,17 @@ class PoliticianStore extends ReduceStore {
     return Object.values(allCachedPositionsForThisPoliticianDict);
   }
 
+  getAnalyticsPoliticianDetails (politicianWeVoteId) {
+    const politician = this.getPoliticianByWeVoteId(politicianWeVoteId);
+    return {
+      image: politician ? politician.we_vote_hosted_profile_image_url_medium : '',
+      politicalParty: politician ? politician.political_party : '',
+      politicianName: politician ? this.getPoliticianName(politicianWeVoteId) : '',
+      politicianWeVoteId,
+      stateCode: politician ? politician.state_code || 'na' : '',
+    };
+  }
+
   getPoliticianListByOfficeWeVoteId (officeWeVoteId) {
     // console.log('officeWeVoteId:', officeWeVoteId, ', this.getState().politicianListsByOfficeWeVoteId:', this.getState().politicianListsByOfficeWeVoteId);
     const politicianListsDict = this.getState().politicianListsByOfficeWeVoteId;

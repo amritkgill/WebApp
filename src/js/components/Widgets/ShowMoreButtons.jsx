@@ -13,6 +13,7 @@ import OfficeStore from '../../stores/OfficeStore';
 class ShowMoreButtons extends React.Component {
   handleShowMoreClick = () => {
     const {
+      officeWeVoteId,
       showMoreId,
       showMoreButtonsLink,
       showMoreButtonWasClicked,
@@ -23,7 +24,7 @@ class ShowMoreButtons extends React.Component {
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
 
-    const dataLayerPayload = {
+    const dataLayerObject = {
       event: 'action',
       actionDetails: {
         actionType,
@@ -34,24 +35,17 @@ class ShowMoreButtons extends React.Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
     const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};
-
-    if (this.props.officeWeVoteId) {
-      // const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};
-      dataLayerPayload.officeDetails = {
-        officeWeVoteId: this.props.officeWeVoteId,
+    if (officeWeVoteId) {
+      dataLayerObject.officeDetails = {
         officeName: officeData.ballot_item_display_name || '',
+        officeWeVoteId,
         stateCode: officeData.state_code || '',
       };
     }
-    TagManager.dataLayer({ dataLayer: dataLayerPayload });
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
     showMoreButtonsLink();
   };
 
@@ -80,6 +74,7 @@ class ShowMoreButtons extends React.Component {
 
 ShowMoreButtons.propTypes = {
   classes: PropTypes.object,
+  officeWeVoteId: PropTypes.string,
   showLessCustomText: PropTypes.string,
   showMoreId: PropTypes.string.isRequired,
   showMoreButtonsLink: PropTypes.func.isRequired,

@@ -117,28 +117,11 @@ class PositionRowListCompressed extends Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // Add candidate or measure details based on ballotItemWeVoteId
     if (ballotItemWeVoteId.includes('cand')) {
-      const candidate = CandidateStore.getCandidateByWeVoteId(ballotItemWeVoteId);
-
-      // console.log('Candidate object structure:', candidate);
-      // console.log('Available candidate properties:', candidate ? Object.keys(candidate) : 'No candidate found');
-
-      dataLayerObject.candidateDetails = {
-        candidateWeVoteId: ballotItemWeVoteId,
-        candidateName: candidate ? CandidateStore.getCandidateName(ballotItemWeVoteId) : '',
-        // Add other properties from spreadsheet as available:
-        image: candidate ? candidate.candidate_photo_url_medium : '',
-        officeName: candidate ? candidate.contest_office_name : '',
-        politicalParty: candidate ? candidate.party : '',
-        stateCode: candidate ? candidate.state_code : '',
-      };
+      dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(ballotItemWeVoteId);
       // console.log('Final candidateDetails for analytics:', dataLayerObject.candidateDetails);
     } else if (ballotItemWeVoteId.includes('meas')) {
       dataLayerObject.measureDetails = {

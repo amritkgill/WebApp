@@ -143,7 +143,7 @@ describe('Basic cross-platform We Vote test', async () => {
     await simpleClick('toggle-button'); // Click dropdown button
     await simpleClick('unfollowValue'); // Unfollow value
     await hiddenClickNth('[id^=issueFollowButton-]', 1); // Follow value
-    await hiddenClickNth('#valueListLink', 1); // Click value link
+    await hiddenClickNth('#issueNameClick', 1); // Click value link
     await selectClick(publicFigureOrOrganizationFollowSelector); // Follow endorsement
     await selectClick(publicFigureOrOrganizationDropDownSelector); // Click dropdown button
     await selectClick(publicFigureOrOrganizationUnfollowSelector); // Unfollow endorsement
@@ -156,7 +156,7 @@ describe('Basic cross-platform We Vote test', async () => {
     await selectClick(publicFigureOrOrganizationUnignoreSelector); // Click unignore button
     await scrollIntoViewSimple('valuesListTitle'); // Scrolls to "Explore More Values"
     await selectClick('[id^=issueFollowButton-]'); // Follow value
-    await simpleClick('valueListLink'); // Clicks on value
+    await simpleClick('issueNameClick'); // Clicks on value
     await simpleClick('backToLinkTabHeader'); // Clicks on "Back"
     await simpleClick('backToLinkTabHeader'); // Clicks on "Back"
     await scrollIntoViewSimple('valuesToFollowPreviewShowMoreId'); // Scrolls to "Find more organizations"

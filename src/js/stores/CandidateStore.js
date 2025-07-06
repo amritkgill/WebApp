@@ -142,6 +142,20 @@ class CandidateStore extends ReduceStore {
     return allCachedPositionsList;
   }
 
+  getAnalyticsCandidateDetails (candidateWeVoteId) {
+    const candidate = this.getCandidateByWeVoteId(candidateWeVoteId);
+    return {
+      candidateWeVoteId,
+      candidateName: candidate ? this.getCandidateName(candidateWeVoteId) : '',
+      image: candidate ? candidate.candidate_photo_url_medium : '',
+      officeName: candidate ? candidate.contest_office_name : '',
+      politicianWeVoteId: candidate ? candidate.politician_we_vote_id : '',
+      politicalParty: candidate ? candidate.party : '',
+      stateCode: candidate ? candidate.state_code : '',
+      twitterHandle: candidate ? candidate.candidate_twitter_handle : '',
+    };
+  }
+
   getCandidateByLinkedCampaignXWeVoteId (campaignXWeVoteId) {
     const candidateWeVoteId = this.getState().allCachedCandidateWeVoteIdsByCampaignXWeVoteId[campaignXWeVoteId] || '';
     const candidate = this.getCandidateByWeVoteId(candidateWeVoteId);

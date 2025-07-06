@@ -79,11 +79,7 @@ class SearchBar2024 extends Component {
           buttonId: 'search_input',
         },
         event: 'action',
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
         pageDetails: {
           pageType: currentPage.pageType,
           pageName: currentPage.pageName,

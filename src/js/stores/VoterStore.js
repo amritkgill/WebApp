@@ -91,6 +91,18 @@ class VoterStore extends ReduceStore {
     return 'organic'; // TODO: Add more options
   }
 
+  getAnalyticsUserDetails () {
+    return {
+      linkedPoliticianWeVoteId: this.getLinkedPoliticianWeVoteId(),
+      signedInEmail: this.getVoterIsSignedInWithEmail(),
+      signedInPhone: this.getVoterIsSignedInWithPhone(),
+      stateCode: this.getVoterStateCode(),
+      userCohort: this.getAnalyticsUserCohort(),
+      userStatus: this.getVoterSignInStatus(),
+      voterWeVoteId: this.getVoterWeVoteId(),
+    };
+  }
+
   getBallotLocationForVoter () {
     // console.log('getBallotLocationForVoter this.getState().address:', this.getState().address);
     if (this.getState().address) {
@@ -177,6 +189,11 @@ class VoterStore extends ReduceStore {
 
   getLinkedOrganizationWeVoteId () {
     return this.getState().voter.linked_organization_we_vote_id || '';
+  }
+
+  getLinkedPoliticianWeVoteId () {
+    // To be created
+    return '';
   }
 
   getPrimaryEmailAddressDict () {
@@ -320,6 +337,10 @@ class VoterStore extends ReduceStore {
     return this.getState().voter.signed_in_facebook || false;
   }
 
+  getVoterIsSignedInWithPhone () {
+    return this.getState().voter.signed_in_with_sms_phone_number || false;
+  }
+
   getVoterIsSignedInWithTwitter () {
     return this.getState().voter.signed_in_twitter || false;
   }
@@ -385,6 +406,10 @@ class VoterStore extends ReduceStore {
       return this.getState().address.normalized_state;
     }
     return this.getStateCode() || this.getStateCodeFromIPAddress() || '';
+  }
+
+  getVoterSignInStatus () {
+    return this.getVoterIsSignedIn() ? 'signedIn' : 'notSignedIn';
   }
 
   getVoterWeVoteId () {
