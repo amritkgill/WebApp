@@ -38,14 +38,6 @@ const pageNameAndTypeSimpleDictForExternalUrls = {
     pageName: 'WeVoteVolunteer',
     pageType: 'career',
   },
-  'https://www.WeVoteEducation.org': {
-    pageName: 'WeVoteEducation',
-    pageType: 'organization',
-  },
-  'https://www.WeVoteUSA.org': {
-    pageName: 'WeVoteUSA',
-    pageType: 'organization',
-  },
   'https://projects.propublica.org/nonprofits/organizations/472691544': {
     pageName: 'WeVoteBudget',
     pageType: 'donation',
@@ -53,6 +45,14 @@ const pageNameAndTypeSimpleDictForExternalUrls = {
   'https://projects.propublica.org/nonprofits/organizations/811052585': {
     pageName: 'WeVoteBudget',
     pageType: 'donation',
+  },
+  'https://www.WeVoteEducation.org': {
+    pageName: 'WeVoteEducation',
+    pageType: 'organization',
+  },
+  'https://www.WeVoteUSA.org': {
+    pageName: 'WeVoteUSA',
+    pageType: 'organization',
   },
 };
 
@@ -67,9 +67,10 @@ function calculatePageNameAndPageTypeDictForExternalUrls (pathOrURL) {
   let pageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having pageName being identical to pageType will save us grief in the future.
   let pageType = 'notSet';
 
-  if (pathOrURL.includes('/-/')) {
-    pageName = 'OpinionSource';
-    pageType = 'reference';
+  if (isPoliticianSEOFriendlyURL(pathOrURL)) {
+    // We need this more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
+    pageName = 'PoliticianDetailsPage';
+    pageType = 'politician';
   } else if (pathOrURL.startsWith('/ballot')) {
     pageName = 'Ballot';
     pageType = 'ballot';
