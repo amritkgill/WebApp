@@ -12,7 +12,7 @@ import speakerDisplayNameToInitials from '../../utils/speakerDisplayNameToInitia
 import {
   getDateFromUltimateElectionDate, getTodayAsInteger, timeFromDate,
 } from '../../utils/dateFormat';
-// import AppObservableStore from '../../stores/AppObservableStore';
+import AppObservableStore from '../../stores/AppObservableStore';
 import stringContains from '../../utils/stringContains';
 import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
@@ -75,8 +75,8 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
   }
   const voterGuideWeVoteIdLink = `/voterguide/${organizationWeVoteId}`;
   const speakerLink = speakerTwitterHandle ? `/${speakerTwitterHandle}` : voterGuideWeVoteIdLink;
-  // const hostnameAndPort = AppObservableStore.getWeVoteRootURL();
-  // const speakerLinkExternal = `${hostnameAndPort}${speakerLink}`;
+  const hostnameAndPort = AppObservableStore.getWeVoteRootURL();
+  const speakerLinkExternal = `${hostnameAndPort}${speakerLink}`;
   // console.log('PositionForBallotItem organizationWeVoteId:', organizationWeVoteId, ', campaignXWeVoteId:', campaignXWeVoteId);
 
   const speakerImageJsx = (
@@ -94,11 +94,12 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
         <Suspense fallback={<></>}>
           <OpenExternalWebSite
             body={speakerImageJsx}
-            url={speakerLink}
-            target="_blank"
-            trackingOn
             destinationPageName={lookupPageNameAndPageTypeDict(speakerLink).pageName}
             destinationPageType={lookupPageNameAndPageTypeDict(speakerLink).pageType}
+            linkIdAttribute="positionSpeakerImage"
+            target="_blank"
+            trackingOn
+            url={speakerLinkExternal}
           />
         </Suspense>
       ) : (
@@ -110,11 +111,12 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
             <Suspense fallback={<></>}>
               <OpenExternalWebSite
                 body={<SpeakerName>{speakerDisplayName}</SpeakerName>}
-                url={speakerLink}
-                target="_blank"
-                trackingOn
                 destinationPageName={lookupPageNameAndPageTypeDict(speakerLink).pageName}
                 destinationPageType={lookupPageNameAndPageTypeDict(speakerLink).pageType}
+                linkIdAttribute="positionSpeakerDisplayName"
+                target="_blank"
+                trackingOn
+                url={speakerLinkExternal}
               />
             </Suspense>
           ) : (
@@ -210,11 +212,12 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
                           </OpinionSource>
                         </Typography>
                       )}
+                      destinationPageName="PositionSourceUrl"
+                      destinationPageType="endorserWebsite"
+                      linkIdAttribute="viewSourceOfPosition"
                       target="_blank"
                       trackingOn
                       url={moreInfoUrl}
-                      destinationPageName={lookupPageNameAndPageTypeDict(moreInfoUrl).pageName}
-                      destinationPageType={lookupPageNameAndPageTypeDict(moreInfoUrl).pageType}
                     />
                   </Suspense>
                 </Popover>
