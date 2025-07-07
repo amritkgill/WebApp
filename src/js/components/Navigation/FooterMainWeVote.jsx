@@ -195,6 +195,15 @@ class FooterMainWeVote extends Component {
             {isWebApp() && (
               <OneRow>
                 <OpenExternalWebSite
+                  linkIdAttribute="footerLinkBlog"
+                  url="https://blog.wevote.us/"
+                  target="_blank"
+                  trackingOn
+                  body={(<span>Blog</span>)}
+                  className={classes.link}
+                />
+                <RowSpacer />
+                <OpenExternalWebSite
                   linkIdAttribute="footerLinkVolunteer"
                   url="https://wevote.applytojob.com/apply"
                   target="_blank"
