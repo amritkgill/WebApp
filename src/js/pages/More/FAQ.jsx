@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import TagManager from 'react-gtm-module';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import FAQBody from '../../common/components/FAQBody';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
+import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 export default class FAQ extends Component {
   static getProps () {
@@ -13,6 +16,38 @@ export default class FAQ extends Component {
 
   componentDidMount () {
     window.scrollTo(0, 0);
+    this.checkAndFireDataLayer();
+  }
+
+  componentDidUpdate () {
+    this.checkAndFireDataLayer();
+  }
+
+  checkAndFireDataLayer = () => {
+    const { dataLayerFired } = this.state;
+    const voter = VoterStore.getVoter();
+    if (!dataLayerFired && voter && voter.we_vote_id) {
+      const { pathname: currentPathname } = window.location;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+      TagManager.dataLayer({
+        dataLayer: {
+          event: 'landing',
+          pageDetails: {
+            pageName: currentPage.pageName,
+            pageType: currentPage.pageType,
+            pathname: currentPathname,
+          },
+          userDetails: {
+            stateCode: VoterStore.getVoterStateCode(),
+            userCohort: VoterStore.getAnalyticsUserCohort(),
+            voterWeVoteId: VoterStore.getVoterWeVoteId(),
+          },
+        },
+      });
+
+      this.setState({ dataLayerFired: true });
+    }
   }
 
   render () {
