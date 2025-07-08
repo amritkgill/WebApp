@@ -72,7 +72,7 @@ export default class SettingsPersonalSideBar extends Component {
   }
 
   // helper functions
-  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null }) => {
+  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null , destinationPage = {},}) => {
     const { isSignedIn } = this.state;
 
     TagManager.dataLayer({
@@ -82,18 +82,19 @@ export default class SettingsPersonalSideBar extends Component {
           actionType,
           buttonId,
         },
-        ...(destinationPath && {
-          destinationDetails: {
-            destinationPath,
-          },
-        }),
+        userDetails: {
+          stateCode: VoterStore.getVoterStateCode(),
+          userCohort: VoterStore.getAnalyticsUserCohort(),
+          voterWeVoteId: voterWeVoteId || VoterStore.getVoterWeVoteId(),
+        },
         pageDetails: {
           pageTitle: document.title,
           pagePath: window.location.pathname,
         },
-        userDetails: {
-          isSignedIn,
-          ...(voterWeVoteId && { voterWeVoteId }),
+        destinationDetails: {
+          destinationPageName: destinationPage.pageName || '',
+          destinationPageType: destinationPage.pageType || '',
+          destinationPathname: destinationPath,
         },
       },
     });
