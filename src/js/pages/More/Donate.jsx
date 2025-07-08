@@ -49,6 +49,7 @@ class Donate extends Component {
       value: '7.00',
       readMore: false,
       windowWidth: window.innerWidth,
+      dataLayerSent: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -57,32 +58,21 @@ class Donate extends Component {
     this.onDonateStoreChange = this.onDonateStoreChange.bind(this);
     this.onSuccessfulDonation = this.onSuccessfulDonation.bind(this);
     this.onVerifyCaptcha = this.onVerifyCaptcha.bind(this);
+    this.onVoterStoreChange = this.onVoterStoreChange.bind(this);
   }
 
   componentDidMount () {
     this.onDonateStoreChange();
     this.donateStoreListener = DonateStore.addListener(this.onDonateStoreChange);
+    this.voterStoreListener = VoterStore.addListener(this.onVoterStoreChange);
     AnalyticsActions.saveActionDonateVisit(VoterStore.electionId());
     DonateActions.donationRefreshDonationList();
     window.scrollTo(0, 0);
     window.addEventListener('resize', this.handleResize);
-
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-    const dataLayerObject = {
-      event: 'landing',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
-      userDetails: VoterStore.getAnalyticsUserDetails(),
-    };
-    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   componentDidUpdate () {
-    const { isC4Donation } = this.state;
+    const { isC4Donation, dataLayerSent } = this.state;
     if (isC4Donation) {
       initializejQuery(() => {
         const { $ } = window;
@@ -90,10 +80,32 @@ class Donate extends Component {
         spot.css({ margin: '0 auto', width: '31%', 'padding-top': '16px' });
       });
     }
+
+    if (!dataLayerSent && VoterStore.getVoterWeVoteId()) {
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+      const dataLayerObject = {
+        event: 'landing',
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+        userDetails: {
+          stateCode: VoterStore.getVoterStateCode(),
+          userCohort: VoterStore.getAnalyticsUserCohort(),
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+      };
+      // console.log('WV-1462: dataLayerObject:', dataLayerObject);
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+      this.setState({ dataLayerSent: true });
+    }
   }
 
   componentWillUnmount () {
     this.donateStoreListener.remove();
+    this.voterStoreListener.remove();
     window.removeEventListener('resize', this.handleResize);
   }
 
@@ -107,6 +119,11 @@ class Donate extends Component {
       }
     }
   }
+
+  onVoterStoreChange () {
+    this.setState({});
+  }
+
 
   /*
   An enter keystroke in the react-bootstrap InputGroup, (or in the original react "input-group")

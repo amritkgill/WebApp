@@ -49,6 +49,7 @@ const pageNameAndTypeSimpleDictForExternalUrls = {
   'https://blog.wevote.us/': {
     pageName: 'WeVoteBlog',
     pageType: 'blog',
+  },
   'https://www.WeVoteEducation.org': {
     pageName: 'WeVoteEducation',
     pageType: 'organization',
