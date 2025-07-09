@@ -139,9 +139,11 @@ function fileRewriterForCordova (path, versions) {
     newValue = newValue.replace(/(.*?)u-show-mobile(.*?)>/, '$1$2 style={uShowMobile()}>\n');
     newValue = newValue.replace(/(.*?)u-show-desktop-tablet(.*?)>/, '$1$2 style={uShowDesktopTablet()}>\n');
 
-    // Disable OverlayTrigger in Cordova, avoids error in log
-    newValue = newValue.replace(/<OverlayTrigger(.*?>)/gim, '<OverlayTrigger show={false} $1');    // Single line
-    newValue = newValue.replace(/(.*?)<OverlayTrigger$/gim, '$1<OverlayTrigger show={false}');           // Multi-line
+    // Remove OverlayTrigger in Cordova, avoids errors in log
+    newValue = newValue.replace(/import OverlayTrigger from .*?$/gim, '// eslint-disable-next-line import/no-unresolved\nimport CordovaOverlayTrigger from \'js/utils/CordovaOverlayTrigger\';');
+    newValue = newValue.replace(/import { OverlayTrigger } from .*?$/gim, '// eslint-disable-next-line import/no-unresolved\nimport CordovaOverlayTrigger from \'js/utils/CordovaOverlayTrigger\';');
+    newValue = newValue.replace(/<OverlayTrigger/gms, '<CordovaOverlayTrigger');    // Multi-line
+    newValue = newValue.replace(/<\/OverlayTrigger/gms, '</CordovaOverlayTrigger');    // Multi-line
 
     // Remove Donate from Cordova -- Stripe causes problems and is not allowed in the app store
     // if (path.includes('App.js')) {

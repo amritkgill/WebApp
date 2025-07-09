@@ -12,24 +12,26 @@ import DonateActions from '../../common/actions/DonateActions';
 import DonationListForm from '../../common/components/Donation/DonationListForm';
 import DonorboxCordova from '../../common/components/Donation/DonorboxCordova';
 import DonorboxEmbed from '../../common/components/Donation/DonorboxEmbed';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import standardBoxShadow from '../../common/components/Style/standardBoxShadow';
 import OpenExternalWebSite from '../../common/components/Widgets/OpenExternalWebSite';
 import DonateStore from '../../common/stores/DonateStore';
 import initializejQuery from '../../common/utils/initializejQuery';
 import { isWebApp } from '../../common/utils/isCordovaOrWebApp';
+import { isTablet } from '../../common/utils/isMobileScreenSize';
 import { renderLog } from '../../common/utils/logging';
+import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import { Section } from '../../components/Welcome/sectionStyles';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
-import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
-import Donation from '../../../img/global/photos/Donate_Screenshot.png';
 
 /* global $ */
 
 // const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
 
+const donationImage = normalizedImagePath('/img/global/photos/Donate_Screenshot.png');
 
 class Donate extends Component {
   static getProps () {
@@ -374,7 +376,7 @@ class Donate extends Component {
                   {/*  </DonorboxWrapper> */}
                   {/* </InnerWrapper> */}
                   <DonationImage
-                    src={Donation}
+                    src={donationImage}
                   />
                 </DonationImageContainer>
               </TwoColumns>
@@ -788,6 +790,7 @@ const DonationImage = styled('img')`
   object-fit: cover;
   display: block;
   position: fixed;
+  padding-top: ${isTablet() ? '40px' : ''};
 `;
 
 const DonationDescriptionContainer = styled('div')`

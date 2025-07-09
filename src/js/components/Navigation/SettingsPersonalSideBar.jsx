@@ -1,14 +1,15 @@
+import { AccountBoxRounded, CampaignRounded, ExitToAppRounded, ImportContactsOutlined, Lock, PeopleAltRounded, SecurityRounded, TextsmsRounded } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
-import { Link } from 'react-router-dom';
 import TagManager from 'react-gtm-module';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { ImportContactsOutlined, AccountBoxRounded, Lock, SecurityRounded, CampaignRounded, PeopleAltRounded, TextsmsRounded, ExitToAppRounded  } from '@mui/icons-material';
-import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import VoterSessionActions from '../../actions/VoterSessionActions';
-import VoterStore from '../../stores/VoterStore';
-import { renderLog } from '../../common/utils/logging';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
+import { renderLog } from '../../common/utils/logging';
+import webAppConfig from '../../config';
+import VoterStore from '../../stores/VoterStore';
 
 const SettingsAccountLevelChip = React.lazy(() => import(/* webpackChunkName: 'SettingsAccountLeveLChip' */ '../Settings/SettingsAccountLevelChip'));
 
@@ -21,6 +22,8 @@ const NONPROFIT_501C4 = 'C4';
 const NEWS_ORGANIZATION = 'NW';
 const POLITICAL_ACTION_COMMITTEE = 'P';
 const PUBLIC_FIGURE = 'PF';
+
+const nextReleaseFeaturesEnabled = webAppConfig.ENABLE_NEXT_RELEASE_FEATURES === undefined ? false : webAppConfig.ENABLE_NEXT_RELEASE_FEATURES;
 
 export default class SettingsPersonalSideBar extends Component {
   constructor (props) {
@@ -125,7 +128,7 @@ export default class SettingsPersonalSideBar extends Component {
         <div className="card-main">
           <div className="SettingsItem__summary__title">Your Settings</div>
 
-          {isSignedIn && (
+          {isSignedIn && nextReleaseFeaturesEnabled && (
             <div className={String(editMode) === 'contacts' ?
               'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
               'SettingsItem__summary__item-container '}
@@ -149,27 +152,27 @@ export default class SettingsPersonalSideBar extends Component {
           )}
 
           {isSignedIn && (
-          // <div className={String(editMode) === 'profile' ?
-          //   'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
-          //   'SettingsItem__summary__item-container '}
-          // >
-          <LinkContainer $isActive={String(editMode) === 'profile'}>
-            <div id="personalSettingsPhoto">
-              <Link
-                to="/settings/profile"
-                className="SettingsItem__summary__item"
-                onClick={() => this.fireSettingsGTMEvent({
-                  buttonId: 'personalSettingsPhoto',
-                  destinationPath: '/settings/profile',
-                })}
-              >
-                <ProfileIcon $isActive={String(editMode) === 'profile'} />
-                <LinkSpan $isActive={String(editMode) === 'profile'}>
-                  Name &amp; Photo
-                </LinkSpan>
-              </Link>
-            </div>
-          </LinkContainer>
+            // <div className={String(editMode) === 'profile' ?
+            //   'SettingsItem__summary__item-container SettingsItem__summary__item-container--selected' :
+            //   'SettingsItem__summary__item-container '}
+            // >
+            <LinkContainer $isActive={String(editMode) === 'profile'}>
+              <div id="personalSettingsPhoto">
+                <Link
+                  to="/settings/profile"
+                  className="SettingsItem__summary__item"
+                  onClick={() => this.fireSettingsGTMEvent({
+                    buttonId: 'personalSettingsPhoto',
+                    destinationPath: '/settings/profile',
+                  })}
+                >
+                  <ProfileIcon $isActive={String(editMode) === 'profile'} />
+                  <LinkSpan $isActive={String(editMode) === 'profile'}>
+                    Name &amp; Photo
+                  </LinkSpan>
+                </Link>
+              </div>
+            </LinkContainer>
           )}
 
           <LinkContainer $isActive={String(editMode) === 'account'}>
@@ -216,12 +219,12 @@ export default class SettingsPersonalSideBar extends Component {
           <LinkContainer $isActive={String(editMode) === 'notifications'}>
             <div id="personalSettingsNotifs">
               <Link
-                  to="/settings/notifications"
-                  className="SettingsItem__summary__item"
-                  onClick={() => this.fireSettingsGTMEvent({
-                    buttonId: 'personalSettingsNotifs',
-                    destinationPath: '/settings/notifications',
-                  })}
+                to="/settings/notifications"
+                className="SettingsItem__summary__item"
+                onClick={() => this.fireSettingsGTMEvent({
+                  buttonId: 'personalSettingsNotifs',
+                  destinationPath: '/settings/notifications',
+                })}
               >
                 <NotificationsIcon $isActive={String(editMode) === 'notifications'} />
                 <LinkSpan $isActive={String(editMode) === 'notifications'}>
