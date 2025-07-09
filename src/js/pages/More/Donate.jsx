@@ -93,11 +93,7 @@ class Donate extends Component {
           pageType: currentPage.pageType,
           pathname: currentPathname,
         },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
       };
       // console.log('WV-1462: dataLayerObject:', dataLayerObject);
       TagManager.dataLayer({ dataLayer: dataLayerObject });
