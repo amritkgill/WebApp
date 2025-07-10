@@ -76,33 +76,26 @@ export default class SettingsPersonalSideBar extends Component {
 
   // helper functions for datalayer
   fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null, destinationPage = {} }) => {
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'action',
-        actionDetails: {
-          actionType,
-          buttonId,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: voterWeVoteId || VoterStore.getVoterWeVoteId(),
-        },
-        pageDetails: {
-          pageTitle: document.title,
-          pagePath: window.location.pathname,
-        },
-        destinationDetails: {
-          destinationPageName: destinationPage.pageName || '',
-          destinationPageType: destinationPage.pageType || '',
-          destinationPathname: destinationPath,
-        },
-      }),
+    const dataLayerObject = {
+      event: 'action',
+      actionDetails: {
+        actionType,
+        buttonId,
+      },
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: voterWeVoteId || VoterStore.getVoterWeVoteId(),
+      },
       pageDetails: {
         pageTitle: document.title,
-        pathname: currentPathname,
+        pagePath: window.location.pathname,
       },
-      userDetails: VoterStore.getAnalyticsUserDetails(),
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName || '',
+        destinationPageType: destinationPage.pageType || '',
+        destinationPathname: destinationPath,
+      },
     };
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
