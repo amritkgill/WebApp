@@ -74,25 +74,28 @@ export default class SettingsPersonalSideBar extends Component {
     });
   }
 
-  // helper functions
-  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate' }) => {
-    const { location: { pathname: currentPathname } } = window;
+  // helper functions for datalayer
+  fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null, destinationPage = {} }) => {
     const dataLayerObject = {
       event: 'action',
       actionDetails: {
         actionType,
         buttonId,
       },
-      ...(destinationPath && {
-        destinationDetails: {
-          destinationPath,
-        },
-      }),
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: voterWeVoteId || VoterStore.getVoterWeVoteId(),
+      },
       pageDetails: {
         pageTitle: document.title,
-        pathname: currentPathname,
+        pagePath: window.location.pathname,
       },
-      userDetails: VoterStore.getAnalyticsUserDetails(),
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName || '',
+        destinationPageType: destinationPage.pageType || '',
+        destinationPathname: destinationPath,
+      },
     };
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
