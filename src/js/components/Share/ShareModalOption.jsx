@@ -3,7 +3,9 @@ import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
+import VoterStore from '../../stores/VoterStore';
 import { renderLog } from '../../common/utils/logging';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
 import { openSnackbar } from '../../common/components/Widgets/SnackNotifier';
@@ -61,6 +63,7 @@ class ShareModalOption extends Component {
 
   copyLink = () => {
     // console.log('ShareModalOption copyLink');
+    const { location: { pathname: currentPathname } } = window;
     openSnackbar({ message: 'Copied!' });
     this.setState({
       copyLinkCopied: true,
@@ -68,6 +71,20 @@ class ShareModalOption extends Component {
     if (this.props.onClickFunction) {
       this.props.onClickFunction();
     }
+    const dataLayerObject = {
+      event: 'ShareModalCopyLinkClick',
+      shareDetails: {
+        title: this.props.title || 'Copy link',
+        urlShared: this.props.urlToShare || '',
+      },
+      pageDetails: {
+        pageName: 'ShareModal',
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('DataLayer for ShareModal Copy Link:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {

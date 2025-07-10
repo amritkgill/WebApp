@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import ActivityActions from '../../actions/ActivityActions';
 import IssueActions from '../../actions/IssueActions';
@@ -24,6 +25,7 @@ import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
 import RepresentativeStore from '../../stores/RepresentativeStore';
 import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const CandidateListRoot = React.lazy(() => import(/* webpackChunkName: 'CandidateListRoot' */ '../../components/CandidateListRoot/CandidateListRoot'));
 const CampaignListRoot = React.lazy(() => import(/* webpackChunkName: 'CampaignListRoot' */ '../../common/components/CampaignListRoot/CampaignListRoot'));
@@ -76,6 +78,7 @@ class CampaignsHome extends Component {
       representativeListTimeStampOfChange: 0,
       searchText: '',
       stateCode: '',
+      dataLayerSent: false,
     };
   }
 
@@ -214,6 +217,33 @@ class CampaignsHome extends Component {
         }
       }
       window.scrollTo(0, 0);
+    }
+
+    if (!this.state.dataLayerSent && VoterStore.getVoterWeVoteId()) {
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+      let urlStateCode = '';
+      if (stateCandidatesPhrase) {
+        let stateName = stateCandidatesPhrase.replace('-candidates', '').replace('-politicians-list', '');
+        stateName = stateName.replaceAll('-', ' ');
+        urlStateCode = convertStateTextToStateCode(stateName);
+        if (urlStateCode.toLowerCase() === 'na') {
+          urlStateCode = 'all';
+        }
+      }
+      const dataLayerObject = {
+        event: 'landing',
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+          stateCode: urlStateCode,
+        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+      this.setState({ dataLayerSent: true });
     }
   }
 
@@ -721,6 +751,8 @@ class CampaignsHome extends Component {
     // console.log('CampaignsHomeLoader.jsx render campaignList:', campaignList);
     const pigsCanFly = false;
 
+    // console.log("Actual list: ", representativeListShownAsRepresentatives.length, "number of results: ", numberOfRepresentativeResults)
+
     if (detailsListMode) {
       // console.log('detailsListMode TRUE');
       return (
@@ -729,7 +761,7 @@ class CampaignsHome extends Component {
             changeListModeShown={this.changeListModeShown}
             clearSearchFunction={this.clearSearchFunction}
             handleChooseStateChange={this.handleChooseStateChange}
-            isSearching={isSearching}
+            isSearching={!!(isSearching)}
             listModeFiltersAvailable={listModeFiltersAvailable}
             searchFunction={this.searchFunction}
             searchText={searchText}
@@ -768,7 +800,7 @@ class CampaignsHome extends Component {
           changeListModeShown={this.changeListModeShown}
           clearSearchFunction={this.clearSearchFunction}
           handleChooseStateChange={this.handleChooseStateChange}
-          isSearching={isSearching}
+          isSearching={!!(isSearching)}
           listModeFiltersAvailable={listModeFiltersAvailable}
           searchFunction={this.searchFunction}
           searchText={searchText}
@@ -777,7 +809,7 @@ class CampaignsHome extends Component {
         {(isSearching && numberOfSearchResults === 0) && (
           <NoSearchResult
             title="No Candidates Found"
-            subtitle="Please try a different search term."
+            subtitle={stateCode ? 'Please try a different search term or state.' : 'Please try a different search term.'}
           />
         )}
 
@@ -822,7 +854,7 @@ class CampaignsHome extends Component {
             {displayBattlegroundPlaceholder && <CandidateListRootPlaceholder titleTextForList="Candidates in Close Races" />}
           </>
         )}
-        {(representativeListShownAsRepresentatives && representativeListShownAsRepresentatives.length > 0) ? (
+        {(representativeListShownAsRepresentatives && representativeListShownAsRepresentatives.length > 0) && (
           <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfRepresentativeResults > 0}>
             <Suspense fallback={<span><CandidateListRootPlaceholder titleTextForList="Current Representatives" /></span>}>
               <RepresentativeListRoot
@@ -838,16 +870,8 @@ class CampaignsHome extends Component {
               />
             </Suspense>
           </WhatIsHappeningSection>
-        ) : (
-          <>
-            {numberOfRepresentativeResults > 0 && (
-              <>
-                <CandidateListRootPlaceholder titleTextForList="Current Representatives" />
-              </>
-            )}
-          </>
         )}
-        {(candidateListOnYourBallot && candidateListOnYourBallot.length > 0) ? (
+        {(candidateListOnYourBallot && candidateListOnYourBallot.length > 0) && (
           <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfCandidatesOnBallotResults > 0}>
             <Suspense fallback={<span><CandidateListRootPlaceholder titleTextForList="On Your Ballot" /></span>}>
               <CandidateListRoot
@@ -863,14 +887,6 @@ class CampaignsHome extends Component {
               />
             </Suspense>
           </WhatIsHappeningSection>
-        ) : (
-          <>
-            {numberOfCandidatesOnBallotResults > 0 && (
-              <>
-                <CandidateListRootPlaceholder titleTextForList="On Your Ballot" />
-              </>
-            )}
-          </>
         )}
         <WhatIsHappeningSection useMinimumHeight={!isSearching && numberOfMorePoliticiansResults > 0}>
           <Suspense fallback={<span><CandidateListRootPlaceholder /></span>}>

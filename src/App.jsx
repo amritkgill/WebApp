@@ -158,6 +158,7 @@ class App extends Component {
     this.setShowReadyHeavy = this.setShowReadyHeavy.bind(this);
     this.bypass2FA = this.bypass2FA.bind(this);
     this.localIsCordova();
+    this.localIsAndroid = this.localIsAndroid.bind(this);
   }
 
   // See https://reactjs.org/docs/error-boundaries.html
@@ -191,6 +192,13 @@ class App extends Component {
     if (isAndroid()) {         // December 12, 2023: All sorts of problems with sign-in with Facebook on Android, so disabling it here
       webAppConfig.ENABLE_FACEBOOK = false;   // This overrides the config setting for the entire Android app
     }
+    if (isWebApp()) {
+      // July 2025, Android "backbutton" is not handled since pushHistory is only keeping the previous location, so pressing "backbutton" twice would be a mess
+      // Also it was originally noted as a bug in the How it Works dialog, which would be a special case that would not use pushHistory
+      // This listener is for Chrome on an Android device while browsing wevote.us
+      document.addEventListener("backbutton", () => {}, false);
+      // if isCordova(), then this is handled in startCordova, after the deviceready event
+    }
 
     if (webAppConfig.ENABLE_FACEBOOK) {
       setTimeout(() => {
@@ -201,6 +209,9 @@ class App extends Component {
 
     if (!webAppConfig.ENABLE_TWITTER) {
       webAppConfig.ENABLE_TWITTER = false;  // Avoid crashes in Feb/March 2024 in case not in config.js
+    }
+    if (!webAppConfig.ENABLE_TWITTER_AS_VOTER_SIGN_IN_OPTION) {
+      webAppConfig.ENABLE_TWITTER_AS_VOTER_SIGN_IN_OPTION = false;  // Avoid crashes in Feb/March 2024 in case not in config.js
     }
 
     if (isCordova()) {
@@ -360,6 +371,11 @@ class App extends Component {
     return cordova !== undefined;
   }
 
+  localIsAndroid () {
+    const { platform } = window.device || '';
+    return this.localIsCordova() && platform !== 'iOS';
+  }
+
   render () {
     renderLog('App');
     const { hideHeader, showReadyLight, enableFullStory } = this.state;
@@ -489,7 +505,7 @@ class App extends Component {
                   <Route path="/candidate/:candidate_we_vote_id/:organization_we_vote_id" exact component={OrganizationVoterGuideCandidate} />
                   <Route path="/candidate/:candidate_we_vote_id" exact component={Candidate} />
                   <Route path="/challenges/" exact component={ChallengesHomeLoader} />
-                  <Route path="/donate" component={(isNotWeVoteMarketingSite || this.localIsCordova()) ? ReadyRedirect : Donate} />
+                  <Route path="/donate" component={(isNotWeVoteMarketingSite || this.localIsAndroid()) ? ReadyRedirect : Donate} />
                   <Route path="/facebook_invitable_friends" component={FacebookInvitableFriends} />
                   <Route path="/findfriends/:set_up_page" exact component={FindFriendsRoot} />
                   <Route path="/findfriends" exact><FindFriendsRoot /></Route>
@@ -529,7 +545,7 @@ class App extends Component {
                   <Route path="/more/alerts" component={ElectionReminder} />
                   <Route path="/more/attributions" component={Attributions} />
                   <Route path="/more/credits" component={Credits} />
-                  <Route path="/more/donate" component={(isNotWeVoteMarketingSite || this.localIsCordova()) ? ReadyRedirect : Donate} />
+                  <Route path="/more/donate" component={(isNotWeVoteMarketingSite || this.localIsAndroid()) ? ReadyRedirect : Donate} />
                   <Route path="/more/elections" component={Elections} />
                   <Route path="/more/extensionsignin" component={ExtensionSignIn} />
                   <Route path="/more/facebooklandingprocess" component={FacebookLandingProcess} />

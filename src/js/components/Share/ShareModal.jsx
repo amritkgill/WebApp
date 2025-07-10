@@ -4,6 +4,7 @@ import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import AnalyticsActions from '../../actions/AnalyticsActions';
 import FriendActions from '../../actions/FriendActions';
@@ -21,6 +22,7 @@ import FriendStore from '../../stores/FriendStore';
 import VoterStore from '../../stores/VoterStore';
 import createMessageToFriendDefaults from '../../utils/createMessageToFriendDefaults';
 import sortFriendListByMutualFriends from '../../utils/friendFunctions';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import MessageCard from '../Widgets/MessageCard';
 import { CopyLink, getKindOfShareFromURL, saveActionShareAnalytics, ShareFacebook, SharePreviewFriends, shareStyles, ShareTwitter, ShareWeVoteFriends } from './shareButtonCommon'; // cordovaSocialSharingByEmail
 import { generateShareLinks } from './ShareModalText';
@@ -181,9 +183,25 @@ class ShareModal extends Component {
     AnalyticsActions.saveActionShareButtonTwitter(VoterStore.electionId());
   }
 
-  closeShareModal = () => {
-    const { location: { pathname } } = window;
-    this.props.closeShareModal(pathname);
+  closeShareModal = (buttonId = '') => {
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'closeModal',
+        buttonId,
+      },
+      event: 'action',
+      pageDetails: {
+        pageName: 'ShareModal',
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+    this.props.closeShareModal(currentPathname);
   }
 
   render () {
@@ -243,7 +261,7 @@ class ShareModal extends Component {
               <IconButton
                 aria-label="Close"
                 className={classes.closeButtonAbsolute}
-                onClick={this.closeShareModal}
+                onClick={() => this.closeShareModal('profileCloseShareModal')}
                 id="profileCloseShareModal"
                 size="large"
               >
@@ -332,7 +350,7 @@ class ShareModal extends Component {
             <IconButton
               aria-label="Close"
               className={classes.closeButton}
-              onClick={this.closeShareModal}
+              onClick={() => this.closeShareModal('profileCloseShareModal')}
               id="profileCloseShareModal"
               size="large"
             >

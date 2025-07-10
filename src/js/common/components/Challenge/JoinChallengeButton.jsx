@@ -128,29 +128,30 @@ class JoinChallengeButton extends React.Component {
     // console.log('goToInviteFriends currentPathname: ', currentPathname);
 
     // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(inviteFriendsPath);
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'inviteFriendsToChallenge',
-        userDetails: {
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        challengeDetails: {
-          challengeWeVoteId,
-        },
-        pageDetails: {
-          pageName: page.pageName,
-          pageType: page.pageType,
-          pathname: currentPathname,
-        },
-        destinationDetails: {
-          destinationPageName: destinationPage.pageName,
-          destinationPageType: destinationPage.pageType,
-          destinationPathname: inviteFriendsPath,
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'invite',
+        buttonId: 'joinChallengeButton',
       },
-    });
+      event: 'action',
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+      challengeDetails: {
+        challengeWeVoteId,
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName,
+        destinationPageType: destinationPage.pageType,
+        destinationPathname: inviteFriendsPath,
+      },
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     AppObservableStore.setSetUpAccountBackLinkPath(currentPathname);
     AppObservableStore.setSetUpAccountEntryPath(inviteFriendsPath);
@@ -177,29 +178,30 @@ class JoinChallengeButton extends React.Component {
       AppObservableStore.setSetUpAccountEntryPath(joinChallengeNextStepPath);
       // console.log('goToJoinChallenge currentPathname: ', currentPathname);
       // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
-      const page = lookupPageNameAndPageTypeDict(currentPathname);
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
       const destinationPage = lookupPageNameAndPageTypeDict(joinChallengeNextStepPath);
-      TagManager.dataLayer({
-        dataLayer: {
-          event: 'joinChallenge',
-          userDetails: {
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
-          challengeDetails: {
-            challengeWeVoteId,
-          },
-          pageDetails: {
-            pageType: page.pageType,
-            pageName: page.pageName,
-            pathname: currentPathname,
-          },
-          destinationDetails: {
-            destinationPageType: destinationPage.pageType,
-            destinationPageName: destinationPage.pageName,
-            destinationPathname: joinChallengeNextStepPath,
-          },
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'join',
+          buttonId: 'joinChallengeButton',
         },
-      });
+        event: 'action',
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+        challengeDetails: {
+          challengeWeVoteId,
+        },
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+        destinationDetails: {
+          destinationPageName: destinationPage.pageName,
+          destinationPageType: destinationPage.pageType,
+          destinationPathname: joinChallengeNextStepPath,
+        },
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
 
       if (itemsAreMissing) {
         historyPush(joinChallengeNextStepPath);

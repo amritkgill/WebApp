@@ -285,6 +285,9 @@ class Ballot extends Component {
     if (apiCalming('voterRetrieve', 500)) {  // May 2021: This is not needed if Header.jsx is firing the same api almost simultaneously on first page load
       VoterActions.voterRetrieve();  // This is needed to update the interface status settings
     }
+    if (apiCalming('issueOrganizationsRetrieve', 3600000)) { // Only once per 60 minutes
+      IssueActions.issueOrganizationsRetrieve();
+    }
 
     if (googleCivicElectionId && googleCivicElectionId !== 0) {
       AnalyticsActions.saveActionBallotVisit(googleCivicElectionId);
@@ -305,8 +308,8 @@ class Ballot extends Component {
       raceLevelFilterType: BallotStore.getRaceLevelFilterTypeSaved() || 'All',
       voterBallotItemsRetrieveHasReturned: BallotStore.voterBallotItemsRetrieveHasReturned(),
     });
+    window.scrollTo(0, 0);
     if (googleCivicElectionIdFromUrl) {
-      window.scrollTo(0, 0);
       this.setState({
         showLoadingBallotMessage: true,
       });

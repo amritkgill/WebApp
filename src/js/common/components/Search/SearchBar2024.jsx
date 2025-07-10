@@ -61,7 +61,7 @@ class SearchBar2024 extends Component {
 
   handleSearchBarKeyPress = () => {
     const { location: { pathname: currentPathname } } = window;
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
 
     if (this.timer) {
       clearTimeout(this.timer);
@@ -74,13 +74,15 @@ class SearchBar2024 extends Component {
       this.props.searchFunction(searchString);
       // if(this.props.trackSearch){
       const dataLayerObject = {
-        event: 'searchKeyword',
-        userDetails: {
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        actionDetails: {
+          actionType: 'search',
+          buttonId: 'search_input',
         },
+        event: 'action',
+        userDetails: VoterStore.getAnalyticsUserDetails(),
         pageDetails: {
-          pageType: page.pageType,
-          pageName: page.pageName,
+          pageType: currentPage.pageType,
+          pageName: currentPage.pageName,
           pathname: currentPathname,
         },
         searchString,

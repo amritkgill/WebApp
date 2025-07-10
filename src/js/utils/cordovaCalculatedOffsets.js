@@ -183,7 +183,7 @@ export function headroomWrapperOffset (includePosition, pageNameOverride = null)
     const { $ } = window;
     const headroomWrapper = $('div[class*=\'HeadroomWrapper\']');
     const outerHeight = headroomWrapper.outerHeight();
-    const position = includePosition ? headroomWrapper.position().top : 0;
+    const position = includePosition && headroomWrapper.length > 0 ? headroomWrapper.position().top : 0;
     offset = outerHeight + position;
     const page = pageNameOverride || pageEnumeration();
     if (page === 'PoliticianDetailsPage' && isCordova()) {

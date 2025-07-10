@@ -27,14 +27,14 @@ class SupportStore extends ReduceStore {
     return this.getInitialState();
   }
 
-  getBallotItemStatSheet (ballotItemWeVoteId) {
+  getBallotItemStatSheet (ballotItemWeVoteId, politicianWeVoteId = '') {
     if (!(this.voterSupportsList && this.voterOpposesList)) { //  && this.supportCounts && this.opposeCounts
       // console.log('getBallotItemStatSheet undefined');
       return undefined;
     }
     const isCandidate = stringContains('cand', ballotItemWeVoteId);
     const isMeasure = stringContains('meas', ballotItemWeVoteId);
-    const isPolitician = stringContains('pol', ballotItemWeVoteId);
+    const isPolitician = stringContains('pol', politicianWeVoteId);
     let allCachedPositions = [];
     if (isCandidate) {
       allCachedPositions = CandidateStore.getAllCachedPositionsByCandidateWeVoteId(ballotItemWeVoteId);
@@ -42,17 +42,19 @@ class SupportStore extends ReduceStore {
       allCachedPositions = MeasureStore.getAllCachedPositionsByMeasureWeVoteId(ballotItemWeVoteId);
     } else if (isPolitician) {
       // TODO Reality check this
-      allCachedPositions = CandidateStore.getAllCachedPositionsByPoliticianWeVoteId(ballotItemWeVoteId);
+      allCachedPositions = CandidateStore.getAllCachedPositionsByPoliticianWeVoteId(politicianWeVoteId);
     }
-    // console.log('getBallotItemStatSheet allCachedPositions:', allCachedPositions);
+    // if (politicianWeVoteId === 'wv87pol49070' || ballotItemWeVoteId === 'wv87cand3133998') { // Adam Schiff
+    //   console.log('getBallotItemStatSheet, ballotItemWeVoteId:', ballotItemWeVoteId, ', politicianWeVoteId: ', politicianWeVoteId, ', allCachedPositions:', allCachedPositions);
+    // }
     const results = extractScoreFromNetworkFromPositionList(allCachedPositions);
     const { numberOfSupportPositionsForScore, numberOfOpposePositionsForScore, numberOfInfoOnlyPositionsForScore } = results;
     // console.log('getBallotItemStatSheet ballotItemWeVoteId:', ballotItemWeVoteId, ', this.voterSupportsList:', this.voterSupportsList);
     return {
-      voterSupportsBallotItem: this.voterSupportsList[ballotItemWeVoteId] || false,
-      voterOpposesBallotItem: this.voterOpposesList[ballotItemWeVoteId] || false,
-      voterPositionIsPublic: this.isForPublicList[ballotItemWeVoteId] || false, // Default to friends only
-      voterTextStatement: this.statementList[ballotItemWeVoteId] || '',
+      voterSupportsBallotItem: this.voterSupportsList[ballotItemWeVoteId] || this.voterSupportsList[politicianWeVoteId] || false,
+      voterOpposesBallotItem: this.voterOpposesList[ballotItemWeVoteId] || this.voterOpposesList[politicianWeVoteId] || false,
+      voterPositionIsPublic: this.isForPublicList[ballotItemWeVoteId] || this.isForPublicList[politicianWeVoteId] || false, // Default to friends only
+      voterTextStatement: this.statementList[ballotItemWeVoteId] || this.statementList[politicianWeVoteId] || '',
       numberOfSupportPositionsForScore: numberOfSupportPositionsForScore || 0,
       numberOfOpposePositionsForScore: numberOfOpposePositionsForScore || 0,
       numberOfInfoOnlyPositionsForScore: numberOfInfoOnlyPositionsForScore || 0,
@@ -112,21 +114,20 @@ class SupportStore extends ReduceStore {
     return this.getState().voter_statement_text;
   }
 
-  statementListWithChanges (statement_list, ballotItemWeVoteId, new_voter_statement_text) { // eslint-disable-line
-    return assign({}, statement_list, { [ballotItemWeVoteId]: new_voter_statement_text });
-  }
-
   isForPublicListWithChanges (is_public_position_list, ballotItemWeVoteId, is_public_position) { // eslint-disable-line
     return assign({}, is_public_position_list, { [ballotItemWeVoteId]: is_public_position });
   }
 
   // Turn action into a dictionary/object format with we_vote_id as key for fast lookup
-  parseListToHash (property, list) { // eslint-disable-line
+  extractValueByPropertyAndStoreListInDictionaryByWeVoteId (property, list) { // eslint-disable-line
     const hashMap = {};
     if (list !== undefined && property) {
       list.forEach((el) => {
         if (el.ballot_item_we_vote_id && el[property]) {
           hashMap[el.ballot_item_we_vote_id] = el[property];
+        }
+        if (el.politician_we_vote_id && el[property]) {
+          hashMap[el.politician_we_vote_id] = el[property];
         }
       });
     }
@@ -141,7 +142,12 @@ class SupportStore extends ReduceStore {
     if (action.res.ballot_item_we_vote_id) {
       ballotItemWeVoteId = action.res.ballot_item_we_vote_id;
     }
-
+    let politicianWeVoteId = '';
+    if (action.res.politician_we_vote_id) {
+      politicianWeVoteId = action.res.politician_we_vote_id;
+    }
+    let clearOpposes = false;
+    let clearSupports = false;
     let isCandidate = false;
     let isMeasure = false;
     let revisedState;
@@ -159,27 +165,48 @@ class SupportStore extends ReduceStore {
         // state.voter_supports is an updated hash with the contents of position list['is_support']
         return {
           ...state,
-          voter_supports: this.parseListToHash('is_support', action.res.position_list),
-          voter_opposes: this.parseListToHash('is_oppose', action.res.position_list),
-          voter_statement_text: this.parseListToHash('statement_text', action.res.position_list),
-          is_public_position: this.parseListToHash('is_public_position', action.res.position_list),
+          voter_supports: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_support', action.res.position_list),
+          voter_opposes: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_oppose', action.res.position_list),
+          voter_statement_text: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('statement_text', action.res.position_list),
+          is_public_position: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_public_position', action.res.position_list),
         };
 
       case 'voterOpposingSave':
-        ({ voter_supports: voterSupports } = state);
-        if (voterSupports && voterSupports[ballotItemWeVoteId] !== undefined) {
+        ({ voter_opposes: voterOpposes, voter_supports: voterSupports } = state);
+        if (!voterOpposes) {
+          voterOpposes = {};
+        }
+        if (ballotItemWeVoteId) {
+          voterOpposes[ballotItemWeVoteId] = true;
+        }
+        if (politicianWeVoteId) {
+          voterOpposes[politicianWeVoteId] = true;
+        }
+        if (!voterSupports) {
+          voterSupports = {};
+        }
+        if (ballotItemWeVoteId && voterSupports[ballotItemWeVoteId] !== undefined) {
           delete voterSupports[ballotItemWeVoteId];
+        }
+        if (politicianWeVoteId && voterSupports[politicianWeVoteId] !== undefined) {
+          delete voterSupports[politicianWeVoteId];
         }
         return {
           ...state,
           voter_supports: voterSupports,
-          voter_opposes: assign({}, state.voter_opposes, { [ballotItemWeVoteId]: true }),
+          voter_opposes: voterOpposes,
         };
 
       case 'voterStopOpposingSave':
         ({ voter_opposes: voterOpposes } = state);
-        if (voterOpposes && voterOpposes[ballotItemWeVoteId] !== undefined) {
+        if (!voterOpposes) {
+          voterOpposes = {};
+        }
+        if (voterOpposes[ballotItemWeVoteId] !== undefined) {
           delete voterOpposes[ballotItemWeVoteId];
+        }
+        if (voterOpposes[politicianWeVoteId] !== undefined) {
+          delete voterOpposes[politicianWeVoteId];
         }
         return {
           ...state,
@@ -187,20 +214,42 @@ class SupportStore extends ReduceStore {
         };
 
       case 'voterSupportingSave':
-        ({ voter_opposes: voterOpposes } = state);
-        if (voterOpposes && voterOpposes[ballotItemWeVoteId] !== undefined) {
+        ({ voter_opposes: voterOpposes, voter_supports: voterSupports } = state);
+        if (!voterOpposes) {
+          voterOpposes = {};
+        }
+        if (ballotItemWeVoteId && voterOpposes[ballotItemWeVoteId] !== undefined) {
           delete voterOpposes[ballotItemWeVoteId];
+        }
+        if (politicianWeVoteId && voterOpposes[politicianWeVoteId] !== undefined) {
+          delete voterOpposes[politicianWeVoteId];
+        }
+        if (!voterSupports) {
+          voterSupports = {};
+        }
+        if (ballotItemWeVoteId) {
+          voterSupports[ballotItemWeVoteId] = true;
+        }
+        if (politicianWeVoteId) {
+          voterSupports[politicianWeVoteId] = true;
         }
         return {
           ...state,
-          voter_supports: assign({}, state.voter_supports, { [ballotItemWeVoteId]: true }),
+          voter_supports: voterSupports,
           voter_opposes: voterOpposes,
         };
 
       case 'voterStopSupportingSave':
+        // console.log('voterStopSupportingSave action.res:', action.res);
         ({ voter_supports: voterSupports } = state);
-        if (voterSupports && voterSupports[ballotItemWeVoteId] !== undefined) {
+        if (!voterSupports) {
+          voterSupports = {};
+        }
+        if (ballotItemWeVoteId && voterSupports[ballotItemWeVoteId] !== undefined) {
           delete voterSupports[ballotItemWeVoteId];
+        }
+        if (politicianWeVoteId && voterSupports[politicianWeVoteId] !== undefined) {
+          delete voterSupports[politicianWeVoteId];
         }
         return {
           ...state,
@@ -208,7 +257,74 @@ class SupportStore extends ReduceStore {
         };
 
       case 'voterPositionCommentSave':
-        // Add the comment to the list in memory
+        clearOpposes = false;
+        clearSupports = false;
+        revisedState = state;
+        ({
+          voter_opposes: voterOpposes,
+          voter_supports: voterSupports,
+        } = state);
+        if (!voterOpposes) {
+          voterOpposes = {};
+        }
+        if (!voterSupports) {
+          voterSupports = {};
+        }
+        if (action.res.stance === 'OPPOSE') {
+          clearSupports = true;
+          if (ballotItemWeVoteId) {
+            voterOpposes[ballotItemWeVoteId] = true;
+          }
+          if (politicianWeVoteId) {
+            voterOpposes[politicianWeVoteId] = true;
+          }
+        } else if (action.res.stance === 'SUPPORT') {
+          clearOpposes = true;
+          if (ballotItemWeVoteId) {
+            voterSupports[ballotItemWeVoteId] = true;
+          }
+          if (politicianWeVoteId) {
+            voterSupports[politicianWeVoteId] = true;
+          }
+        } else if (action.res.stance === 'INFO_ONLY') {
+          clearOpposes = true;
+          clearSupports = true;
+        }
+        if (clearOpposes) {
+          if (ballotItemWeVoteId && voterOpposes[ballotItemWeVoteId] !== undefined) {
+            delete voterOpposes[ballotItemWeVoteId];
+          }
+          if (politicianWeVoteId && voterOpposes[politicianWeVoteId] !== undefined) {
+            delete voterOpposes[politicianWeVoteId];
+          }
+        }
+        if (clearSupports) {
+          if (ballotItemWeVoteId && voterSupports[ballotItemWeVoteId] !== undefined) {
+            delete voterSupports[ballotItemWeVoteId];
+          }
+          if (politicianWeVoteId && voterSupports[politicianWeVoteId] !== undefined) {
+            delete voterSupports[politicianWeVoteId];
+          }
+        }
+        if (action.res.statement_text) {
+          if (ballotItemWeVoteId) {
+            revisedState = {
+              ...revisedState,
+              voter_statement_text: assign({}, revisedState.voter_statement_text, { [ballotItemWeVoteId]: action.res.statement_text }),
+            };
+          }
+          if (politicianWeVoteId) {
+            revisedState = {
+              ...revisedState,
+              voter_statement_text: assign({}, revisedState.voter_statement_text, { [politicianWeVoteId]: action.res.statement_text }),
+            };
+          }
+        }
+        revisedState = { ...revisedState,
+          voter_opposes: voterOpposes,
+          voter_supports: voterSupports,
+        };
+        // After storing it locally, refresh the whole list of positions
         isCandidate = stringContains('cand', ballotItemWeVoteId);
         isMeasure = stringContains('meas', ballotItemWeVoteId);
         if (isCandidate) {
@@ -216,17 +332,29 @@ class SupportStore extends ReduceStore {
         } else if (isMeasure) {
           MeasureActions.positionListForBallotItemFromFriends(ballotItemWeVoteId);
         }
-        return {
-          ...state,
-          voter_statement_text: this.statementListWithChanges(state.voter_statement_text, ballotItemWeVoteId, action.res.statement_text),
-        };
+        return revisedState;
 
       case 'voterPositionVisibilitySave':
         // Add the visibility to the list in memory
-        return {
-          ...state,
-          is_public_position: this.isForPublicListWithChanges(state.is_public_position, ballotItemWeVoteId, action.res.is_public_position),
-        };
+        revisedState = state;
+        console.log('voterPositionVisibilitySave: ', action.res);
+        if (action.res.is_public_position === undefined) {
+          // Do not update
+        } else {
+          if (ballotItemWeVoteId) {
+            revisedState = {
+              ...revisedState,
+              is_public_position: assign({}, revisedState.is_public_position, { [ballotItemWeVoteId]: action.res.is_public_position }),
+            };
+          }
+          if (politicianWeVoteId) {
+            revisedState = {
+              ...revisedState,
+              is_public_position: assign({}, revisedState.is_public_position, { [politicianWeVoteId]: action.res.is_public_position }),
+            };
+          }
+        }
+        return revisedState;
 
       case 'voterSignOut':
         // console.log('resetting SupportStore');

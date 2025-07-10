@@ -8,55 +8,53 @@ import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../stores/VoterStore';
+import OfficeStore from '../../stores/OfficeStore';
 
 class ShowMoreButtons extends React.Component {
-  constructor (props) {
-    super(props);
-    this.handleShowMoreClick = this.handleShowMoreClick.bind(this);
-    this.pushDataLayer = this.pushDataLayer.bind(this);
-  }
-
   handleShowMoreClick = () => {
-    const { showMoreId, showMoreButtonWasClicked, showMoreButtonsLink } = this.props; // trackInGTM,
-    const { location: { pathname: currentPathname } } = window; // Get path here
-    // if (trackInGTM) {
-    //   console.log('click');
-    const eventName = showMoreButtonWasClicked ? 'showLessButtonClick' : 'showMoreButtonClick';
-    this.pushDataLayer(eventName, showMoreId, currentPathname); // Use currentPathname
-    // } else {
-    //   console.log('Show More/Less clicked (not tracked):', showMoreId);
-    // }
-    showMoreButtonsLink();
-  };
+    const {
+      officeWeVoteId,
+      showMoreId,
+      showMoreButtonsLink,
+      showMoreButtonWasClicked,
+    } = this.props;
 
-  pushDataLayer = (eventName, showMoreId, currentPathname) => {
+    const actionType = showMoreButtonWasClicked ? 'showLess' : 'showMore';
+
+    const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
     const dataLayerObject = {
-      event: eventName,
-      element_id: showMoreId,
+      event: 'action',
+      actionDetails: {
+        actionType,
+        buttonId: showMoreId,
+      },
       pageDetails: {
         pageName: currentPage.pageName,
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        weVoteVoterId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-    // console.log(currentPathname);
+    const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};
+    if (officeWeVoteId) {
+      dataLayerObject.officeDetails = {
+        officeName: officeData.ballot_item_display_name || '',
+        officeWeVoteId,
+        stateCode: officeData.state_code || '',
+      };
+    }
     TagManager.dataLayer({ dataLayer: dataLayerObject });
+    showMoreButtonsLink();
   };
 
   render () {
     renderLog('ShowMoreButtons');
     const { classes, showLessCustomText, showMoreButtonWasClicked, showMoreCustomText, showMoreId } = this.props;
-    let showMoreText;
-
-    if (showMoreButtonWasClicked) {
-      showMoreText = showLessCustomText || 'show less';
-    } else {
-      showMoreText = showMoreCustomText || 'show more';
-    }
+    const showMoreText = showMoreButtonWasClicked ?
+      (showLessCustomText || 'show less') :
+      (showMoreCustomText || 'show more');
 
     return (
       <ShowMoreButtonsStyled className="card-child" id={`toggleContentButton-${showMoreId}`} onClick={this.handleShowMoreClick}>
@@ -76,6 +74,7 @@ class ShowMoreButtons extends React.Component {
 
 ShowMoreButtons.propTypes = {
   classes: PropTypes.object,
+  officeWeVoteId: PropTypes.string,
   showLessCustomText: PropTypes.string,
   showMoreId: PropTypes.string.isRequired,
   showMoreButtonsLink: PropTypes.func.isRequired,

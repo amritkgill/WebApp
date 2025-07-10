@@ -1,11 +1,13 @@
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import { renderLog } from '../../common/utils/logging';
 import VoterConstants from '../../constants/VoterConstants';
 import AppObservableStore from '../../common/stores/AppObservableStore';
 import BallotStore from '../../stores/BallotStore';
 import SupportStore from '../../stores/SupportStore';
 import VoterStore from '../../stores/VoterStore';
-import HowItWorksWizard from './HowItWorksWizard';
+import CompleteYourProfileWizard from './CompleteYourProfileWizard';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const SignInModal = React.lazy(() => import(/* webpackChunkName: 'SignInModal' */ '../../common/components/SignIn/SignInModal'));
 
@@ -30,6 +32,25 @@ class CompleteYourProfile2024 extends Component {
   }
 
   componentDidMount () {
+    // Track component load/impression for analytics
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'landing',
+        componentName: 'CompleteYourProfile2024',
+      },
+      event: 'landing',
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('CompleteYourProfile2024 component loaded:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
     this.ballotStoreListener = BallotStore.addListener(this.onBallotStoreChange.bind(this));
     this.supportStoreListener = SupportStore.addListener(this.onSupportStoreChange.bind(this));
     this.voterStoreListener = VoterStore.addListener(this.onVoterStoreChange.bind(this));
@@ -183,12 +204,63 @@ class CompleteYourProfile2024 extends Component {
   }
 
   openHowItWorksModal = () => {
+    // console.log('openHowItWorksModal called');
+
     AppObservableStore.setShowHowItWorksModal(true);
+
+    // Add dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'howWeVoteWorksStep',
+      },
+      event: 'action',
+      destinationDetails: {
+        destinationPageName: 'HowItWorksModal',
+        destinationPageType: currentPage.pageType, // Use same pageType as current page
+        destinationPathname: currentPathname,
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('openHowItWorksModal dataLayer:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   openPersonalizedScoreIntroModal = () => {
-    // console.log('Opening modal');
+    // console.log('openPersonalizedScoreIntroModal called');
     AppObservableStore.setShowPersonalizedScoreIntroModal(true);
+    // Add dataLayer tracking
+    const { location: { pathname: currentPathname } } = window;
+    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'yourPersonalizedScoreStep',
+      },
+      event: 'action',
+      destinationDetails: {
+        destinationPageName: 'PersonalizedScoreIntroModal',
+        destinationPageType: currentPage.pageType,
+        destinationPathname: currentPathname,
+      },
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('openPersonalizedScoreIntroModal dataLayer:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   goToNextIncompleteStep = () => {
@@ -220,7 +292,42 @@ class CompleteYourProfile2024 extends Component {
   }
 
   toggleShowSignInModal = () => {
+    // Refactor to use:
+    // AppObservableStore.setShowSignInModal(
     const { showSignInModal } = this.state;
+
+    // console.log('toggleShowSignInModal called, current state:', showSignInModal);
+
+    const voterIsSignedIn = VoterStore.getVoterIsSignedIn();
+
+    // Only track dataLayer when opening the modal (not closing)
+    if (!showSignInModal && !voterIsSignedIn) {
+      // Add dataLayer tracking
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: !showSignInModal ? 'openModal' : 'closeModal',
+          buttonId: 'SignInToSaveStep',
+        },
+        event: 'action',
+        destinationDetails: {
+          destinationPageName: 'SignInModal',
+          destinationPageType: currentPage.pageType,
+          destinationPathname: currentPathname,
+        },
+        pageDetails: {
+          pageName: 'CompleteYourProfileWizard',
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+      // console.log('toggleShowSignInModal dataLayer:', dataLayerObject);
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+    }
+
     this.setState({
       showSignInModal: !showSignInModal,
     });
@@ -287,7 +394,6 @@ class CompleteYourProfile2024 extends Component {
 
     // If we have completed all the steps, don't render this component
     const allStepsHaveBeenCompleted = howItWorksWatched && personalizedScoreIntroCompleted && voterIsSignedIn;
-    // Prior: (addressIntroCompleted || addressIntroCompletedByCookie) && howItWorksWatched && personalizedScoreIntroCompleted && valuesIntroCompleted && voterIsSignedIn
     const showCompleteYourProfileForDebugging = false;
     if (showCompleteYourProfileForDebugging) {
       // Pass by this OFF switch so we render this component
@@ -311,7 +417,7 @@ class CompleteYourProfile2024 extends Component {
           </Suspense>
         )}
 
-        <HowItWorksWizard steps={steps} activeStep={activeStep} />
+        <CompleteYourProfileWizard steps={steps} activeStep={activeStep} />
       </div>
     );
   }

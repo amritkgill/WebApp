@@ -3,12 +3,15 @@ import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import CampaignSupporterActions from '../../actions/CampaignSupporterActions';
 import { renderLog } from '../../utils/logging';
 import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
 import CampaignStore from '../../stores/CampaignStore';
+import VoterStore from '../../../stores/VoterStore';
 import { generateSharingLink } from './shareButtonCommon';
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class ShareByCopyLink extends Component {
   constructor (props) {
@@ -96,6 +99,26 @@ class ShareByCopyLink extends Component {
     if (this.props.onClickFunction) {
       this.props.onClickFunction();
     }
+
+    // adding dataLayer for "Copy link" on Share Ballot
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+
+    const dataLayerObject = {
+      event: 'ShareBallotCopyLinkClick',
+      shareDetails: {
+        shareType: this.props.shareType || 'ballotWithChoices',
+        campaignXWeVoteId: this.props.campaignXWeVoteId || null,
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('DataLayer for copy link:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {
@@ -124,6 +147,7 @@ ShareByCopyLink.propTypes = {
   darkButton: PropTypes.bool,
   mobileMode: PropTypes.bool,
   onClickFunction: PropTypes.func,
+  shareType: PropTypes.string,
   uniqueExternalId: PropTypes.string,
 };
 

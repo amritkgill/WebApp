@@ -482,7 +482,7 @@ class HeaderBar extends Component {
       discussValue = 99; // 4;
       discussVisible = false; // We are turning off Discuss header link for now
       donateValue = 99; // Donate not used in Cordova
-      donateVisible = false;
+      donateVisible = true;
       howItWorksValue = 5;
       // howItWorksVisible = true;
       squadsValue = 4;
@@ -892,6 +892,7 @@ const HeaderBarWrapper = styled('div', {
   margin-top: ${hasNotch ? '9%' : ''};
   box-shadow: ${(!scrolledDown || !hasSubmenu)  ? '' : standardBoxShadow('wide')};
   border-bottom: ${(!scrolledDown || !hasSubmenu) ? '' : '1px solid #aaa'};
+  padding-left: calc(100vw - 100%);
 `));
 
 const StyledHeaderMenuTabs = styled(Tabs)`

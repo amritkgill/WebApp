@@ -1,3 +1,4 @@
+// lookupPageNameAndPageTypeDict.js
 import { isChallengeSEOFriendlyURL, isPoliticianSEOFriendlyURL } from '../common/utils/isSEOFriendlyURL';
 import { isWeVoteMarketingSite } from '../common/utils/hrefUtils';
 
@@ -88,15 +89,27 @@ function calculatePageNameAndPageTypeDict (path) {
   let settingsPageName = 'notSet'; // Per our naming convention for pageName, this would normally be 'NotSet' but I think the value of having settingsPageName being identical to settingsPageType will save us grief in the future.
   let settingsPageType = 'notSet';
 
-  if (path.startsWith('/ballot')) {
+  if (isPoliticianSEOFriendlyURL(path)) {
+    // We need this more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
+    settingsPageName = 'PoliticianDetailsPage';
+    settingsPageType = 'politician';
+  } else if (path.startsWith('/ballot')) {
     settingsPageName = 'Ballot';
     settingsPageType = 'ballot';
+  } else if (path.startsWith('/candidate/')) {
+    settingsPageName = 'Candidate';
+    settingsPageType = 'candidate';
+  } else if (path.startsWith('/measure/')) {
+    settingsPageName = 'Measure';
+    settingsPageType = 'measure';
+  } else if (path.startsWith('/voterguide/')) {
+    settingsPageName = 'OrganizationVoterGuide';
+    settingsPageType = 'organizationVoterGuide';
   } else if (path.endsWith('/cs/')) {
     settingsPageName = 'CampaignsHomeLoader';
     settingsPageType = 'candidate';
   } else if (isChallengeSEOFriendlyURL(path)) {
-    // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
-    settingsPageType = 'challenge';
+    // We need this more complex logic here because there are many paths in /src/App.jsx that use "/+/" in the path
     if (path.endsWith('join-challenge')) {
       settingsPageName = 'ChallengeInviteFriendsJoin';
     } else if (path.endsWith('customize-message')) {
@@ -108,19 +121,19 @@ function calculatePageNameAndPageTypeDict (path) {
     } else {
       settingsPageName = 'ChallengeHomePage';
     }
+    settingsPageType = 'challenge';
   } else if (path.startsWith('/friends')) {
     settingsPageName = 'Friends';
     settingsPageType = 'friends';
   } else if (path.startsWith('/news')) {
     settingsPageName = 'News';
     settingsPageType = 'news';
-  } else if (isPoliticianSEOFriendlyURL(path)) {
-    // We need to add more complex logic here because there are many paths in /src/App.jsx that use "/-/" in the path
-    settingsPageType = 'politician';
-    settingsPageName = 'PoliticianDetailsPage';
+  } else if (path.startsWith('/value/')) {
+    settingsPageName = 'IssuePage';
+    settingsPageType = 'issue';
   } else if (/^\/[^/\s]+$/.test(path)) {
     settingsPageName = 'TwitterHandleLanding';
-    settingsPageType = 'twitterHandleLanding';
+    settingsPageType = 'endorser';  // Changed from 'twitterHandleLanding' to 'endorser'
   }
 
   return {

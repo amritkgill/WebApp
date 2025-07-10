@@ -5,6 +5,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import numberAbbreviate from '../../common/utils/numberAbbreviate';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import isMobileScreenSize from '../../common/utils/isMobileScreenSize';
@@ -17,6 +18,7 @@ import convertToInteger from '../../common/utils/convertToInteger';
 import { convertNameToSlug } from '../../common/utils/textFormat';
 import IssueFollowToggleButton from './IssueFollowToggleButton';
 import IssueImageDisplay from './IssueImageDisplay';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 const ReadMore = React.lazy(() => import(/* webpackChunkName: 'ReadMore' */ '../../common/components/Widgets/ReadMore'));
 const SignInModal = React.lazy(() => import(/* webpackChunkName: 'SignInModal' */ '../../common/components/SignIn/SignInModal'));
@@ -141,6 +143,36 @@ class IssueCard extends Component {
     this.addToIssueFollowersAdjustment(-1);
   }
 
+  handleIssueClick = (buttonId) => {
+    const { location: { pathname: currentPathname } } = window;
+    const { issue } = this.state;
+    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
+    const destinationPathname = this.getIssueLink();
+    const { pageName: destinationPageName, pageType: destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'navigate',
+        buttonId,
+      },
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+      destinationDetails: {
+        destinationPageName,
+        destinationPageType,
+        destinationPathname,
+      },
+    };
+    if (issue.issue_we_vote_id) {
+      dataLayerObject.topicDetails = IssueStore.getAnalyticsIssueDetails(issue.issue_we_vote_id);
+    }
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+  };
+
   addToIssueFollowersAdjustment (value) {
     let { issueFollowersAdjustment } = this.state;
     issueFollowersAdjustment =
@@ -213,7 +245,7 @@ class IssueCard extends Component {
       );
     }
 
-    const issueTooltip = isMobileScreenSize() ? (<span />) : (
+    const issueTooltip = isMobileScreenSize() ? (<></>) : (
       <Tooltip className="u-z-index-9020" id="issueTooltip">
         <div id="topicToolTipMsg">
           Follow
@@ -227,7 +259,7 @@ class IssueCard extends Component {
     let linkedOrganizationsTooltip = <></>;
     let linkedOrganizationNameCount = 0;
     if (linkedOrganizationPreviewList) {
-      linkedOrganizationsTooltip = isMobileScreenSize() ? (<span />) : (
+      linkedOrganizationsTooltip = isMobileScreenSize() ? (<></>) : (
         <Tooltip className="u-z-index-9020" id="linkedOrganizationsTooltip">
           <div>
             See endorsements from
@@ -270,7 +302,7 @@ class IssueCard extends Component {
       );
     }
 
-    const followersTooltip = isMobileScreenSize() ? (<span />) : (
+    const followersTooltip = isMobileScreenSize() ? (<></>) : (
       <Tooltip className="u-z-index-9020" id="followersToolTip">
         <div>
           {numberAbbreviate(adjustedFollowersCount)}
@@ -361,9 +393,11 @@ class IssueCard extends Component {
                     <span>
                       {includeLinkToIssue ? (
                         <Link
-                              to={this.getIssueLink}
-                              className="u-no-underline"
-                              tabIndex={-1}
+                          id={`issueIconClick-${issueWeVoteId}`}
+                          to={this.getIssueLink}
+                          className="u-no-underline"
+                          tabIndex={-1}
+                          onClick={() => this.handleIssueClick(`issueIconClick-${issueWeVoteId}`)}
                         >
                           {issueImage}
                         </Link>
@@ -377,9 +411,11 @@ class IssueCard extends Component {
                 </IssueImage>
                 <>
                   {includeLinkToIssue ? (
-                    <Link id="valueListLink"
-                          to={this.getIssueLink}
-                          className="u-link-color"
+                    <Link
+                      id="issueNameClick"
+                      to={this.getIssueLink}
+                      className="u-link-color"
+                      onClick={() => this.handleIssueClick(`issueNameClick-${issueWeVoteId}`)}
                     >
                       {issueNameAndCount}
                     </Link>
@@ -412,6 +448,8 @@ class IssueCard extends Component {
           <IssueCardDescription>
             <Suspense fallback={<></>}>
               <ReadMore
+                buttonId="clickShowMoreAboutIssue"
+                issueWeVoteId={issueWeVoteId}
                 textToDisplay={issueDescription}
                 numberOfLines={numberOfLines}
               />
@@ -422,8 +460,10 @@ class IssueCard extends Component {
           <OverlayTrigger overlay={linkedOrganizationsTooltip} placement="top">
             <span>
               {includeLinkToIssue ? (
-                <Link id="issueAdvocatesLink"
-                      to={this.getIssueLink}
+                <Link
+                  id="issueAdvocatesLink"
+                  to={this.getIssueLink}
+                  onClick={() => this.handleIssueClick(`issueAdvocatesLink-${issueWeVoteId}`)}
                 >
                   {issueAdvocates}
                 </Link>

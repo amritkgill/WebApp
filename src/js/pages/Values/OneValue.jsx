@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import IssueActions from '../../actions/IssueActions';
 import OrganizationActions from '../../actions/OrganizationActions';
 import apiCalming from '../../common/utils/apiCalming';
@@ -19,6 +20,8 @@ import ValuesList from './ValuesList';
 import { convertNameToSlug } from '../../common/utils/textFormat';
 import NoSearchResult from '../../components/Search/NoSearchResult';
 import EndorsementCard from '../../components/Widgets/EndorsementCard';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import VoterStore from '../../stores/VoterStore';
 
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
 const IssueCard = React.lazy(() => import(/* webpackChunkName: 'IssueCard' */ '../../components/Values/IssueCard'));
@@ -149,9 +152,29 @@ class OneValue extends Component {
     });
   }
 
-  changeListModeShown = (newListModeShown) => {
+  changeListModeShown = (buttonId) => {
+    const { location: { pathname: currentPathname } } = window;
+    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
+    const { issue } = this.state;
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'filter',
+        buttonId,
+      },
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    if (issue.issue_we_vote_id) {
+      dataLayerObject.topicDetails = IssueStore.getAnalyticsIssueDetails(issue.issue_we_vote_id);
+    }
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
     this.setState({
-      listModeShown: newListModeShown,
+      listModeShown: buttonId,
     });
   }
 
@@ -264,7 +287,7 @@ class OneValue extends Component {
             <FilterChoices>
               <Chip
                 key="forThisElectionKey"
-                id = "forThisElection"
+                id="forThisElection"
                 label={<span style={showEndorsersForThisElection ? { fontWeight: 600 } : {}}>For This Election</span>}
                 className={showEndorsersForThisElection ? classes.selectedChip : classes.notSelectedChip}
                 component="div"
@@ -273,7 +296,7 @@ class OneValue extends Component {
               />
               <Chip
                 key="allOrganizationsKey"
-                id = "allEndorsers"
+                id="allEndorsers"
                 label={<span style={showAllEndorsers ? { fontWeight: 600 } : {}}>All Endorsers</span>}
                 className={showAllEndorsers ? classes.selectedChip : classes.notSelectedChip}
                 component="div"

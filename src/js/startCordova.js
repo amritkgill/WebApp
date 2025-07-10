@@ -1,7 +1,7 @@
 import VoterActions from './actions/VoterActions';
 import { getCordovaScreenHeight, isIOS, isIOSAppOnMac, isIPad, isSimulator, prepareForCordovaKeyboard, restoreStylesAfterCordovaKeyboard } from './common/utils/cordovaUtils';
 import initializejQuery from './common/utils/initializejQuery';
-import { isCordova } from './common/utils/isCordovaOrWebApp';
+import { isAndroid, isCordova } from './common/utils/isCordovaOrWebApp';
 import Cookies from './common/utils/js-cookie/Cookies';
 import { httpLog } from './common/utils/logging';
 import TwitterSignIn from './components/Twitter/TwitterSignIn';
@@ -107,6 +107,11 @@ export function initializationForCordova (startReact) {
     if (isIPad()) {
       document.querySelector('body').style.height = getCordovaScreenHeight();
       console.log('Cordova: Initial "body" height for iPad = calculation disabled '); // , result.height / result.scale);
+    }
+    if (isAndroid()) {
+      // July 2025, Android "backbutton" is not handled since pushHistory is only keeping the previous location, so pressing "backbutton" twice would be a mess
+      // Also it was originally noted as a bug in the How it Works dialog, which would be a special case that would not use pushHistory
+      document.addEventListener('backbutton', () => {}, false);
     }
     initializejQuery(() => {
       const { $ } = window;

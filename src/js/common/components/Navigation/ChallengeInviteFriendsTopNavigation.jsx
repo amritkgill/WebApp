@@ -135,8 +135,8 @@ const ChallengeInviteFriendsTopNavigation = ({ challengeSEOFriendlyPath, challen
               component={Toolbar}
             >
               <TabsStyled value={value} onChange={handleChange} aria-label="Tab menu">
-                {!hideAboutTab && <TabStyled id="challengeLandingTab-0" label="About" onClick={() => history.push(aboutUrl)} value={1} isSmallScreen={isSmallScreen} />}
-                <TabStyled id="challengeLandingTab-1" label="Leaderboard" onClick={() => history.push(leaderboardUrl)} value={2} isSmallScreen={isSmallScreen} />
+                {!hideAboutTab && <TabStyled id="challengeLandingTab-0" label="About" onClick={() => history.push(aboutUrl)} value={1} $isSmallScreen={isSmallScreen} />}
+                <TabStyled id="challengeLandingTab-1" label="Leaderboard" onClick={() => history.push(leaderboardUrl)} value={2} $isSmallScreen={isSmallScreen} />
                 {voterIsChallengeParticipant && <TabStyled id="challengeLandingTab-2" label={isSmallScreen ? 'Invited' : 'Invited friends'} onClick={() => history.push(friendsUrl)} value={3} />}
               </TabsStyled>
               <MoreInfoIconWrapper

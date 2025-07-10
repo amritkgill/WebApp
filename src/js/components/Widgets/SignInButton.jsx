@@ -13,27 +13,28 @@ import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageType
 export default function SignInButton (props) {
   renderLog('SignInButton');  // Set LOG_RENDER_EVENTS to log all renders
 
-  // GTM Data Layer push for SignIn button on HomePage by AnujaLawankar-March24th,2025
-  const { pageName, pageType } = lookupPageNameAndPageTypeDict(window.location.pathname);
+  const { location: { pathname: currentPathname } } = window;
+  const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
   const handleClick = () => {
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'signInClick', // sign_in_click
-        userDetails: {
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        destinationDetails: {
-          destinationPageName: 'SignInModal',
-          destinationPageType: 'auth',
-          destinationPathname: window.location.pathname,
-        },
-        pageDetails: {
-          pageName,
-          pageType,
-          pathname: window.location.pathname,
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'SignIn',
       },
-    });
+      event: 'action',
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+      destinationDetails: {
+        destinationPageName: 'SignInModal',
+        destinationPageType: pageType,
+        destinationPathname: currentPathname,
+      },
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
     // Trigger the actual sign-in modal
     if (props.toggleSignInModal) {
       props.toggleSignInModal();

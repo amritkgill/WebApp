@@ -178,7 +178,7 @@ class ShareButtonFooter extends Component {
     }, () => this.openShareOptions()); // openShareOptions advances directly to share
   }
 
-  handleCloseShareButtonDrawer = () => {
+  handleCloseShareButtonDrawer = (buttonId = '') => {
     this.setState({
       openShareButtonDrawer: false,
       showShareButton: true,

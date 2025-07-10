@@ -1,31 +1,37 @@
 import { Launch } from '@mui/icons-material';
 import { Button, FormControl, FormControlLabel, InputAdornment, Radio, RadioGroup, TextField } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
 import { GoogleReCaptcha, GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import TagManager from 'react-gtm-module';
 import { Helmet } from 'react-helmet-async';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import AnalyticsActions from '../../actions/AnalyticsActions';
 import DonateActions from '../../common/actions/DonateActions';
 import DonationListForm from '../../common/components/Donation/DonationListForm';
+import DonorboxCordova from '../../common/components/Donation/DonorboxCordova';
 import DonorboxEmbed from '../../common/components/Donation/DonorboxEmbed';
-import InjectedCheckoutForm from '../../common/components/Donation/InjectedCheckoutForm';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import standardBoxShadow from '../../common/components/Style/standardBoxShadow';
 import OpenExternalWebSite from '../../common/components/Widgets/OpenExternalWebSite';
 import DonateStore from '../../common/stores/DonateStore';
 import initializejQuery from '../../common/utils/initializejQuery';
+import { isWebApp } from '../../common/utils/isCordovaOrWebApp';
+import { isTablet } from '../../common/utils/isMobileScreenSize';
 import { renderLog } from '../../common/utils/logging';
+import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import { Section } from '../../components/Welcome/sectionStyles';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
-import $ajax from '../../utils/service';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
-const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
+/* global $ */
 
+// const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
+
+const donationImage = normalizedImagePath('/img/global/photos/Donate_Screenshot.png');
 
 class Donate extends Component {
   static getProps () {
@@ -41,8 +47,11 @@ class Donate extends Component {
       joining: true,
       preDonation: true,
       okToDonateWithoutAuth: true,
-      showWaiting: false,
+      // showWaiting: false,
       value: '7.00',
+      readMore: false,
+      windowWidth: window.innerWidth,
+      dataLayerSent: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -51,18 +60,21 @@ class Donate extends Component {
     this.onDonateStoreChange = this.onDonateStoreChange.bind(this);
     this.onSuccessfulDonation = this.onSuccessfulDonation.bind(this);
     this.onVerifyCaptcha = this.onVerifyCaptcha.bind(this);
+    this.onVoterStoreChange = this.onVoterStoreChange.bind(this);
   }
 
   componentDidMount () {
     this.onDonateStoreChange();
     this.donateStoreListener = DonateStore.addListener(this.onDonateStoreChange);
+    this.voterStoreListener = VoterStore.addListener(this.onVoterStoreChange);
     AnalyticsActions.saveActionDonateVisit(VoterStore.electionId());
     DonateActions.donationRefreshDonationList();
     window.scrollTo(0, 0);
+    window.addEventListener('resize', this.handleResize);
   }
 
   componentDidUpdate () {
-    const { isC4Donation } = this.state;
+    const { isC4Donation, dataLayerSent } = this.state;
     if (isC4Donation) {
       initializejQuery(() => {
         const { $ } = window;
@@ -70,10 +82,29 @@ class Donate extends Component {
         spot.css({ margin: '0 auto', width: '31%', 'padding-top': '16px' });
       });
     }
+
+    if (!dataLayerSent && VoterStore.getVoterWeVoteId()) {
+      const { location: { pathname: currentPathname } } = window;
+      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+      const dataLayerObject = {
+        event: 'landing',
+        pageDetails: {
+          pageName: currentPage.pageName,
+          pageType: currentPage.pageType,
+          pathname: currentPathname,
+        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+      // console.log('WV-1462: dataLayerObject:', dataLayerObject);
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+      this.setState({ dataLayerSent: true });
+    }
   }
 
   componentWillUnmount () {
     this.donateStoreListener.remove();
+    this.voterStoreListener.remove();
+    window.removeEventListener('resize', this.handleResize);
   }
 
   onDonateStoreChange () {
@@ -87,8 +118,13 @@ class Donate extends Component {
     }
   }
 
+  onVoterStoreChange () {
+    this.setState({});
+  }
+
+
   /*
-  An enter keystroke in the react-bootstrap InputGroup, (or in the original react "input-group",)
+  An enter keystroke in the react-bootstrap InputGroup, (or in the original react "input-group")
   causes a page reload, and you lose context.  So swallow the 'Enter' keystroke event while in
   the InputGroup.
   */
@@ -104,11 +140,17 @@ class Donate extends Component {
     this.setState({ isMonthly });
   };
 
+  handleResize = () => {
+    this.setState({
+      windowWidth: window.innerWidth,
+    });
+  };
+
   onSuccessfulDonation () {
     console.log('onSuccessfulDonation in Donate ------------------------------');
     console.log('Donation store changed in Donate, Checkout form removed');
     this.setState({
-      showWaiting: true,
+      // showWaiting: true,
       preDonation: false,
     });
   }
@@ -124,7 +166,7 @@ class Donate extends Component {
     const { isC4Donation } = this.state;
     if (isC4Donation) {
       // console.log('------------ onVerifyCaptcha: ', token);
-      $ajax({
+      $.ajax({
         endpoint: 'googleRecaptchaVerify',
         data: { token },
         success: (res) => {
@@ -141,7 +183,7 @@ class Donate extends Component {
               isSignedin,
             });
             if (!allowedToDonate) {
-              $ajax({
+              $.ajax({
                 endpoint: 'logToCloudWatch',
                 data: { message: `reCAPTCHA FAILED verification signedIn ${isSignedin}, results ${JSON.stringify(res)}` },
               });
@@ -161,6 +203,8 @@ class Donate extends Component {
   preDonateDescription = () => (
     <span id="first_paragraph">
       Thank you for being a voter! For every $10 donated, you help 50 Americans be voters too.
+      {/* When people feel prepared to vote, they’re more likely to cast a ballot — especially in local and primary elections, where participation is lowest. At */}
+      {/* WeVote our mission is to close the confidence gap that keeps so many voters on the sidelines. */}
     </span>
   );
 
@@ -194,6 +238,65 @@ class Donate extends Component {
     </span>
   );
 
+  donationDescriptionReadMore = (readMore, isC4Donation) => (
+    <DonationDescriptionContainer>
+      <DonationDescription id="donation_copy">
+        When people feel prepared to vote, they’re more likely to cast a ballot — especially in local and primary elections, where participation is lowest. At WeVote, our mission is to close the confidence gap that keeps so many voters on the sidelines.
+      </DonationDescription>
+      {readMore && (
+        <>
+          <p>
+            We don’t take sides. Instead, we provide trusted, nonpartisan tools that help people feel informed and ready to vote.
+            Because WeVote is 100% volunteer-run, your donation directly powers our work — helping us reach new voters, low-turnout communities, and busy people who care but aren’t sure where to start.
+            Our tools are free for voters, but not free to build, maintain, or scale. That’s why we’re asking for your support. A gift of $50, $100, or $250 will help us expand our reach, strengthen our platform, and bridge the information gap in our democracy.
+          </p>
+          <p>
+            $50 - can bring 500 new voters to WeVote
+          </p>
+          <p>
+            $100 - can match voters to their ballots for one month
+          </p>
+          <p>
+            $250 - can provide our recruiting team with their software for one month, or cover our server fees for 10 days
+          </p>
+        </>
+      )}
+      <DonationDescription>
+        If you believe every voter deserves to feel confident and prepared, please give now.
+        {!readMore && (
+          <ReadMoreButton
+            onClick={() => this.setState({
+              readMore: true,
+            })}
+          >
+            Read more...
+          </ReadMoreButton>
+        )}
+      </DonationDescription>
+      {readMore && (
+        <OpenExternalWebSite
+          linkIdAttribute="annualBudget"
+          url={isC4Donation ? 'https://projects.propublica.org/nonprofits/organizations/811052585' : 'https://projects.propublica.org/nonprofits/organizations/472691544'}
+          target="_blank"
+          trackingOn
+          body={(
+            <span id="budgets_small">
+              Questions about donating?
+              <Launch
+                style={{
+                  height: 14,
+                  marginLeft: 2,
+                  marginTop: '-3px',
+                  width: 14,
+                }}
+              />
+            </span>
+          )}
+        />
+      )}
+    </DonationDescriptionContainer>
+  );
+
   changeValue (newValue) {
     const { joining } = this.state;
     if (!joining) {
@@ -209,7 +312,7 @@ class Donate extends Component {
   render () {
     renderLog('Donate');  // Set LOG_RENDER_EVENTS to log all renders
     const { classes } = this.props;
-    const { isC4Donation, isSignedin, joining, showWaiting, value, isMonthly, preDonation, okToDonateWithoutAuth } = this.state;
+    const { isC4Donation, isSignedin, joining, value, isMonthly, preDonation, okToDonateWithoutAuth, windowWidth } = this.state;
 
     // Default donation goes to c3, unless we specify a donation to the c4
     let c3DonationHtml = '';
@@ -218,40 +321,62 @@ class Donate extends Component {
     if (!isC4Donation) {
       c3DonationHtml = (
         <C3DonationWrapper>
+          <ResetMargin />
           <Wrapper>
             <Helmet>
               <title>Donate - WeVote</title>
               {/* eslint-disable-next-line react/no-unknown-property */}
               <script src="https://donorbox.org/widget.js" paypalExpress="true" defer />
             </Helmet>
-            <ContentTitle id="want_to_vote">
-              Want more Americans to vote?
-            </ContentTitle>
+            {/* <ContentTitle id="want_to_vote"> */}
+            {/*  Want more Americans to vote? */}
+            {/* </ContentTitle> */}
             <CenteredText className="u-show-mobile">
               <Section noTopMargin>
                 <DonateDescriptionContainer>
-                  {this.preDonateDescription()}
-                  {' '}
-                  {this.preDonateDescriptionBottom(isC4Donation)}
+                  {/* {this.preDonateDescription()} */}
+                  {/* {' '} */}
+                  {/* {this.preDonateDescriptionBottom(isC4Donation)} */}
+                  {this.donationDescriptionReadMore(this.state.readMore, isC4Donation)}
                 </DonateDescriptionContainer>
-              </Section>
-            </CenteredText>
-            <TwoColumns>
-              <OneColumn50Percent className="u-show-desktop-tablet">
-                {this.preDonateDescription()}
-                {' '}
-                {this.preDonateDescriptionBottom(isC4Donation)}
-              </OneColumn50Percent>
-              <OneColumn50Percent>
                 <InnerWrapper>
                   <DonorboxWrapper>
                     <Suspense fallback={<div>Loading...</div>}>
-                      <DonorboxEmbed />
+                      {isWebApp() ? <DonorboxEmbed /> : <DonorboxCordova />}
                     </Suspense>
                   </DonorboxWrapper>
                 </InnerWrapper>
-              </OneColumn50Percent>
-            </TwoColumns>
+              </Section>
+            </CenteredText>
+            {windowWidth > 532 && (
+              <TwoColumns>
+                <TextAndDonorboxColumn className="u-show-desktop-tablet">
+                  {/* {this.preDonateDescription()} */}
+                  {/* {' '} */}
+                  {/* {this.preDonateDescriptionBottom(isC4Donation)} */}
+                  {this.donationDescriptionReadMore(this.state.readMore, isC4Donation)}
+                  <InnerWrapper>
+                    <DonorboxWrapper>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <DonorboxEmbed />
+                      </Suspense>
+                    </DonorboxWrapper>
+                  </InnerWrapper>
+                </TextAndDonorboxColumn>
+                <DonationImageContainer>
+                  {/* <InnerWrapper> */}
+                  {/*  <DonorboxWrapper> */}
+                  {/*    <Suspense fallback={<div>Loading...</div>}> */}
+                  {/*      <DonorboxEmbed /> */}
+                  {/*    </Suspense> */}
+                  {/*  </DonorboxWrapper> */}
+                  {/* </InnerWrapper> */}
+                  <DonationImage
+                    src={donationImage}
+                  />
+                </DonationImageContainer>
+              </TwoColumns>
+            )}
             <br />
             <br />
           </Wrapper>
@@ -379,7 +504,7 @@ class Donate extends Component {
                             </ContributeGridItemJoin>
                           </ContributeGridSection>
                         </ContributeGridWrapper>
-                        <PaymentWrapper joining={joining}>
+                        {/* <PaymentWrapper joining={joining}>
                           <PaymentCenteredWrapper>
                             <Elements stripe={stripePromise}>
                               <InjectedCheckoutForm
@@ -390,7 +515,7 @@ class Donate extends Component {
                               />
                             </Elements>
                           </PaymentCenteredWrapper>
-                        </PaymentWrapper>
+                        </PaymentWrapper> */}
                       </>
                     ) : (
                       <ReCaptchaFailed>
@@ -452,9 +577,9 @@ class Donate extends Component {
     }
 
     return (
-      <PageContentContainer>
+      <DonatePageContentContainer>
         {isC4Donation ? c4DonationHtml : c3DonationHtml}
-      </PageContentContainer>
+      </DonatePageContentContainer>
     );
   }
 }
@@ -518,7 +643,6 @@ const C4DonationWrapper = styled('div')`
 `;
 
 const CenteredText = styled('div')`
-  align-items: center;
   display: flex;
   justify-content: center;
   margin-bottom: 12px;
@@ -544,9 +668,8 @@ const DonorboxWrapper = styled('div')`
 const Wrapper = styled('div')`
   display: flex;
   flex-flow: column nowrap;
-  align-items: center;
-  background: white;
   overflow-x: hidden;
+  height: 100%;
 `;
 
 const InnerWrapper = styled('div')`
@@ -554,7 +677,7 @@ const InnerWrapper = styled('div')`
 `;
 
 const DonateDescriptionContainer = styled('div')`
-  // margin: 1em auto;
+  margin: 1.5em auto;
   margin-bottom: 12px;
   width: 960px;
   max-width: 90vw;
@@ -571,12 +694,12 @@ const DonateDescriptionContainer = styled('div')`
   }
 `;
 
-const PaymentWrapper  = styled('div', {
-  shouldForwardProp: (prop) => !['joining'].includes(prop),
-})(({ joining }) => (`
-  display: ${joining ? '' : 'none'};
-  text-align: center;
-`));
+// const PaymentWrapper  = styled('div', {
+//   shouldForwardProp: (prop) => !['joining'].includes(prop),
+// })(({ joining }) => (`
+//   display: ${joining ? '' : 'none'};
+//   text-align: center;
+// `));
 
 const ReCaptchaFailed  = styled('div')`
   text-align: center;
@@ -592,18 +715,18 @@ const DonateCaveat = styled('p')`
   font-style: italic;
 `;
 
-const PaymentCenteredWrapper  = styled('div')(({ theme }) => (`
-  width: 500px;
-  ${theme.breakpoints.down('sm')} {
-    width: 300px;
-  }
-  display: inline-block;
-  background-color: rgb(246, 244,246);
-  box-shadow: ${standardBoxShadow('medium')};
-  border: 2px solid darkgrey;
-  border-radius: 3px;
-  padding: 8px;
-`));
+// const PaymentCenteredWrapper  = styled('div')(({ theme }) => (`
+//   width: 500px;
+//   ${theme.breakpoints.down('sm')} {
+//     width: 300px;
+//   }
+//   display: inline-block;
+//   background-color: rgb(246, 244,246);
+//   box-shadow: ${standardBoxShadow('medium')};
+//   border: 2px solid darkgrey;
+//   border-radius: 3px;
+//   padding: 8px;
+// `));
 
 
 const ContributeGridWrapper = styled('div')(({ theme }) => (`
@@ -648,15 +771,60 @@ const ContributeGridItemJoin = styled('div', {
   grid-column: auto / span 2;
 `));
 
-const OneColumn50Percent = styled('div')`
-  margin: 0 15px;
-  max-width: 480px;
+const DonationImageContainer = styled('div')`
+  height: 99%;
+  width: 70%;
+  overflow: hidden;
+`;
+
+const TextAndDonorboxColumn = styled('div')`
+  max-width: 400px;
+`;
+
+const DonationImage = styled('img')`
+  width: 57%;
+  object-fit: cover;
+  display: block;
+  position: fixed;
+  padding-top: ${isTablet() ? '40px' : ''};
+`;
+
+const DonationDescriptionContainer = styled('div')`
+  padding: 0 20px;
+  margin-top: 40px;
+`;
+
+const DonationDescription = styled('p')`
 `;
 
 const TwoColumns = styled('div')`
+  background: white;
+  margin-left: 15%;
+  margin-bottom: -3.5%;
+  padding-bottom: 1%;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
+  height: 100%;
 `;
+
+const ReadMoreButton = styled('button')`
+  background-color: transparent;
+  border: none;
+  color: ${DesignTokenColors.primary700};
+`;
+
+const DonatePageContentContainer = styled(PageContentContainer)`
+  max-width: 100%;
+  // background-color: ${DesignTokenColors.secondary500};
+  background-color: #0d5470;
+  padding-top: 20px;
+`;
+
+const ResetMargin = createGlobalStyle`
+  html, body {
+    margin: 0;
+  }
+`;
+
 
 export default withStyles(styles)(Donate);
