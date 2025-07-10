@@ -17,7 +17,7 @@ import ActivityStore from '../../stores/ActivityStore';
 import VoterStore from '../../stores/VoterStore';
 import { createDescriptionOfFriendPosts } from '../../utils/activityUtils';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const ImageHandler = React.lazy(() => import(/* webpackChunkName: 'ImageHandler' */ '../ImageHandler'));
 
@@ -98,8 +98,6 @@ class HeaderNotificationMenu extends Component {
 
 
 onSettingsClick = (buttonId) => {
-  const { location: { pathname: currentPathname } } = window;
-  const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
   const destinationPathname = '/settings/notifications';
   const destinationPage = lookupPageNameAndPageTypeDict(destinationPathname);
   const dataLayerObject = {
@@ -108,11 +106,7 @@ onSettingsClick = (buttonId) => {
       buttonId,
     },
     event: 'action',
-    pageDetails: {
-      pageName: currentPage.pageName,
-      pageType: currentPage.pageType,
-      pathname: currentPathname,
-    },
+    pageDetails: getPageDetails(),
     destinationDetails: {
       destinationPageName: destinationPage.pageName,
       destinationPageType: destinationPage.pageType,
@@ -282,11 +276,7 @@ onSettingsClick = (buttonId) => {
         buttonId: 'headerNotificationMenuIcon',
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: 'NotificationsModal',
         destinationPageType: currentPage.pageType,

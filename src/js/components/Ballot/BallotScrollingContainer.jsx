@@ -28,7 +28,7 @@ import { PositionRowListInnerWrapper, PositionRowListOneWrapper, PositionRowList
 import BallotMatchIndicator from '../BallotItem/BallotMatchIndicator';
 import PositionRowListCompressed from './PositionRowListCompressed';
 import BallotMatchIndicator2024 from '../BallotItem/BallotMatchIndicator2024';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import webAppConfig from '../../config';
 
 // const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
@@ -96,11 +96,7 @@ class BallotScrollingContainer extends Component {
         buttonId,
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPageDetails.pageName,
-        pageType: currentPageDetails.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         pageName: 'CandidateModal',
         pageType: currentPageDetails.pageType,

@@ -11,7 +11,7 @@ import BallotStore from '../../stores/BallotStore';
 import VoterStore from '../../stores/VoterStore';
 import VoterActions from '../../actions/VoterActions';
 import apiCalming from '../../common/utils/apiCalming';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 class ViewUpcomingBallotButton extends React.Component {
   constructor (props) {
@@ -68,8 +68,6 @@ class ViewUpcomingBallotButton extends React.Component {
 
   goToBallotLocal = () => {
     if (this.props.goToBallotFunction) {
-      const { location: { pathname: currentPathname } } = window;
-      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
       const destinationPathname = '/ballot';
       const destinationPage = lookupPageNameAndPageTypeDict(destinationPathname);
       const dataLayerObject = {
@@ -84,11 +82,7 @@ class ViewUpcomingBallotButton extends React.Component {
           destinationPageType: destinationPage.pageType,
           destinationPathname,
         },
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
+        pageDetails: getPageDetails(),
       };
       TagManager.dataLayer({ dataLayer: dataLayerObject });
       this.props.goToBallotFunction();

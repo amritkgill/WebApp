@@ -24,7 +24,7 @@ import CampaignStore from '../../stores/CampaignStore';
 import { getCampaignXValuesFromIdentifiers, retrieveCampaignXFromIdentifiersIfNeeded } from '../../utils/campaignUtils';
 import initializejQuery from '../../utils/initializejQuery';
 import SplitIconButton from '../Widgets/SplitIconButton';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../../stores/VoterStore';
 
 const stripePromise = loadStripe(webAppConfig.STRIPE_API_KEY);
@@ -192,11 +192,7 @@ class PayToPromoteProcess extends Component {
       },
       event: 'action',
       userDetails: VoterStore.getAnalyticsUserDetails(),
-      pageDetails: {
-        pageType: currentPage.pageType,
-        pageName: currentPage.pageName,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: currentPage.destinationPageName,
         destinationPageType: currentPage.destinationPageType,

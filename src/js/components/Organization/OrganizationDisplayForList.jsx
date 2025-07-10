@@ -12,7 +12,7 @@ import PositionRatingSnippet from '../PositionItem/PositionRatingSnippet';
 import PositionSupportOpposeSnippet from '../PositionItem/PositionSupportOpposeSnippet';
 import TwitterAccountStats from '../Widgets/TwitterAccountStats';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const FollowToggle = React.lazy(() => import(/* webpackChunkName: 'FollowToggle' */ '../Widgets/FollowToggle'));
 
@@ -107,8 +107,6 @@ class OrganizationDisplayForList extends Component {
   }
 
   sendEndorserClickEvent (buttonId) {
-    const { location: { pathname: currentPathname } } = window;
-    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const { twitterHandle } = this.state;
     const { organizationWeVoteId } = this.props;
     const destinationPathname = twitterHandle ? `/${twitterHandle}` : `/voterguide/${organizationWeVoteId}`;
@@ -126,11 +124,7 @@ class OrganizationDisplayForList extends Component {
         destinationPathname,
 
       },
-      pageDetails: {
-        pageName,
-        pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     TagManager.dataLayer({ dataLayer: dataLayerObject });

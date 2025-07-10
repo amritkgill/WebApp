@@ -10,6 +10,7 @@ import AppObservableStore, { messageService } from '../../common/stores/AppObser
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const SettingsAccountLevelChip = React.lazy(() => import(/* webpackChunkName: 'SettingsAccountLeveLChip' */ '../Settings/SettingsAccountLevelChip'));
 
@@ -87,10 +88,7 @@ export default class SettingsPersonalSideBar extends Component {
         userCohort: VoterStore.getAnalyticsUserCohort(),
         voterWeVoteId: voterWeVoteId || VoterStore.getVoterWeVoteId(),
       },
-      pageDetails: {
-        pageTitle: document.title,
-        pagePath: window.location.pathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: destinationPage.pageName || '',
         destinationPageType: destinationPage.pageType || '',

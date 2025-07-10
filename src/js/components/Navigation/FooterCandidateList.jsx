@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import TagManager from 'react-gtm-module';
 import { convertStateTextToStateCode, stateCodeMap } from '../../common/utils/addressFunctions';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../stores/VoterStore';
 // React functional component example
 export default function FooterCandidateList () {
@@ -13,8 +13,6 @@ export default function FooterCandidateList () {
   let stateNamePhraseLowerCase;
 
   function handleClick (linkTo, buttonId = '') {
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(linkTo);
 
     const dataLayerObject = {
@@ -23,11 +21,7 @@ export default function FooterCandidateList () {
         buttonId,
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: destinationPage.pageName,
         destinationPageType: destinationPage.pageType,

@@ -27,7 +27,7 @@ import OrganizationStore from '../../stores/OrganizationStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import VoterStore from '../../stores/VoterStore';
 import { avatarGeneric } from '../../utils/applicationUtils';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 
 const STARTING_NUMBER_OF_IMAGES_TO_DISPLAY = 10;
@@ -112,11 +112,7 @@ class PositionRowListCompressed extends Component {
         organizationCount: this.getOrganizationCount(),
         talkingAboutText: this.getTalkingAboutText(),
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // Add candidate or measure details based on ballotItemWeVoteId

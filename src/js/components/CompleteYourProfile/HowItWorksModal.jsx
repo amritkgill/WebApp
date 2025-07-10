@@ -1,10 +1,10 @@
 import { Close } from '@mui/icons-material';
 import { Dialog, DialogContent, IconButton } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import TagManager from 'react-gtm-module';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import VoterActions from '../../actions/VoterActions';
 import { hasIPhoneNotch } from '../../common/utils/cordovaUtils';
@@ -12,7 +12,7 @@ import isMobileScreenSize from '../../common/utils/isMobileScreenSize';
 import { renderLog } from '../../common/utils/logging';
 import VoterConstants from '../../constants/VoterConstants';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const HowItWorks = React.lazy(() => import(/* webpackChunkName: 'HowItWorks' */ '../../pages/HowItWorks'));
 
@@ -40,19 +40,13 @@ class HowItWorksModal extends Component {
   }
 
   sendHowItWorksCloseEvent (buttonId) {
-    const { location: { pathname: currentPathname } } = window;
-    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const dataLayerObject = {
       actionDetails: {
         actionType: 'closeModal',
         buttonId,
       },
       event: 'action',
-      pageDetails: {
-        pageName,
-        pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     TagManager.dataLayer({ dataLayer: dataLayerObject });

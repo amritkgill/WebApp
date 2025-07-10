@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TruncateMarkup from 'react-truncate-markup';
 import TagManager from 'react-gtm-module';
+import TruncateMarkup from 'react-truncate-markup';
 import styled from 'styled-components';
-import { renderLog } from '../../utils/logging';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 import IssueStore from '../../../stores/IssueStore';
 import VoterStore from '../../../stores/VoterStore';
+import { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 import PoliticianStore from '../../stores/PoliticianStore';
+import { renderLog } from '../../utils/logging';
 
 export default class ReadMore extends Component {
   constructor (...args) {
@@ -33,8 +33,6 @@ export default class ReadMore extends Component {
     event.preventDefault();
     const { readMore } = this.state;
     const showMoreLabel = readMore ? 'showMore' : 'showLess';
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const { politicianWeVoteId } = this.props;
     const { buttonId, issueWeVoteId } = this.props;
 
@@ -44,11 +42,7 @@ export default class ReadMore extends Component {
         actionType: showMoreLabel,
         buttonId,
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     if (politicianWeVoteId) {

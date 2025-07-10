@@ -1,11 +1,12 @@
 import { Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
-import TagManager from 'react-gtm-module';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import VoterActions from '../actions/VoterActions';
+import AppObservableStore from '../common/stores/AppObservableStore';
 import { isCordova } from '../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../common/utils/logging';
 import Header, { Container, Title } from '../components/Welcome/howItWorksHeaderStyles';
@@ -13,10 +14,9 @@ import AnnotatedSlideshow from '../components/Widgets/AnnotatedSlideshow';
 import HeaderSwitch from '../components/Widgets/HeaderSwitch';
 import StepsChips from '../components/Widgets/StepsChips';
 import VoterConstants from '../constants/VoterConstants';
-import AppObservableStore from '../common/stores/AppObservableStore';
 import VoterStore from '../stores/VoterStore';
 import cordovaScrollablePaneTopPadding from '../utils/cordovaScrollablePaneTopPadding';
-import lookupPageNameAndPageTypeDict from '../utils/lookupPageNameAndPageTypeDict';
+import { getPageDetails } from '../utils/lookupPageNameAndPageTypeDict';
 
 const WelcomeAppbar = React.lazy(() => import(/* webpackChunkName: 'WelcomeAppbar' */ '../components/Navigation/WelcomeAppbar'));
 const WelcomeFooter = React.lazy(() => import(/* webpackChunkName: 'WelcomeFooter' */ '../components/Welcome/WelcomeFooter'));
@@ -318,8 +318,6 @@ class HowItWorks extends Component {
   };
 
   sendHowItWorksSlideEvent (stepIndex) {
-    const { location: { pathname: currentPathname } } = window;
-    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const titleId = this.getTitleIdFromIndex(stepIndex);
     const dataLayerObject = {
       actionDetails: {
@@ -327,11 +325,7 @@ class HowItWorks extends Component {
         buttonId: titleId,
       },
       event: 'action',
-      pageDetails: {
-        pageName,
-        pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     TagManager.dataLayer({ dataLayer: dataLayerObject });

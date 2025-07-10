@@ -7,7 +7,7 @@ import BallotStore from '../../stores/BallotStore';
 import SupportStore from '../../stores/SupportStore';
 import VoterStore from '../../stores/VoterStore';
 import CompleteYourProfileWizard from './CompleteYourProfileWizard';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const SignInModal = React.lazy(() => import(/* webpackChunkName: 'SignInModal' */ '../../common/components/SignIn/SignInModal'));
 
@@ -33,20 +33,13 @@ class CompleteYourProfile2024 extends Component {
 
   componentDidMount () {
     // Track component load/impression for analytics
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
     const dataLayerObject = {
       actionDetails: {
         actionType: 'landing',
         componentName: 'CompleteYourProfile2024',
       },
       event: 'landing',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // console.log('CompleteYourProfile2024 component loaded:', dataLayerObject);
@@ -223,11 +216,7 @@ class CompleteYourProfile2024 extends Component {
         destinationPageType: currentPage.pageType, // Use same pageType as current page
         destinationPathname: currentPathname,
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // console.log('openHowItWorksModal dataLayer:', dataLayerObject);
@@ -252,11 +241,7 @@ class CompleteYourProfile2024 extends Component {
         destinationPageType: currentPage.pageType,
         destinationPathname: currentPathname,
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // console.log('openPersonalizedScoreIntroModal dataLayer:', dataLayerObject);

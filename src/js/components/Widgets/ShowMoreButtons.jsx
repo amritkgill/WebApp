@@ -6,9 +6,9 @@ import React from 'react';
 import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
-import VoterStore from '../../stores/VoterStore';
 import OfficeStore from '../../stores/OfficeStore';
+import VoterStore from '../../stores/VoterStore';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 class ShowMoreButtons extends React.Component {
   handleShowMoreClick = () => {
@@ -21,20 +21,13 @@ class ShowMoreButtons extends React.Component {
 
     const actionType = showMoreButtonWasClicked ? 'showLess' : 'showMore';
 
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
     const dataLayerObject = {
       event: 'action',
       actionDetails: {
         actionType,
         buttonId: showMoreId,
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     const officeData = OfficeStore.getOffice(this.props.officeWeVoteId) || {};

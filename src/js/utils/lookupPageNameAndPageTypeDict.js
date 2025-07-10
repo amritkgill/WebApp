@@ -149,3 +149,23 @@ export default function lookupPageNameAndPageTypeDict (path) {
     return calculatePageNameAndPageTypeDict(path);
   }
 }
+
+export function getPageDetails (stateCode = null) {
+  const { location: { pathname } } = window;
+  const currentPage = lookupPageNameAndPageTypeDict(pathname);
+  console.log(currentPage);
+
+  if (stateCode) {
+    return {
+      pageType: currentPage.pageType,
+      pageName: currentPage.pageName,
+      pathname,
+      stateCode,
+    };
+  }
+  return {
+    pageType: currentPage.pageType,
+    pageName: currentPage.pageName,
+    pathname,
+  };
+}

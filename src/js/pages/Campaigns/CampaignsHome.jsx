@@ -25,7 +25,7 @@ import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
 import RepresentativeStore from '../../stores/RepresentativeStore';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const CandidateListRoot = React.lazy(() => import(/* webpackChunkName: 'CandidateListRoot' */ '../../components/CandidateListRoot/CandidateListRoot'));
 const CampaignListRoot = React.lazy(() => import(/* webpackChunkName: 'CampaignListRoot' */ '../../common/components/CampaignListRoot/CampaignListRoot'));
@@ -234,12 +234,7 @@ class CampaignsHome extends Component {
       }
       const dataLayerObject = {
         event: 'landing',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-          stateCode: urlStateCode,
-        },
+        pageDetails: getPageDetails(urlStateCode),
         userDetails: VoterStore.getAnalyticsUserDetails(),
       };
       TagManager.dataLayer({ dataLayer: dataLayerObject });

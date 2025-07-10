@@ -1,10 +1,11 @@
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { TwitterShareButton } from 'react-share';
 import TagManager from 'react-gtm-module';
+import { TwitterShareButton } from 'react-share';
 import styled from 'styled-components';
 import VoterStore from '../../../stores/VoterStore';
+import { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 import CampaignSupporterActions from '../../actions/CampaignSupporterActions';
 import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
 import CampaignStore from '../../stores/CampaignStore';
@@ -12,7 +13,6 @@ import { isAndroid, isCordova } from '../../utils/isCordovaOrWebApp';
 import { renderLog } from '../../utils/logging';
 import politicianListToSentenceString from '../../utils/politicianListToSentenceString';
 import { androidTwitterClickHandler, generateQuoteForSharing, generateSharingLink } from './shareButtonCommon';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class ShareOnTwitterButton extends Component {
   constructor (props) {
@@ -90,8 +90,6 @@ class ShareOnTwitterButton extends Component {
 
     // datalayer for Twitter
     const { shareType, campaignXWeVoteId } = this.props;
-    const { location: { pathname: currentPathname } } = window;
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
 
     const dataLayerObject = {
       event: 'ShareBallotTwitterClick',
@@ -100,11 +98,7 @@ class ShareOnTwitterButton extends Component {
         shareType: shareType || 'ballotWithChoices',
         campaignXWeVoteId: campaignXWeVoteId || null,
       },
-      pageDetails: {
-        pageName: page.pageName,
-        pageType: page.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // console.log('DataLayer for Twitter share:', dataLayerObject);

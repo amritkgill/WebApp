@@ -5,7 +5,7 @@ import { isCordova, isWebApp } from '../utils/isCordovaOrWebApp';
 import { renderLog } from '../utils/logging';
 import ToolBar from './Widgets/ToolBar';
 import { Video, PlayerContainer } from './Style/VideoStyles';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../stores/VoterStore';
 import historyPush from '../utils/historyPush';
 
@@ -18,8 +18,6 @@ export default class FAQBody extends Component {
   }
 
   pushDataLayer (destinationPath, buttonId) {
-    const { location: { pathname: currentPathname } } = window;
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(destinationPath);
 
     const dataLayerObj = {
@@ -28,11 +26,7 @@ export default class FAQBody extends Component {
         actionType: 'navigate',
         buttonId,
       },
-      pageDetails: {
-        pageName: page.pageName,
-        pageType: page.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageType: destinationPage.pageType,
         destinationPageName: destinationPage.pageName,

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HeaderLogoImage from './HeaderLogoImage';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import VoterStore from '../../stores/VoterStore';
 
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
@@ -18,8 +18,6 @@ const HeaderBarLogo = ({ chosenSiteLogoUrl, isBeta, light }) => {
   const homepagePath = '/ready';
 
   function handleClick () {
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(homepagePath);
     const dataLayerObject = {
       actionDetails: {
@@ -27,11 +25,7 @@ const HeaderBarLogo = ({ chosenSiteLogoUrl, isBeta, light }) => {
         buttonId: 'logoHeaderBar',
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: destinationPage.pageName,
         destinationPageType: destinationPage.pageType,

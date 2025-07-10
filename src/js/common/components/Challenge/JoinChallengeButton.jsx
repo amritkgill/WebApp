@@ -12,7 +12,7 @@ import ChallengeParticipantActions from '../../actions/ChallengeParticipantActio
 import ReadyStore from '../../../stores/ReadyStore';
 import VoterStore from '../../../stores/VoterStore';
 import { getChallengeValuesFromIdentifiers } from '../../utils/challengeUtils';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class JoinChallengeButton extends React.Component {
   constructor (props) {
@@ -128,7 +128,6 @@ class JoinChallengeButton extends React.Component {
     // console.log('goToInviteFriends currentPathname: ', currentPathname);
 
     // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(inviteFriendsPath);
     const dataLayerObject = {
       actionDetails: {
@@ -140,11 +139,7 @@ class JoinChallengeButton extends React.Component {
       challengeDetails: {
         challengeWeVoteId,
       },
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: destinationPage.pageName,
         destinationPageType: destinationPage.pageType,
@@ -178,7 +173,6 @@ class JoinChallengeButton extends React.Component {
       AppObservableStore.setSetUpAccountEntryPath(joinChallengeNextStepPath);
       // console.log('goToJoinChallenge currentPathname: ', currentPathname);
       // Adding event data to dataLayer for Google Tag Manager to fire the inviteFriendsToChallenge tag
-      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
       const destinationPage = lookupPageNameAndPageTypeDict(joinChallengeNextStepPath);
       const dataLayerObject = {
         actionDetails: {
@@ -190,11 +184,7 @@ class JoinChallengeButton extends React.Component {
         challengeDetails: {
           challengeWeVoteId,
         },
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
+        pageDetails: getPageDetails(),
         destinationDetails: {
           destinationPageName: destinationPage.pageName,
           destinationPageType: destinationPage.pageType,

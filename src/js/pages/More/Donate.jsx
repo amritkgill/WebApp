@@ -25,7 +25,7 @@ import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import { Section } from '../../components/Welcome/sectionStyles';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 /* global $ */
 
@@ -84,15 +84,9 @@ class Donate extends Component {
     }
 
     if (!dataLayerSent && VoterStore.getVoterWeVoteId()) {
-      const { location: { pathname: currentPathname } } = window;
-      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
       const dataLayerObject = {
         event: 'landing',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
+        pageDetails: getPageDetails(),
         userDetails: VoterStore.getAnalyticsUserDetails(),
       };
       // console.log('WV-1462: dataLayerObject:', dataLayerObject);

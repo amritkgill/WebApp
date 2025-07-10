@@ -1,15 +1,15 @@
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import TagManager from 'react-gtm-module';
 import OpenExternalWebSite from '../../common/components/Widgets/OpenExternalWebSite';
 import AppObservableStore from '../../common/stores/AppObservableStore';
 import { isWebApp } from '../../common/utils/isCordovaOrWebApp';
-import VoterStore from '../../stores/VoterStore';
 import webAppConfig from '../../config';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const BallotElectionListWithFilters = React.lazy(() => import(/* webpackChunkName: 'BallotElectionListWithFilters' */ '../Ballot/BallotElectionListWithFilters'));
 const DeleteAllContactsButton = React.lazy(() => import(/* webpackChunkName: 'DeleteAllContactsButton' */ '../SetUpAccount/DeleteAllContactsButton'));
@@ -51,11 +51,7 @@ class FooterMainWeVote extends Component {
         buttonId: 'footerLinkHowItWorks',
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: 'HowItWorksModal',
         destinationPageType: currentPage.pageType,
@@ -67,8 +63,6 @@ class FooterMainWeVote extends Component {
   }
 
   pushDataLayer (destinationPath, buttonId = '') {
-    const { location: { pathname: currentPathname } } = window;
-    const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(destinationPath);
     const dataLayerObject = {
       actionDetails: {
@@ -76,11 +70,7 @@ class FooterMainWeVote extends Component {
         buttonId,
       },
       event: 'action',
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: destinationPage.pageName,
         destinationPageType: destinationPage.pageType,

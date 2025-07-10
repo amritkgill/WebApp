@@ -16,6 +16,7 @@ import VoterActions from '../../../actions/VoterActions';
 import DesignTokenColors from '../../../common/components/Style/DesignTokenColors';
 import { openSnackbar } from '../../../common/components/Widgets/SnackNotifier';
 import AppObservableStore from '../../../common/stores/AppObservableStore';
+import PoliticianStore from '../../../common/stores/PoliticianStore';
 import convertToInteger from '../../../common/utils/convertToInteger';
 import { isWebApp } from '../../../common/utils/isCordovaOrWebApp';
 import isMobileScreenSize from '../../../common/utils/isMobileScreenSize';
@@ -24,15 +25,14 @@ import { renderLog } from '../../../common/utils/logging';
 import normalizedImagePath from '../../../common/utils/normalizedImagePath';
 import stringContains from '../../../common/utils/stringContains';
 import webAppConfig from '../../../config';
-import PoliticianStore from '../../../common/stores/PoliticianStore';
-import SupportStore from '../../../stores/SupportStore';
 import VoterConstants from '../../../constants/VoterConstants';
+import CandidateStore from '../../../stores/CandidateStore';
+import SupportStore from '../../../stores/SupportStore';
 import VoterStore from '../../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 import PositionPublicToggle from '../../PositionItem/PositionPublicToggle';
 import PositionStatementModal from '../PositionStatementModal'; // eslint-disable-line import/no-cycle
 import ShareButtonDropDown from '../ShareButtonDropdown';
-import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
-import CandidateStore from '../../../stores/CandidateStore';
 
 const HelpWinOrDefeatModal = React.lazy(() => import(/* webpackChunkName: 'HelpWinOrDefeatModal' */ '../../../common/components/CampaignSupport/HelpWinOrDefeatModal')); // eslint-disable-line import/no-cycle
 
@@ -277,11 +277,7 @@ class ItemActionBar extends PureComponent {
       },
       event: 'action',
       userDetails: VoterStore.getAnalyticsUserDetails(),
-      pageDetails: {
-        pageName: currentPage.pageName,
-        pageType: currentPage.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       destinationDetails: {
         destinationPageName: isHelpWinOrHelpDefeat,
         destinationPageType: currentPage.pageType,

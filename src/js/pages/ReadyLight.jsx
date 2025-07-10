@@ -1,8 +1,8 @@
-import TagManager from 'react-gtm-module';
 import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import React, { Component, Suspense } from 'react';
+import TagManager from 'react-gtm-module';
 import { Helmet } from 'react-helmet-async';
 import ActivityActions from '../actions/ActivityActions';
 import AnalyticsActions from '../actions/AnalyticsActions';
@@ -12,7 +12,6 @@ import apiCalming from '../common/utils/apiCalming';
 import historyPush from '../common/utils/historyPush';
 import { isAndroid, isWebApp } from '../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../common/utils/logging';
-import lookupPageNameAndPageTypeDict from '../utils/lookupPageNameAndPageTypeDict';
 import ReadyFinePrint from '../components/Ready/ReadyFinePrint';
 import ReadyIntroduction from '../components/Ready/ReadyIntroduction';
 import ReadyTaskPlan from '../components/Ready/ReadyTaskPlan';
@@ -25,6 +24,7 @@ import webAppConfig from '../config';
 import VoterStore from '../stores/VoterStore';
 import { cordovaSimplePageContainerTopOffset } from '../utils/cordovaCalculatedOffsets';
 import lazyPreloadPages from '../utils/lazyPreloadPages';
+import { getPageDetails } from '../utils/lookupPageNameAndPageTypeDict';
 
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../common/components/Widgets/DelayedLoad'));
 const ElectionCountdown = React.lazy(() => import(/* webpackChunkName: 'ElectionCountdown' */ '../components/Ready/ElectionCountdown'));
@@ -73,19 +73,12 @@ class ReadyLight extends Component {
     const { dataLayerFired } = this.state;
     if (!dataLayerFired) {
       if (VoterStore.voterFirstRetrieveCompleted()) {
-        const { location: { pathname: currentPathname } } = window;
-        const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
         const dataLayerObject = {
           actionDetails: {
             actionType: 'landing',
           },
           event: 'landing',
-          pageDetails: {
-            pageName: currentPage.pageName,
-            pageType: currentPage.pageType,
-            pathname: currentPathname,
-          },
+          pageDetails: getPageDetails(),
           userDetails: VoterStore.getAnalyticsUserDetails(),
         };
 

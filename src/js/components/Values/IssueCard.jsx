@@ -18,7 +18,7 @@ import convertToInteger from '../../common/utils/convertToInteger';
 import { convertNameToSlug } from '../../common/utils/textFormat';
 import IssueFollowToggleButton from './IssueFollowToggleButton';
 import IssueImageDisplay from './IssueImageDisplay';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import lookupPageNameAndPageTypeDict, { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 const ReadMore = React.lazy(() => import(/* webpackChunkName: 'ReadMore' */ '../../common/components/Widgets/ReadMore'));
 const SignInModal = React.lazy(() => import(/* webpackChunkName: 'SignInModal' */ '../../common/components/SignIn/SignInModal'));
@@ -144,9 +144,7 @@ class IssueCard extends Component {
   }
 
   handleIssueClick = (buttonId) => {
-    const { location: { pathname: currentPathname } } = window;
     const { issue } = this.state;
-    const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPathname = this.getIssueLink();
     const { pageName: destinationPageName, pageType: destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
     const dataLayerObject = {
@@ -155,11 +153,7 @@ class IssueCard extends Component {
         buttonId,
       },
       event: 'action',
-      pageDetails: {
-        pageName,
-        pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
       destinationDetails: {
         destinationPageName,

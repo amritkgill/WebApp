@@ -1,33 +1,17 @@
 import { Edit } from '@mui/icons-material';
+import parser from 'parse-address';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import parser from 'parse-address';
-import styled from 'styled-components';
 import TagManager from 'react-gtm-module';
+import styled from 'styled-components';
+import AppObservableStore from '../../common/stores/AppObservableStore';
 import daysUntil from '../../common/utils/daysUntil';
 import { renderLog } from '../../common/utils/logging';
 import stringContains from '../../common/utils/stringContains';
-import AppObservableStore from '../../common/stores/AppObservableStore';
 import BallotStore from '../../stores/BallotStore';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
-import {
-  BallotAddress,
-  ClickBlockWrapper,
-  ContentWrapper,
-  ElectionDateBelow,
-  ElectionDateRight,
-  ElectionNameBlock,
-  ElectionNameH1,
-  ElectionNameScrollContent,
-  ElectionStateLabel,
-  OverflowContainer,
-  OverflowContent,
-  VoteByBelowLabel,
-  VoteByBelowWrapper,
-  VoteByRightLabel,
-  VoteByRightWrapper,
-} from '../Style/BallotTitleHeaderStyles';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
+import { BallotAddress, ClickBlockWrapper, ContentWrapper, ElectionDateBelow, ElectionDateRight, ElectionNameBlock, ElectionNameH1, ElectionNameScrollContent, ElectionStateLabel, OverflowContainer, OverflowContent, VoteByBelowLabel, VoteByBelowWrapper, VoteByRightLabel, VoteByRightWrapper, } from '../Style/BallotTitleHeaderStyles';
 
 
 class BallotTitleHeaderNationalPlaceholder extends Component {
@@ -87,9 +71,6 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
       const showEditAddress = true;
       const showSelectBallotModal = true;
       // this.props.toggleSelectBallotModal('', showEditAddress, false);
-      const { location: { pathname: currentPathname } } = window;
-      const page = lookupPageNameAndPageTypeDict(currentPathname);
-
       const address = VoterStore.getTextForMapSearch();
       let city = '';
       let region = '';
@@ -111,11 +92,7 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
         },
         event: 'action',
         userDetails: VoterStore.getAnalyticsUserDetails(),
-        pageDetails: {
-          pageName: page.pageName,
-          pageType: page.pageType,
-          pathname: currentPathname,
-        },
+        pageDetails: getPageDetails(),
         electionDetails: {
           electionGeo: {
             city,

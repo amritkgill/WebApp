@@ -1,15 +1,15 @@
-import styled from 'styled-components';
-import TagManager from 'react-gtm-module';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import TagManager from 'react-gtm-module';
+import styled from 'styled-components';
+import signInModalGlobalState from '../../common/components/Widgets/signInModalGlobalState';
+import PoliticianStore from '../../common/stores/PoliticianStore';
 import { renderLog } from '../../common/utils/logging';
 import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
-import PoliticianStore from '../../common/stores/PoliticianStore';
-import VoterStore from '../../stores/VoterStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
-import signInModalGlobalState from '../../common/components/Widgets/signInModalGlobalState';
+import VoterStore from '../../stores/VoterStore';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import ValueNameWithPopoverDisplay from './ValueNameWithPopoverDisplay';
 
 // Show a voter a horizontal list of all the issues they are following that relate to this ballot item
@@ -145,8 +145,6 @@ class IssuesByBallotItemDisplayList extends Component {
 
   handleExpandIssues = (buttonId) => {
     const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId } = this.state;
-    const { location: { pathname: currentPathname } } = window;
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
     // dataLayer
     const dataLayerObject = {
       event: 'action',
@@ -154,11 +152,7 @@ class IssuesByBallotItemDisplayList extends Component {
         actionType: 'showMore',
         buttonId,
       },
-      pageDetails: {
-        pageName: page.pageName,
-        pageType: page.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     let candidate = {};
