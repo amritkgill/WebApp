@@ -76,25 +76,21 @@ class ReadyLight extends Component {
         const { location: { pathname: currentPathname } } = window;
         const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
 
-        TagManager.dataLayer({
-          dataLayer: {
-            actionDetails: {
-              actionType: 'landing',
-              componentName: 'readyPageFirstEntrance',
-            },
-            event: 'landing',
-            pageDetails: {
-              pageName: currentPage.pageName,
-              pageType: currentPage.pageType,
-              pathname: currentPathname,
-            },
-            userDetails: {
-              stateCode: VoterStore.getVoterStateCode(),
-              userCohort: VoterStore.getAnalyticsUserCohort(),
-              voterWeVoteId: VoterStore.getVoterWeVoteId(),
-            },
+        const dataLayerObject = {
+          actionDetails: {
+            actionType: 'landing',
           },
-        });
+          event: 'landing',
+          pageDetails: {
+            pageName: currentPage.pageName,
+            pageType: currentPage.pageType,
+            pathname: currentPathname,
+          },
+          userDetails: VoterStore.getAnalyticsUserDetails(),
+        };
+
+        TagManager.dataLayer({ dataLayer: dataLayerObject });
+
         this.setState({
           dataLayerFired: true,
         });
