@@ -193,8 +193,6 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
                   open={open}
                   anchorEl={anchorEl}
                   onClose={handlePopoverClose}
-                  anchorReference="anchorPosition"
-                  anchorPosition={{ top: 75, left: 370 }}
                   transformOrigin={{
                     vertical: 'top',
                     horizontal: 'left',
