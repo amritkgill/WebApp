@@ -71,7 +71,7 @@ export default class SettingsPersonalSideBar extends Component {
     });
   }
 
-  // helper functions
+  // helper functions for datalayer
   fireSettingsGTMEvent = ({ buttonId, destinationPath = '', actionType = 'navigate', voterWeVoteId = null, destinationPage = {} }) => {
     TagManager.dataLayer({
       dataLayer: {
