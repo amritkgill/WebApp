@@ -146,9 +146,9 @@ const UpdateInformationWrapper = styled('div')`
   justify-content: flex-start;
 `;
 const TooltipContent = styled('div')`
-  position: relative;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 const GotItButton = styled(Button)`
   align-self: flex-end;
@@ -159,7 +159,7 @@ const GotItButton = styled(Button)`
   white-space: nowrap;
 `;
 const CloseButton = styled(IconButton)`
-  align-self: flex-end;
+   align-self: flex-end;
    color: #fff;
    min-width: 0;
    padding: 0;
