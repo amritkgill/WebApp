@@ -45,61 +45,50 @@ class FooterMainWeVote extends Component {
 
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          actionType: 'openModal',
-          buttonId: 'footerLinkHowItWorks',
-        },
-        event: 'action',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
-        destinationDetails: {
-          destinationPageName: 'HowItWorksModal',
-          destinationPageType: currentPage.pageType,
-          destinationPathname: currentPathname,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId: 'footerLinkHowItWorks',
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: 'HowItWorksModal',
+        destinationPageType: currentPage.pageType,
+        destinationPathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   pushDataLayer (destinationPath, buttonId = '') {
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(destinationPath);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          actionType: 'navigate',
-          buttonId,
-        },
-        event: 'action',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
-        destinationDetails: {
-          destinationPageName: destinationPage.pageName,
-          destinationPageType: destinationPage.pageType,
-          destinationPathname: destinationPath,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'navigate',
+        buttonId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName,
+        destinationPageType: destinationPage.pageType,
+        destinationPathname: destinationPath,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {
@@ -205,6 +194,15 @@ class FooterMainWeVote extends Component {
             </OneRow>
             {isWebApp() && (
               <OneRow>
+                <OpenExternalWebSite
+                  linkIdAttribute="footerLinkBlog"
+                  url="https://blog.wevote.us/"
+                  target="_blank"
+                  trackingOn
+                  body={(<span>Blog</span>)}
+                  className={classes.link}
+                />
+                <RowSpacer />
                 <OpenExternalWebSite
                   linkIdAttribute="footerLinkVolunteer"
                   url="https://wevote.applytojob.com/apply"

@@ -105,15 +105,9 @@ class ShareOnTwitterButton extends Component {
         pageType: page.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
-      timestamp: new Date().toISOString(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
-    console.log('DataLayer for Twitter share:', dataLayerObject);
+    // console.log('DataLayer for Twitter share:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
   };
 

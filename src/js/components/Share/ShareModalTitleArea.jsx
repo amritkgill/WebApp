@@ -206,7 +206,7 @@ class ShareModalTitleArea extends Component {
         <IconButton
           aria-label="Close"
           className={classes.closeButtonAbsolute}
-          onClick={handleCloseShareButtonDrawer}
+          onClick={() => handleCloseShareButtonDrawer('closeShareModal')}
           id="closeShareModal"
           size="large"
           style={isIPad() ? { top: 2 } : {}}

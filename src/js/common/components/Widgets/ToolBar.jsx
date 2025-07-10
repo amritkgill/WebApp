@@ -118,7 +118,7 @@ function ToolBar (params) {
               url="https://github.com/WeVote"
               target="_blank"
               ariaLabel="Github"
-              body={isMobileScreenSize() ? (<span />) : (
+              body={isMobileScreenSize() ? (<></>) : (
                 <Tooltip title="Github">
                   <IconButton size="large">
                     <GitHubStyled />

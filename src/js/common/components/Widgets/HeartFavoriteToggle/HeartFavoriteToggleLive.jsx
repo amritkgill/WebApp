@@ -318,6 +318,7 @@ class HeartFavoriteToggleLive extends React.Component {
     const support = false;
     const stopOpposing = false;
     const stopSupporting = true;
+    // console.log('submitStopSupportingClick');
     this.setState({
       supportersCount: supportersCount - 1,
       // supportersCountNextGoal: supportersCountNextGoalWithFloor,
@@ -351,9 +352,14 @@ class HeartFavoriteToggleLive extends React.Component {
     // console.log('HeartFavoriteToggleLive submitActionClick');
     if (!campaignXWeVoteId && !organizationWeVoteId) {
       console.log('HeartFavoriteToggleLive submitActionClick: missing campaignXWeVoteId:', campaignXWeVoteId, ', or organizationWeVoteId:', organizationWeVoteId);
-    } else if (!voterFirstName || !voterLastName || !voterIsSignedIn) {
+    } else if (!voterIsSignedIn) {
+      // Open complete your profile modal
+      console.log('HeartFavoriteToggleLive submitActionClick: voter not signed in');
+      AppObservableStore.setShowCompleteYourProfileModal(true);
+    } else if (!voterFirstName || !voterLastName) {
       // Open complete your profile modal
       AppObservableStore.setShowCompleteYourProfileModal(true);
+      this.functionToUseWhenProfileComplete(support, oppose, stopSupporting, stopOpposing);
     } else {
       if (campaignXWeVoteId) {
         // Mark that voter supports this campaign after they sign in

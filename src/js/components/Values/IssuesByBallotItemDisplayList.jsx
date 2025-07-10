@@ -1,8 +1,13 @@
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import { renderLog } from '../../common/utils/logging';
+import CandidateStore from '../../stores/CandidateStore';
 import IssueStore from '../../stores/IssueStore';
+import PoliticianStore from '../../common/stores/PoliticianStore';
+import VoterStore from '../../stores/VoterStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import signInModalGlobalState from '../../common/components/Widgets/signInModalGlobalState';
 import ValueNameWithPopoverDisplay from './ValueNameWithPopoverDisplay';
@@ -138,8 +143,35 @@ class IssuesByBallotItemDisplayList extends Component {
     }
   };
 
-  handleExpandIssues = () => {
-    const { expandIssues, totalLengthOfIssuesToRenderList } = this.state;
+  handleExpandIssues = (buttonId) => {
+    const { expandIssues, totalLengthOfIssuesToRenderList, ballotItemWeVoteId } = this.state;
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    // dataLayer
+    const dataLayerObject = {
+      event: 'action',
+      actionDetails: {
+        actionType: 'showMore',
+        buttonId,
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    let candidate = {};
+    if (ballotItemWeVoteId.includes('cand')) {
+      dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(ballotItemWeVoteId);
+      candidate = CandidateStore.getCandidateByWeVoteId(ballotItemWeVoteId);
+    }
+    if (candidate && candidate.politician_we_vote_id) {
+      // Note that there is no guarantee that the politician data has been retrieved from the API server yet.
+      dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(candidate.politician_we_vote_id);
+    }
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
     this.setState({
       expandIssues: !expandIssues,
       currentNumberOfIssuesToDisplay: totalLengthOfIssuesToRenderList,
@@ -241,7 +273,7 @@ class IssuesByBallotItemDisplayList extends Component {
                       {(currentNumberOfIssuesToDisplay < totalLengthOfIssuesToRenderList) && (
                         <MoreWrapper
                           id="issuesByBallotItemDisplayListMoreIssues"
-                          onClick={this.handleExpandIssues}
+                          onClick={() => this.handleExpandIssues('issuesByBallotItemDisplayListMoreIssues')}
                         >
                           show more
                         </MoreWrapper>

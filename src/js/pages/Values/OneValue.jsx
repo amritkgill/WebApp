@@ -156,32 +156,23 @@ class OneValue extends Component {
     const { location: { pathname: currentPathname } } = window;
     const { pageName, pageType } = lookupPageNameAndPageTypeDict(currentPathname);
     const { issue } = this.state;
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          actionType: 'filter',
-          buttonId,
-        },
-        event: 'action',
-        // filterSelected: buttonId,
-        pageDetails: {
-          pageName,
-          pageType,
-          pathname: currentPathname,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        topicDetails: {
-          topicName: issue.issue_name,
-          topicWeVoteId: issue.issue_we_vote_id,
-          consideredLeft: issue.considered_left,
-          consideredRight: issue.considered_right,
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'filter',
+        buttonId,
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName,
+        pageType,
+        pathname: currentPathname,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    if (issue.issue_we_vote_id) {
+      dataLayerObject.topicDetails = IssueStore.getAnalyticsIssueDetails(issue.issue_we_vote_id);
+    }
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
     this.setState({
       listModeShown: buttonId,
     });

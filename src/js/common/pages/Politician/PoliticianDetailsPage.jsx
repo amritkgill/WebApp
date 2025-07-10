@@ -32,6 +32,7 @@ import standardBoxShadow from '../../components/Style/standardBoxShadow';
 import { PageWrapper } from '../../components/Style/stepDisplayStyles';
 import DelayedLoad from '../../components/Widgets/DelayedLoad';
 import LinkToAdminTools from '../../components/Widgets/LinkToAdminTools';
+import OfficeNameText from '../../components/Widgets/OfficeNameText';
 import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
 import CampaignSupporterStore from '../../stores/CampaignSupporterStore';
 import OfficeHeldStore from '../../stores/OfficeHeldStore';
@@ -56,7 +57,6 @@ const CampaignSupportThermometer = React.lazy(() => import(/* webpackChunkName: 
 const CampaignNewsItemList = React.lazy(() => import(/* webpackChunkName: 'CampaignNewsItemList' */ '../../components/Campaign/CampaignNewsItemList'));
 const CampaignShareChunk = React.lazy(() => import(/* webpackChunkName: 'CampaignShareChunk' */ '../../components/Campaign/CampaignShareChunk'));
 const ImageHandler = React.lazy(() => import(/* webpackChunkName: 'ImageHandler' */ '../../../components/ImageHandler'));
-const OfficeNameText = React.lazy(() => import(/* webpackChunkName: 'OfficeNameText' */ '../../components/Widgets/OfficeNameText'));
 const OfficeItemCompressed = React.lazy(() => import(/* webpackChunkName: 'OfficeItemCompressed' */ '../../../components/Ballot/OfficeItemCompressed'));
 const PoliticianCardForList = React.lazy(() => import(/* webpackChunkName: 'PoliticianCardForList' */ '../../../components/PoliticianListRoot/PoliticianCardForList'));
 const PoliticianEndorsementsList = React.lazy(() => import(/* webpackChunkName: 'PoliticianEndorsementsList' */ '../../components/Politician/PoliticianEndorsementsList'));
@@ -307,33 +307,25 @@ class PoliticianDetailsPage extends Component {
       // Take the "calculated" identifiers and retrieve if missing
       window.scrollTo(0, 0);
     }
-    // --------Zubin - TAGMANAGER DATA LAYER LOGIC---------
     if (!this.state.dataLayerSent) {
       // console.log('TagManager code executing...');
       // console.log('Politician ID id exists? ', politician);
       if (politician && politician.politician_we_vote_id) {
         // console.log('Politician Details retrieved, Adding DataLayer...');
         const { location: { pathname: currentPathname } } = window;
-        const politicianState = politician.state_code || 'na';
-        const dataLayerObj = {
+        const dataLayerObject = {
           event: 'landing',
-          userDetails: {
-            stateCode: VoterStore.getVoterStateCode(),
-            userCohort: VoterStore.getAnalyticsUserCohort(),
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
-          politicianDetails: {
-            politicianWeVoteId: politician.politician_we_vote_id,
-            politicianName: politician.politician_name,
-            politicianState,
-          },
+          userDetails: VoterStore.getAnalyticsUserDetails(),
           pageDetails: {
             pageName: this.constructor.name, // name of page from constructor itself
             pageType: 'politician', // in which page we are currently
             pathname: currentPathname,
           },
         };
-        TagManager.dataLayer({ dataLayer: dataLayerObj });
+        if (politician.politician_we_vote_id) {
+          dataLayerObject.politicianDetails = PoliticianStore.getAnalyticsPoliticianDetails(politician.politician_we_vote_id);
+        }
+        TagManager.dataLayer({ dataLayer: dataLayerObject });
         // Set the flag to true so that it runs just once
         this.setState({
           dataLayerSent: true,
@@ -790,7 +782,9 @@ class PoliticianDetailsPage extends Component {
     const politicianLinksContainer = (politicianLinksList) ? (
       <PoliticianLinksWrapper>
         <SectionTitleSimple>More candidate information</SectionTitleSimple>
-        <PoliticianLinks links={politicianLinksList} />
+        <Suspense fallback={<span>&nbsp;</span>}>
+          <PoliticianLinks links={politicianLinksList} />
+        </Suspense>
       </PoliticianLinksWrapper>
     ) : <PoliticianLinksWrapper />;
 
@@ -927,6 +921,7 @@ class PoliticianDetailsPage extends Component {
         </CommentsListWrapper>
       );
     }
+
     // let commentListTeaserHtml = <></>;
     // if (supporterEndorsementsWithText && supporterEndorsementsWithText.length > 0) {
     //   commentListTeaserHtml = (
@@ -998,7 +993,7 @@ class PoliticianDetailsPage extends Component {
                       id={`politicianDetailsImageAndName-${politicianWeVoteId}`}
                     >
                       {/* Candidate Image */}
-                      <Suspense fallback={<></>}>
+                      <Suspense fallback={<span>&nbsp;</span>}>
                         <ImageHandler
                           className={avatarCompressed}
                           sizeClassName="icon-candidate-small u-push--sm "
@@ -1052,13 +1047,15 @@ class PoliticianDetailsPage extends Component {
                       </div>
                     </AboutAndEditFlex>
                     {politicianDescription ? (
-                      <ReadMore
-                        numberOfLines={6}
-                        textToDisplay={politicianDescription}
-                        buttonId="clickShowMoreAboutPolitician"
-                        id="clickShowMoreAboutPolitician"
-                        politicianWeVoteId={politicianWeVoteIdForDisplay}
-                      />
+                      <Suspense fallback={<span>&nbsp;</span>}>
+                        <ReadMore
+                          numberOfLines={6}
+                          textToDisplay={politicianDescription}
+                          buttonId="clickShowMoreAboutPolitician"
+                          id="clickShowMoreAboutPolitician"
+                          politicianWeVoteId={politicianWeVoteIdForDisplay}
+                        />
+                      </Suspense>
                     ) : (
                       <NoInformationProvided>No description has been provided for this candidate.</NoInformationProvided>
                     )}
@@ -1223,13 +1220,15 @@ class PoliticianDetailsPage extends Component {
                           </div>
                         </AboutAndEditFlex>
                         {politicianDescription ? (
-                          <ReadMore
-                            numberOfLines={6}
-                            textToDisplay={politicianDescription}
-                            buttonId="clickShowMoreAboutPolitician"
-                            id="clickShowMoreAboutPolitician"
-                            politicianWeVoteId={politicianWeVoteIdForDisplay}
-                          />
+                          <Suspense fallback={<span>&nbsp;</span>}>
+                            <ReadMore
+                              numberOfLines={6}
+                              textToDisplay={politicianDescription}
+                              buttonId="clickShowMoreAboutPolitician"
+                              id="clickShowMoreAboutPolitician"
+                              politicianWeVoteId={politicianWeVoteIdForDisplay}
+                            />
+                          </Suspense>
                         ) : (
                           <NoInformationProvided>No description has been provided for this candidate.</NoInformationProvided>
                         )}
@@ -1284,15 +1283,17 @@ class PoliticianDetailsPage extends Component {
                     </CampaignSubSectionTitleWrapper>
                     {(officeWeVoteId) ? (
                       <BallotOverflowWrapper>
-                        <OfficeItemCompressed
-                          officeWeVoteId={officeWeVoteId}
-                          ballotItemDisplayName=""  // {contestOfficeNameFromOpponentList}
-                          candidateList={opponentCandidateList}
-                          // candidatesToShowForSearchResults={candidatesToShowForSearchResults}
-                          // disableAutoRollUp
-                          // isFirstBallotItem={isFirstBallotItem}
-                          // primaryParty={primaryParty}
-                        />
+                        <Suspense fallback={<span>&nbsp;</span>}>
+                          <OfficeItemCompressed
+                            officeWeVoteId={officeWeVoteId}
+                            ballotItemDisplayName=""  // {contestOfficeNameFromOpponentList}
+                            candidateList={opponentCandidateList}
+                            // candidatesToShowForSearchResults={candidatesToShowForSearchResults}
+                            // disableAutoRollUp
+                            // isFirstBallotItem={isFirstBallotItem}
+                            // primaryParty={primaryParty}
+                          />
+                        </Suspense>
                       </BallotOverflowWrapper>
                     ) : (
                       <OtherElectionsWrapper>
@@ -1302,7 +1303,7 @@ class PoliticianDetailsPage extends Component {
                   </CandidateCampaignListDesktop>
                 )}
                 <ViewBallotButtonWrapper>
-                  <Suspense fallback={<></>}>
+                  <Suspense fallback={<span>&nbsp;</span>}>
                     <ViewUpcomingBallotButton buttonText="View Your Full Ballot" goToBallotFunction={this.goToBallot} onlyOfferViewYourBallot />
                   </Suspense>
                 </ViewBallotButtonWrapper>

@@ -1,11 +1,10 @@
 import { Button, FormControlLabel, Radio, RadioGroup } from '@mui/material';
-import styled from 'styled-components';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import VoterActions from '../../actions/VoterActions';
 import VoterPhotoUpload from '../../common/components/Settings/VoterPhotoUpload';
-import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import VoterStore from '../../stores/VoterStore';
 
 
@@ -77,7 +76,7 @@ class SettingsProfilePicture extends Component {
       <Wrapper>
         <RadioWrapper value={profileImageTypeCurrentlyActive} onChange={this.changeProfileImageTypeCurrentlyActive} name="profile-option">
           <ColumnWrapper>
-            <CustomColumns onlyOneOption={onlyOneOption} style={isCordova() ? {  display: 'none' } : {}}>
+            <CustomColumns onlyOneOption={onlyOneOption}>
               <ProfilePictureOption>
                 <FormControlLabel
                   value="UPLOADED"

@@ -257,7 +257,7 @@ export function sortCandidateList (newCandidateList) {
 
   // Prepare an array of candidate names that are supported by voter
   unsortedCandidateList.forEach((candidate) => {
-    ballotItemStatSheet = SupportStore.getBallotItemStatSheet(candidate.we_vote_id);
+    ballotItemStatSheet = SupportStore.getBallotItemStatSheet(candidate.we_vote_id, candidate.politician_we_vote_id);
     // console.log('ballotItemStatSheet:', ballotItemStatSheet);
     if (ballotItemStatSheet) {
       ({ numberOfOpposePositionsForScore, numberOfSupportPositionsForScore, voterSupportsBallotItem } = ballotItemStatSheet);

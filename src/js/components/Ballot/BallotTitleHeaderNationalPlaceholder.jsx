@@ -1,13 +1,16 @@
 import { Edit } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import parser from 'parse-address';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import daysUntil from '../../common/utils/daysUntil';
 import { renderLog } from '../../common/utils/logging';
 import stringContains from '../../common/utils/stringContains';
 import AppObservableStore from '../../common/stores/AppObservableStore';
 import BallotStore from '../../stores/BallotStore';
 import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import {
   BallotAddress,
   ClickBlockWrapper,
@@ -76,13 +79,54 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
     }
   }
 
-  showSelectBallotModalEditAddress = () => {
+  showSelectBallotModalEditAddress = (buttonId) => {
+    console.log('Passed buttonId:', buttonId);
     const { linksOff } = this.props;
     // console.log('BallotTitleHeaderNationalPlaceholder showSelectBallotModalEditAddress linksOff:', linksOff);
     if (!linksOff) {
       const showEditAddress = true;
       const showSelectBallotModal = true;
       // this.props.toggleSelectBallotModal('', showEditAddress, false);
+      const { location: { pathname: currentPathname } } = window;
+      const page = lookupPageNameAndPageTypeDict(currentPathname);
+
+      const address = VoterStore.getTextForMapSearch();
+      let city = '';
+      let region = '';
+      let zip = '';
+
+      if (address) {
+        const parsedAddress = parser.parseLocation(address);
+        if (parsedAddress) {
+          city = parsedAddress.city || '';
+          region = parsedAddress.state || '';
+          zip = parsedAddress.zip || '';
+        }
+      }
+
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'openModal',
+          buttonId,
+        },
+        event: 'action',
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+        pageDetails: {
+          pageName: page.pageName,
+          pageType: page.pageType,
+          pathname: currentPathname,
+        },
+        electionDetails: {
+          electionGeo: {
+            city,
+            region,
+            zip,
+          },
+        },
+      };
+      console.log('dataLayerObject:', dataLayerObject);
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+
       AppObservableStore.setShowSelectBallotModal(showSelectBallotModal, showEditAddress);
     }
   }
@@ -174,7 +218,8 @@ class BallotTitleHeaderNationalPlaceholder extends Component {
                             onKeyDown={(event) => {
                               if (event.key === 'Enter') this.showSelectBallotModalEditAddress();
                             }}
-                            className={linksOff ? '' : 'u-link-color'}>
+                            className={linksOff ? '' : 'u-link-color'}
+                          >
                             {textForMapSearch}
                           </span>
                         </BallotAddress>

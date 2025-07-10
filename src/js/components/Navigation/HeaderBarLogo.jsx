@@ -21,31 +21,25 @@ const HeaderBarLogo = ({ chosenSiteLogoUrl, isBeta, light }) => {
     const { location: { pathname: currentPathname } } = window;
     const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
     const destinationPage = lookupPageNameAndPageTypeDict(homepagePath);
-
-    TagManager.dataLayer({
-      dataLayer: {
-        actionDetails: {
-          actionType: 'navigate',
-          buttonId: 'logoHeaderBar',
-        },
-        event: 'action',
-        pageDetails: {
-          pageName: currentPage.pageName,
-          pageType: currentPage.pageType,
-          pathname: currentPathname,
-        },
-        destinationDetails: {
-          destinationPageName: destinationPage.pageName,
-          destinationPageType: destinationPage.pageType,
-          destinationPathname: homepagePath,
-        },
-        userDetails: {
-          stateCode: VoterStore.getVoterStateCode(),
-          userCohort: VoterStore.getAnalyticsUserCohort(),
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'navigate',
+        buttonId: 'logoHeaderBar',
       },
-    });
+      event: 'action',
+      pageDetails: {
+        pageName: currentPage.pageName,
+        pageType: currentPage.pageType,
+        pathname: currentPathname,
+      },
+      destinationDetails: {
+        destinationPageName: destinationPage.pageName,
+        destinationPageType: destinationPage.pageType,
+        destinationPathname: homepagePath,
+      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   return (

@@ -33,14 +33,9 @@ export default function FooterCandidateList () {
         destinationPageType: destinationPage.pageType,
         destinationPathname: linkTo,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
-
-    TagManager.dataLayer(dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   return (

@@ -36,7 +36,7 @@ const CompleteYourProfileWizard = ({ steps, activeStep }) => {
 
     const dataLayerObject = {
       actionDetails: {
-        actionType: 'close',
+        actionType: 'closeModal',
         buttonId,
       },
       event: 'action',
@@ -45,11 +45,7 @@ const CompleteYourProfileWizard = ({ steps, activeStep }) => {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     if (activeStep !== undefined) {
       dataLayerObject.actionDetails.activeStep = activeStep;

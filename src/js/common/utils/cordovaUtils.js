@@ -66,7 +66,7 @@ export function dumpScreenAndDeviceFields () {
 // IMPORTANT:  The HTML5 window.history, is very different from the react-router V5 history, don't use window.history!
 export function historyPush (route) {
   if (webAppConfig.LOG_ROUTING) {
-    console.log(`historyPush ---> ${route} <---`);
+    console.log(`historyPush '${route}'`);
   }
   global.weVoteGlobalHistory.push(route);
 }
@@ -453,6 +453,10 @@ export function getAndroidSize () {
 
   // const ua = navigator.userAgent;
   // console.log('Phone user agent: ', ua);
+  // console.log('Phone device model: ', window.device.model);
+  // console.log('Phone device viewport: ', height, width, scale);
+  // console.log(`scale: ${scale} y: ${height} 'x: ${width} diag/diam ${diameter}`);
+
 
   if (isAndroidTablet()) {
     androidSizeString = '--wide';

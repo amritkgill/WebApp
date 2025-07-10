@@ -5,30 +5,29 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
-import styled from 'styled-components';
 import TagManager from 'react-gtm-module';
+import styled from 'styled-components';
 import FriendActions from '../../actions/FriendActions';
 import OrganizationActions from '../../actions/OrganizationActions';
-import LoadingWheel from '../../common/components/Widgets/LoadingWheel';
-import apiCalming from '../../common/utils/apiCalming';
-import { renderLog } from '../../common/utils/logging';
-import AppObservableStore from '../../common/stores/AppObservableStore';
-import { limitToShowInfoOnly, limitToShowOppose, limitToShowSupport, orderByTwitterFollowers, orderByWrittenComment } from '../../common/utils/orderByPositionFunctions';
+import LazyImage from '../../common/components/LazyImage';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import LoadingWheel from '../../common/components/Widgets/LoadingWheel';
+import AppObservableStore from '../../common/stores/AppObservableStore';
+import apiCalming from '../../common/utils/apiCalming';
+import isMobileScreenSize from '../../common/utils/isMobileScreenSize';
+import { renderLog } from '../../common/utils/logging';
+import { limitToShowInfoOnly, limitToShowOppose, limitToShowSupport, orderByTwitterFollowers, orderByWrittenComment } from '../../common/utils/orderByPositionFunctions';
+import speakerDisplayNameToInitials from '../../common/utils/speakerDisplayNameToInitials';
 import BallotStore from '../../stores/BallotStore';
 import CandidateStore from '../../stores/CandidateStore';
 import FriendStore from '../../stores/FriendStore';
 import IssueStore from '../../stores/IssueStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 import MeasureStore from '../../stores/MeasureStore';
 import OrganizationStore from '../../stores/OrganizationStore';
 import VoterGuideStore from '../../stores/VoterGuideStore';
 import VoterStore from '../../stores/VoterStore';
-import LazyImage from '../../common/components/LazyImage';
 import { avatarGeneric } from '../../utils/applicationUtils';
-import speakerDisplayNameToInitials from '../../common/utils/speakerDisplayNameToInitials';
-import isMobileScreenSize from '../../common/utils/isMobileScreenSize';
-
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 
 const STARTING_NUMBER_OF_IMAGES_TO_DISPLAY = 10;
@@ -118,28 +117,11 @@ class PositionRowListCompressed extends Component {
         pageType: currentPage.pageType,
         pathname: currentPathname,
       },
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
+      userDetails: VoterStore.getAnalyticsUserDetails(),
     };
     // Add candidate or measure details based on ballotItemWeVoteId
     if (ballotItemWeVoteId.includes('cand')) {
-      const candidate = CandidateStore.getCandidateByWeVoteId(ballotItemWeVoteId);
-
-      // console.log('Candidate object structure:', candidate);
-      // console.log('Available candidate properties:', candidate ? Object.keys(candidate) : 'No candidate found');
-
-      dataLayerObject.candidateDetails = {
-        candidateWeVoteId: ballotItemWeVoteId,
-        candidateName: candidate ? CandidateStore.getCandidateName(ballotItemWeVoteId) : '',
-        // Add other properties from spreadsheet as available:
-        image: candidate ? candidate.candidate_photo_url_medium : '',
-        officeName: candidate ? candidate.contest_office_name : '',
-        politicalParty: candidate ? candidate.party : '',
-        stateCode: candidate ? candidate.state_code : '',
-      };
+      dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(ballotItemWeVoteId);
       // console.log('Final candidateDetails for analytics:', dataLayerObject.candidateDetails);
     } else if (ballotItemWeVoteId.includes('meas')) {
       dataLayerObject.measureDetails = {
@@ -415,7 +397,7 @@ class PositionRowListCompressed extends Component {
     let onePositionNameCount = 1;
     const displayedSpeakerNames = new Set();
     if (filteredPositionList) {
-      filteredPositionListTooltip = isMobileScreenSize() ? (<span />) : (
+      filteredPositionListTooltip = isMobileScreenSize() ? (<></>) : (
         <Tooltipstyle className="u-z-index-9020" id="filteredPositionListTooltip">
           <div>
             {filteredPositionList.length === 1 ? (

@@ -482,7 +482,7 @@ class HeaderBar extends Component {
       discussValue = 99; // 4;
       discussVisible = false; // We are turning off Discuss header link for now
       donateValue = 99; // Donate not used in Cordova
-      donateVisible = false;
+      donateVisible = true;
       howItWorksValue = 5;
       // howItWorksVisible = true;
       squadsValue = 4;

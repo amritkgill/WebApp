@@ -1,3 +1,4 @@
+import TagManager from 'react-gtm-module';
 import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
@@ -11,6 +12,7 @@ import apiCalming from '../common/utils/apiCalming';
 import historyPush from '../common/utils/historyPush';
 import { isAndroid, isWebApp } from '../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../common/utils/logging';
+import lookupPageNameAndPageTypeDict from '../utils/lookupPageNameAndPageTypeDict';
 import ReadyFinePrint from '../components/Ready/ReadyFinePrint';
 import ReadyIntroduction from '../components/Ready/ReadyIntroduction';
 import ReadyTaskPlan from '../components/Ready/ReadyTaskPlan';
@@ -40,6 +42,7 @@ class ReadyLight extends Component {
     this.state = {
       chosenReadyIntroductionText: '',
       chosenReadyIntroductionTitle: '',
+      dataLayerFired: false,
       voterIsSignedIn: false,
     };
   }
@@ -65,6 +68,40 @@ class ReadyLight extends Component {
     }, 8000);
     window.scrollTo(0, 0);
   }
+
+  componentDidUpdate () {
+    const { dataLayerFired } = this.state;
+    if (!dataLayerFired) {
+      if (VoterStore.voterFirstRetrieveCompleted()) {
+        const { location: { pathname: currentPathname } } = window;
+        const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+        TagManager.dataLayer({
+          dataLayer: {
+            actionDetails: {
+              actionType: 'landing',
+              componentName: 'readyPageFirstEntrance',
+            },
+            event: 'landing',
+            pageDetails: {
+              pageName: currentPage.pageName,
+              pageType: currentPage.pageType,
+              pathname: currentPathname,
+            },
+            userDetails: {
+              stateCode: VoterStore.getVoterStateCode(),
+              userCohort: VoterStore.getAnalyticsUserCohort(),
+              voterWeVoteId: VoterStore.getVoterWeVoteId(),
+            },
+          },
+        });
+        this.setState({
+          dataLayerFired: true,
+        });
+      }
+    }
+  }
+
 
   componentDidCatch (error, info) {
     console.log('ReadyLight.jsx caught: ', error, info.componentStack);

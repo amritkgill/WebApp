@@ -9,7 +9,7 @@ import ModalDisplayTemplateA, {
   TextFieldForm, TextFieldWrapper, VoterAvatarImg,
 } from './ModalDisplayTemplateA';
 import SupportActions from '../../actions/SupportActions';
-import { prepareForCordovaKeyboard, restoreStylesAfterCordovaKeyboard } from '../../common/utils/cordovaUtils';
+import { restoreStylesAfterCordovaKeyboard } from '../../common/utils/cordovaUtils';
 import { isAndroid } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
 import stringContains from '../../common/utils/stringContains';
@@ -35,8 +35,8 @@ class PositionStatementModal extends Component {
     this.voterStoreListener = VoterStore.addListener(this.onVoterStoreChange.bind(this));
     this.candidateStoreListener = CandidateStore.addListener(this.onCandidateStoreChange.bind(this));
     this.measureStoreListener = MeasureStore.addListener(this.onMeasureStoreChange.bind(this));
-    const { ballotItemWeVoteId } = this.props;
-    const ballotItemStatSheet = SupportStore.getBallotItemStatSheet(ballotItemWeVoteId);
+    const { ballotItemWeVoteId, politicianWeVoteId } = this.props;
+    const ballotItemStatSheet = SupportStore.getBallotItemStatSheet(ballotItemWeVoteId, politicianWeVoteId);
     if (ballotItemStatSheet) {
       const { voterOpposesBallotItem, voterPositionIsPublic, voterSupportsBallotItem, voterTextStatement } = ballotItemStatSheet;
       this.setState({
@@ -122,8 +122,8 @@ class PositionStatementModal extends Component {
   }
 
   onSupportStoreChange () {
-    const { ballotItemWeVoteId } = this.props;
-    const ballotItemStatSheet = SupportStore.getBallotItemStatSheet(ballotItemWeVoteId);
+    const { ballotItemWeVoteId, politicianWeVoteId } = this.props;
+    const ballotItemStatSheet = SupportStore.getBallotItemStatSheet(ballotItemWeVoteId, politicianWeVoteId);
     let voterOpposesBallotItem = '';
     let voterSupportsBallotItem = '';
     let voterTextStatement = '';
@@ -165,10 +165,10 @@ class PositionStatementModal extends Component {
 
   savePositionStatement = (e) => {
     e.preventDefault();
-    const { ballotItemWeVoteId } = this.props;
+    const { ballotItemWeVoteId, politicianWeVoteId } = this.props;
     const { ballotItemType, voterTextStatement } = this.state;
     // console.log('PositionStatementModal ballotItemWeVoteId:', ballotItemWeVoteId, 'ballotItemType: ', ballotItemType, 'voterTextStatement: ', voterTextStatement);
-    SupportActions.voterPositionCommentSave(ballotItemWeVoteId, ballotItemType, voterTextStatement);
+    SupportActions.voterPositionCommentSave(ballotItemWeVoteId, ballotItemType, politicianWeVoteId, voterTextStatement);
     restoreStylesAfterCordovaKeyboard('PositionStatementModal');
     this.props.toggleModal();
   }
@@ -182,7 +182,7 @@ class PositionStatementModal extends Component {
   render () {
     renderLog('PositionStatementModal');  // Set LOG_RENDER_EVENTS to log all renders
     const {
-      ballotItemWeVoteId, classes, externalUniqueId, show, showEditAddress,
+      ballotItemWeVoteId, classes, externalUniqueId, politicianWeVoteId, show, showEditAddress,
     } = this.props;
     const {
       ballotItemDisplayName, voterIsSignedIn, voterPhotoUrlMedium,
@@ -269,6 +269,7 @@ class PositionStatementModal extends Component {
               commentButtonHideInMobile
               // currentBallotIdInUrl={currentBallotIdInUrl}
               externalUniqueId={`${externalUniqueId}-ballotItemSupportOpposeComment-${ballotItemWeVoteId}`}
+              politicianWeVoteId={politicianWeVoteId}
               shareButtonHide
               // hidePositionPublicToggle={hidePositionPublicToggle}
               // supportOrOpposeHasBeenClicked={this.passDataBetweenItemActionToItemPosition}
@@ -307,6 +308,7 @@ PositionStatementModal.propTypes = {
   ballotItemWeVoteId: PropTypes.string.isRequired,
   classes: PropTypes.object,
   externalUniqueId: PropTypes.string,
+  politicianWeVoteId: PropTypes.string,
   showEditAddress: PropTypes.bool,
   show: PropTypes.bool,
   toggleModal: PropTypes.func.isRequired,

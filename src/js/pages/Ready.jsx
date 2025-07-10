@@ -1,3 +1,4 @@
+import TagManager from 'react-gtm-module';
 import { Card } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
@@ -15,6 +16,7 @@ import apiCalming from '../common/utils/apiCalming';
 import historyPush from '../common/utils/historyPush';
 import { isAndroid, isWebApp } from '../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../common/utils/logging';
+import lookupPageNameAndPageTypeDict from '../utils/lookupPageNameAndPageTypeDict';
 import ReadyFinePrint from '../components/Ready/ReadyFinePrint';
 import ReadyIntroduction from '../components/Ready/ReadyIntroduction';
 import ReadyTaskPlan from '../components/Ready/ReadyTaskPlan';
@@ -49,6 +51,7 @@ class Ready extends Component {
     this.state = {
       chosenReadyIntroductionText: '',
       chosenReadyIntroductionTitle: '',
+      dataLayerFired: false,
       voterIsSignedIn: false,
     };
   }
@@ -115,7 +118,38 @@ class Ready extends Component {
 
   componentDidUpdate () {
     if (AppObservableStore.isSnackMessagePending()) openSnackbar({});
+    const { dataLayerFired } = this.state;
+    if (!dataLayerFired) {
+      if (VoterStore.voterFirstRetrieveCompleted()) {
+        const { location: { pathname: currentPathname } } = window;
+        const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
+
+        TagManager.dataLayer({
+          dataLayer: {
+            actionDetails: {
+              actionType: 'landing',
+              componentName: 'readyPageReturnVisit',
+            },
+            event: 'landing',
+            pageDetails: {
+              pageName: currentPage.pageName,
+              pageType: currentPage.pageType,
+              pathname: currentPathname,
+            },
+            userDetails: {
+              stateCode: VoterStore.getVoterStateCode(),
+              userCohort: VoterStore.getAnalyticsUserCohort(),
+              voterWeVoteId: VoterStore.getVoterWeVoteId(),
+            },
+          },
+        });
+        this.setState({
+          dataLayerFired: true,
+        });
+      }
+    }
   }
+
 
   componentDidCatch (error, info) {
     console.log('!!!Ready.jsx caught: ', error, info.componentStack);
