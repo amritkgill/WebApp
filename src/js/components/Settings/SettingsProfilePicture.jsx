@@ -8,7 +8,7 @@ import VoterActions from '../../actions/VoterActions';
 import VoterPhotoUpload from '../../common/components/Settings/VoterPhotoUpload';
 import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import VoterStore from '../../stores/VoterStore';
-
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 class SettingsProfilePicture extends Component {
   constructor (props) {
@@ -52,25 +52,26 @@ class SettingsProfilePicture extends Component {
       VoterActions.voterPhotoSave(voterPhotoQueuedToSave, voterPhotoQueuedToSaveSet, profileImageTypeCurrentlyActive);
       VoterActions.voterPhotoQueuedToSave(undefined);
 
-          // Adding event data to dataLayer for Google Tag Manager
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
-    TagManager.dataLayer({
-      dataLayer: {
-        event: 'save_profile_photo',
-        actionDetails: {
-          actionType: 'save',
-          buttonId: 'saveEditYourPhotoBottom',
+      // Adding event data to dataLayer for Google Tag Manager
+      const currentPathname = window.location.pathname;
+      const page = lookupPageNameAndPageTypeDict(currentPathname);
+      TagManager.dataLayer({
+        dataLayer: {
+          event: 'save_profile_photo',
+          actionDetails: {
+            actionType: 'save',
+            buttonId: 'saveEditYourPhotoBottom',
+          },
+          userDetails: {
+            voterWeVoteId: VoterStore.getVoterWeVoteId(),
+          },
+          pageDetails: {
+            pageName: page.pageName,
+            pageType: page.pageType,
+            pathname: currentPathname,
+          },
         },
-        userDetails: {
-          voterWeVoteId: VoterStore.getVoterWeVoteId(),
-        },
-        pageDetails: {
-          pageName: page.pageName,
-          pageType: page.pageType,
-          pathname: currentPathname,
-        },
-      },
-    });
+      });
     }
     this.setState({
       voterPhotoQueuedToSaveSet: false,

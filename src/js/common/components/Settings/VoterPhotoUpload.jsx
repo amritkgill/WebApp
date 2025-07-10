@@ -5,11 +5,12 @@ import { DropzoneArea } from 'mui-file-dropzone';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import VoterActions from '../../../actions/VoterActions';
 import VoterStore from '../../../stores/VoterStore';
 import isMobileScreenSize from '../../utils/isMobileScreenSize';
 import { renderLog } from '../../utils/logging';
-
+import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
 
 class VoterPhotoUpload extends Component {
   constructor (props) {
@@ -86,25 +87,25 @@ class VoterPhotoUpload extends Component {
   submitDeleteYourPhoto = () => {
     VoterActions.voterPhotoDelete();
     VoterActions.voterPhotoQueuedToSave(undefined);
-          // Adding event data to dataLayer for Google Tag Manager
+    // Adding event data to dataLayer for Google Tag Manager
     const page = lookupPageNameAndPageTypeDict(window.location.pathname);
-      TagManager.dataLayer({
-        dataLayer: {
-          event: 'remove_profile_photo',
-          actionDetails: {
-            actionType: 'remove',
-            buttonId: 'removePhotoLink',
-          },
-          userDetails: {
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
-          pageDetails: {
-            pageName: page.pageName,
-            pageType: page.pageType,
-            pathname: window.location.pathname,
-            },
-          },
-        });
+    TagManager.dataLayer({
+      dataLayer: {
+        event: 'remove_profile_photo',
+        actionDetails: {
+          actionType: 'remove',
+          buttonId: 'removePhotoLink',
+        },
+        userDetails: {
+          voterWeVoteId: VoterStore.getVoterWeVoteId(),
+        },
+        pageDetails: {
+          pageName: page.pageName,
+          pageType: page.pageType,
+          pathname: window.location.pathname,
+        },
+      },
+    });
   }
 
   render () {
@@ -122,7 +123,8 @@ class VoterPhotoUpload extends Component {
                   <VoterPhotoImage maxWidth={maxWidth} src={voterProfileUploadedImageUrlLarge} alt="Profile Photo" />
                   <DeleteLink
                     className="u-link-color u-link-underline u-cursor--pointer"
-                    onClick={this.submitDeleteYourPhoto} id = "removePhotoLink"
+                    onClick={this.submitDeleteYourPhoto}
+id="removePhotoLink"
                   >
                     remove photo
                   </DeleteLink>
