@@ -10,16 +10,15 @@ import VoterStore from '../../stores/VoterStore';
 import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 export default class FAQ extends Component {
-  static getProps () {
-    return {};
+  constructor (props) {
+    super(props);
+    this.state = {
+      dataLayerFired: false,
+    };
   }
 
   componentDidMount () {
     window.scrollTo(0, 0);
-    this.checkAndFireDataLayer();
-  }
-
-  componentDidUpdate () {
     this.checkAndFireDataLayer();
   }
 
@@ -38,11 +37,7 @@ export default class FAQ extends Component {
             pageType: currentPage.pageType,
             pathname: currentPathname,
           },
-          userDetails: {
-            stateCode: VoterStore.getVoterStateCode(),
-            userCohort: VoterStore.getAnalyticsUserCohort(),
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
+          userDetails: VoterStore.getAnalyticsUserDetails(),
         },
       });
 
