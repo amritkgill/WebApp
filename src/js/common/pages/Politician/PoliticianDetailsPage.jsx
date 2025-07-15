@@ -311,12 +311,12 @@ class PoliticianDetailsPage extends Component {
     if (!this.state.dataLayerSent) {
       if (politician && politician.politician_we_vote_id) {
         const dataLayerObject = {
-          event: 'landing',
-          userDetails: VoterStore.getAnalyticsUserDetails(),
-          pageDetails: getPageDetails(),
           actionDetails: {
             actionType: 'landing',
           },
+          event: 'landing',
+          pageDetails: getPageDetails(),
+          userDetails: VoterStore.getAnalyticsUserDetails(),
         };
         if (politician.candidate_we_vote_id) {
           dataLayerObject.candidateDetails = CandidateStore.getAnalyticsCandidateDetails(politician.candidate_we_vote_id);
