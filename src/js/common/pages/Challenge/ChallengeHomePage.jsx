@@ -45,6 +45,8 @@ import ChallengeInviteeListRoot from '../../components/ChallengeInviteeListRoot/
 import ThanksForViewingChallenge from '../../components/Challenge/ThanksForViewingChallenge';
 import ShareStore from '../../stores/ShareStore';
 import ChallengeHeaderSimple from '../../components/Navigation/ChallengeHeaderSimple';
+import { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
+import TagManager from 'react-gtm-module';
 
 const ChallengeCardForList = React.lazy(() => import(/* webpackChunkName: 'ChallengeCardForList' */ '../../components/ChallengeListRoot/ChallengeCardForList'));
 // const ChallengeCommentsList = React.lazy(() => import(/* webpackChunkName: 'ChallengeCommentsList' */ '../../components/Challenge/ChallengeCommentsList'));
@@ -106,6 +108,7 @@ class ChallengeHomePage extends Component {
       challengeTitle: '',
       challengeWeVoteId: '',
       challengeWeVoteIdForDisplay: '', // Value for challenge already received
+      dataLayerFired: false,
       sharingStepCompleted: false,
       step2Completed: false,
       thanksForViewingChallengeOn: false,
@@ -281,6 +284,27 @@ class ChallengeHomePage extends Component {
     if (triggerFreshRetrieve || triggerSEOPathRedirect) {
       // Take the "calculated" identifiers and retrieve if missing
       window.scrollTo(0, 0);
+    }
+
+    const { dataLayerFired } = this.state;
+
+    if (!dataLayerFired) {
+      if (VoterStore.voterFirstRetrieveCompleted()) {
+        const dataLayerObject = {
+          actionDetails: {
+            actionType: 'landing',
+          },
+          event: 'landing',
+          pageDetails: getPageDetails(),
+          userDetails: VoterStore.getAnalyticsUserDetails(),
+        };
+
+        TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+        this.setState({
+          dataLayerFired: true,
+        });
+      }
     }
   }
 

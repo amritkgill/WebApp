@@ -912,7 +912,8 @@ const styles = (theme) => ({
   },
 });
 
-const HeaderBarWrapper = styled('div', {
+const HeaderBarWrapper = styled.div.attrs({
+  className: 'HeaderBarWrapper', // div.attrs and className all added to achieve drop-shadow on Donate page
   shouldForwardProp: (prop) => !['hasNotch', 'scrolledDown', 'hasSubmenu'].includes(prop),
 })(({ hasNotch, scrolledDown, hasSubmenu }) => (`
   margin-top: ${hasNotch ? '9%' : ''};

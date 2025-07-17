@@ -25,6 +25,8 @@ import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import { Section } from '../../components/Welcome/sectionStyles';
 import webAppConfig from '../../config';
 import VoterStore from '../../stores/VoterStore';
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import DonationPhoto from '../../../img/global/photos/woman-voting-donation-page.png';
 import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 /* global $ */
@@ -280,25 +282,26 @@ class Donate extends Component {
         )}
       </DonationDescription>
       {readMore && (
-        <OpenExternalWebSite
-          linkIdAttribute="annualBudget"
-          url={isC4Donation ? 'https://projects.propublica.org/nonprofits/organizations/811052585' : 'https://projects.propublica.org/nonprofits/organizations/472691544'}
-          target="_blank"
-          trackingOn
-          body={(
-            <span id="budgets_small">
-              Questions about donating?
-              <Launch
-                style={{
-                  height: 14,
-                  marginLeft: 2,
-                  marginTop: '-3px',
-                  width: 14,
-                }}
-              />
-            </span>
-          )}
-        />
+        <OpenExternalWebSiteWrapper>
+          <OpenExternalWebSite
+            linkIdAttribute="annualBudget"
+            url={isC4Donation ? 'https://projects.propublica.org/nonprofits/organizations/811052585' : 'https://projects.propublica.org/nonprofits/organizations/472691544'}
+            target="_blank"
+            body={(
+              <span id="budgets_small">
+                Questions about donating?
+                <Launch
+                  style={{
+                    height: 14,
+                    marginLeft: 2,
+                    marginTop: '-3px',
+                    width: 14,
+                  }}
+                />
+              </span>
+            )}
+          />
+        </OpenExternalWebSiteWrapper>
       )}
     </DonationDescriptionContainer>
   );
@@ -327,6 +330,7 @@ class Donate extends Component {
     if (!isC4Donation) {
       c3DonationHtml = (
         <C3DonationWrapper>
+          <AddShadowToHeader />
           <ResetMargin />
           <Wrapper>
             <Helmet>
@@ -370,15 +374,13 @@ class Donate extends Component {
                   </InnerWrapper>
                 </TextAndDonorboxColumn>
                 <DonationImageContainer>
-                  {/* <InnerWrapper> */}
-                  {/*  <DonorboxWrapper> */}
-                  {/*    <Suspense fallback={<div>Loading...</div>}> */}
-                  {/*      <DonorboxEmbed /> */}
-                  {/*    </Suspense> */}
-                  {/*  </DonorboxWrapper> */}
-                  {/* </InnerWrapper> */}
+                  {/*<DonorboxWrapper>*/}
+                  {/*  <Suspense fallback={<div>Loading...</div>}>*/}
+                  {/*    <DonorboxEmbed />*/}
+                  {/*  </Suspense>*/}
+                  {/*</DonorboxWrapper>*/}
                   <DonationImage
-                    src={donationImage}
+                    src={DonationPhoto}
                   />
                 </DonationImageContainer>
               </TwoColumns>
@@ -643,6 +645,7 @@ const styles = (theme) => ({
 });
 
 const C3DonationWrapper = styled('div')`
+  min-height: 100%;
 `;
 
 const C4DonationWrapper = styled('div')`
@@ -673,9 +676,12 @@ const DonorboxWrapper = styled('div')`
 
 const Wrapper = styled('div')`
   display: flex;
-  flex-flow: column nowrap;
   overflow-x: hidden;
   height: 100%;
+
+  @media (max-width: 532px) {
+    flex-direction: column;
+  }
 `;
 
 const InnerWrapper = styled('div')`
@@ -683,11 +689,10 @@ const InnerWrapper = styled('div')`
 `;
 
 const DonateDescriptionContainer = styled('div')`
-  margin: 1.5em auto;
-  margin-bottom: 12px;
+  margin: 1.5em auto .25em;
   width: 960px;
   max-width: 90vw;
-  text-align: center;
+  text-align: left;
   @media (min-width: 960px) and (max-width: 991px) {
     > * {
       width: 90%;
@@ -778,17 +783,23 @@ const ContributeGridItemJoin = styled('div', {
 `));
 
 const DonationImageContainer = styled('div')`
-  height: 99%;
-  width: 70%;
+  display: flex;
+  height: 100%;
   overflow: hidden;
+  margin-left: -8%;
 `;
 
 const TextAndDonorboxColumn = styled('div')`
   max-width: 400px;
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
 `;
 
 const DonationImage = styled('img')`
-  width: 57%;
+  height: 100%;
   object-fit: cover;
   display: block;
   position: fixed;
@@ -797,38 +808,60 @@ const DonationImage = styled('img')`
 
 const DonationDescriptionContainer = styled('div')`
   padding: 0 20px;
-  margin-top: 40px;
+  margin-top: 50px;
+
+  @media (max-width: 532px) {
+    margin-top: 30px;
+    padding: 0;
+  }
 `;
 
 const DonationDescription = styled('p')`
 `;
 
 const TwoColumns = styled('div')`
-  background: white;
-  margin-left: 15%;
-  margin-bottom: -3.5%;
-  padding-bottom: 1%;
+  margin-left: 13%;
   display: flex;
-  align-items: flex-start;
-  height: 100%;
+  min-height: 100vh;
+  width: 100%;
 `;
 
 const ReadMoreButton = styled('button')`
   background-color: transparent;
   border: none;
+  cursor: pointer;
   color: ${DesignTokenColors.primary700};
+  padding: 8px 0;
+  text-decoration: underline;
+  text-decoration-color: ${DesignTokenColors.primary700};
+  &:hover {
+    opacity: 0.6;
+  }
 `;
 
 const DonatePageContentContainer = styled(PageContentContainer)`
-  max-width: 100%;
-  // background-color: ${DesignTokenColors.secondary500};
+  min-width: 100%;
   background-color: #0d5470;
   padding-top: 20px;
 `;
 
+const OpenExternalWebSiteWrapper = styled('div')`
+  margin: 8px 0 24px 0;
+`;
+
+
 const ResetMargin = createGlobalStyle`
   html, body {
+    height: 100%;
     margin: 0;
+    padding: 0;
+  }
+`;
+
+const AddShadowToHeader = createGlobalStyle`
+  .HeaderBarWrapper {
+    box-shadow: ${standardBoxShadow('wide')};
+    border-bottom: 1px solid rgb(170, 170, 170);
   }
 `;
 
