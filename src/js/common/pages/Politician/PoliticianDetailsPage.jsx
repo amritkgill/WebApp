@@ -51,6 +51,7 @@ import saveCampaignSupportAndGoToNextPage from '../../utils/saveCampaignSupportA
 import extractPoliticianDetailsFromUrl from '../../utils/extractPoliticianDetailsFromUrl';
 import VoterStore from '../../../stores/VoterStore';
 import VoterPositionEntryAndDisplay from '../../../components/PositionItem/VoterPositionEntryAndDisplay';
+// import VoterPositionEntryAndDisplayMook from '../../components/PositionItem/VoterPositionEntryAndDisplay';
 import { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
 
 const CampaignRetrieveController = React.lazy(() => import(/* webpackChunkName: 'CampaignRetrieveController' */ '../../components/Campaign/CampaignRetrieveController'));
@@ -1097,6 +1098,12 @@ class PoliticianDetailsPage extends Component {
               politicianWeVoteId={politicianWeVoteId}
               politicianName={politicianName}
             />
+            {/*
+            <VoterPositionEntryAndDisplayMook
+              politicianWeVoteId={politicianWeVoteId}
+              politicianName={politicianName}
+            />
+            */}
             {positionListTeaserHtml}
             <SpacerAfterPositions />
             {(opponentCandidateList && opponentCandidateList.length > 0) && (
@@ -1274,6 +1281,12 @@ class PoliticianDetailsPage extends Component {
                   politicianWeVoteId={politicianWeVoteId}
                   politicianName={politicianName}
                 />
+                {/*
+                <VoterPositionEntryAndDisplayMook
+                  politicianWeVoteId={politicianWeVoteId}
+                  politicianName={politicianName}
+                />
+                */}
                 {positionListTeaserHtml}
                 <SpacerAfterPositions />
                 {(opponentCandidateList && opponentCandidateList.length > 0) && (

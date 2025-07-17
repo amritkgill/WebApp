@@ -59,7 +59,7 @@ class SearchBar2024 extends Component {
     }
   }
 
-  handleSearchBarKeyPress = () => {
+  handleSearchBarKeyPress = (buttonId) => {
     if (this.timer) {
       clearTimeout(this.timer);
     }
@@ -73,7 +73,7 @@ class SearchBar2024 extends Component {
       const dataLayerObject = {
         actionDetails: {
           actionType: 'search',
-          buttonId: 'search_input',
+          buttonId,
         },
         event: 'action',
         userDetails: VoterStore.getAnalyticsUserDetails(),
@@ -110,7 +110,7 @@ class SearchBar2024 extends Component {
           id="search_input"
           placeholder={placeholder}
           value={searchString}
-          onKeyDown={this.handleSearchBarKeyPress}
+          onKeyDown={() => this.handleSearchBarKeyPress('search_input')}
           onChange={this.updateResults}
           onFocus={() => focusTextFieldAndroid('SearchBar2024')}
           onBlur={blurTextFieldAndroid}

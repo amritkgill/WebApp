@@ -12,14 +12,16 @@ import MeasureStore from './MeasureStore'; // eslint-disable-line import/no-cycl
 class SupportStore extends ReduceStore {
   getInitialState () {
     return {
-      voter_supports: {},
-      voter_opposes: {},
-      voter_statement_text: {},
+      ballotItemMappingToPosition: {}, // Dictionary with key: candidate, measure, politician we_vote_id, value: position_we_vote_id
       is_public_position: {},
-      weVoteIdSupportListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs supporting this ballot item
-      weVoteIdOpposeListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs opposing this ballot item
       nameSupportListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs supporting this ballot item
       nameOpposeListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs opposing this ballot item
+      voterPositionsByPositionWeVoteId: {}, // Dictionary with key: position_we_vote_id, value: the position dict
+      voter_opposes: {},
+      voter_statement_text: {},
+      voter_supports: {},
+      weVoteIdSupportListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs supporting this ballot item
+      weVoteIdOpposeListForEachBallotItem: {}, // Dictionary with key: candidate or measure we_vote_id, value: list of orgs opposing this ballot item
     };
   }
 
@@ -62,6 +64,17 @@ class SupportStore extends ReduceStore {
       numberOfOpposePositionsForScore: numberOfOpposePositionsForScore || 0,
       numberOfInfoOnlyPositionsForScore: numberOfInfoOnlyPositionsForScore || 0,
     };
+  }
+
+  getPositionFromBallotItemWeVoteId (ballotItemWeVoteId = '') {
+    if (!ballotItemWeVoteId) {
+      return {};
+    }
+    const positionWeVoteId = this.getState().ballotItemMappingToPosition[ballotItemWeVoteId];
+    if (!positionWeVoteId) {
+      return {};
+    }
+    return this.getState().voterPositionsByPositionWeVoteId[positionWeVoteId] || {};
   }
 
   getVoterOpposesByBallotItemWeVoteId (ballotItemWeVoteId) {
@@ -141,6 +154,7 @@ class SupportStore extends ReduceStore {
     // Exit if we don't have a successful response (since we expect certain variables in a successful response below)
     if (!action.res || !action.res.success) return state;
 
+    let ballotItemMappingToPositionTemp = {};
     let ballotItemWeVoteId = '';
     if (action.res.ballot_item_we_vote_id) {
       ballotItemWeVoteId = action.res.ballot_item_we_vote_id;
@@ -155,6 +169,7 @@ class SupportStore extends ReduceStore {
     let isMeasure = false;
     let revisedState;
     let voterOpposes = {};
+    let voterPositionsByPositionWeVoteIdTemp = {};
     let voterSupports = {};
 
     switch (action.type) {
@@ -167,11 +182,31 @@ class SupportStore extends ReduceStore {
         // is_support is a property coming from 'position_list' in the incoming response
         // state.voter_supports is an updated hash with the contents of position list['is_support']
         // console.log('SupportStore from voterAllPositionsRetrieve is_public_position: ', this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_public_position', action.res.position_list));
+        voterPositionsByPositionWeVoteIdTemp = action.res.position_list.reduce((acc, position) => {
+          if (position.position_we_vote_id) {
+            acc[position.position_we_vote_id] = position;
+          }
+          return acc;
+        }, {});
+        ballotItemMappingToPositionTemp = action.res.position_list.reduce((acc, position) => {
+          if (position.position_we_vote_id) {
+            if (position.ballot_item_we_vote_id && !acc[position.ballot_item_we_vote_id]) {
+              acc[position.ballot_item_we_vote_id] = position.position_we_vote_id;
+            }
+            if (position.politician_we_vote_id && !acc[position.politician_we_vote_id]) {
+              acc[position.politician_we_vote_id] = position.position_we_vote_id;
+            }
+          }
+          return acc;
+        }, {});
+        // console.log('SupportStore from voterAllPositionsRetrieve voterPositionsByPositionWeVoteIdTemp: ', voterPositionsByPositionWeVoteIdTemp);
         return {
           ...state,
+          ballotItemMappingToPosition: ballotItemMappingToPositionTemp,
           voter_supports: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_support', action.res.position_list),
           voter_opposes: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_oppose', action.res.position_list),
           voter_statement_text: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('statement_text', action.res.position_list),
+          voterPositionsByPositionWeVoteId: voterPositionsByPositionWeVoteIdTemp,
           is_public_position: this.extractValueByPropertyAndStoreListInDictionaryByWeVoteId('is_public_position', action.res.position_list),
         };
 

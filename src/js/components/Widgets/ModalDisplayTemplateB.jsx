@@ -321,10 +321,6 @@ export const VoterAvatarImg = styled('img')`
   }
 `;
 
-export const UserInfoWrapper = styled('div')`
-  display: flex;
-`;
-
 export const UserInfoText = styled('div')`
   padding-left: 16px;
   `;
@@ -369,12 +365,6 @@ export const OpinionButton = styled(Button)`
   background-color: ${(props) => (props.selected ? DesignTokenColors.primary600 : 'transparent')};
     background-color: ${(props) => (props.selected ? DesignTokenColors.primary600 : DesignTokenColors.primary50)};
   }
-`;
-export const PositionBlockWrapper = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 12px 0 26px 0;
 `;
 
 export const InputBox = styled.input`

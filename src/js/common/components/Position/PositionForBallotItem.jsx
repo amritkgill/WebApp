@@ -1,17 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Suspense, useState } from 'react';
 import styled from 'styled-components';
-import { BlockOutlined, CheckOutlined, Launch, MoreHoriz } from '@mui/icons-material';
+import { Launch, MoreHoriz } from '@mui/icons-material';
 import Popover from '@mui/material/Popover';
 import { Avatar, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import HeartFavoriteToggleLoader from '../Widgets/HeartFavoriteToggle/HeartFavoriteToggleLoader';
 import ThumbsUpDownToggle from '../Widgets/ThumbsUpDownToggle/ThumbsUpDownToggle';
 import DesignTokenColors from '../Style/DesignTokenColors';
+import { SpeakerInfoWrapper, SpeakerName, SpeakerStatement, SpeakerStatementWrapper } from '../Style/PositionDisplayStyles';
 import speakerDisplayNameToInitials from '../../utils/speakerDisplayNameToInitials';
-import {
-  getDateFromUltimateElectionDate, getTodayAsInteger, timeFromDate,
-} from '../../utils/dateFormat';
+import SpeakerEndorsedOrOpposedSnippet from './SpeakerEndorsedOrOpposedSnippet';
 import AppObservableStore from '../../stores/AppObservableStore';
 import stringContains from '../../utils/stringContains';
 import lookupPageNameAndPageTypeDict from '../../../utils/lookupPageNameAndPageTypeDict';
@@ -34,13 +33,8 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
   const id = open ? 'simple-popover' : undefined;
 
   const {
-    is_oppose_or_negative_rating: isOpposeOrNegativeRating,
-    is_support_or_positive_rating: isSupportOrPositiveRating,
     more_info_url: moreInfoUrl,
     organization_we_vote_id: organizationWeVoteIdRaw,
-    position_ultimate_election_date: positionUltimateElectionDateAsInteger,
-    // position_we_vote_id: positionWeVoteId,
-    position_year: positionYear,
     statement_text: statementText,
     speaker_display_name: speakerDisplayName,
     speaker_twitter_handle: speakerTwitterHandle,
@@ -53,21 +47,6 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
   // I think we need a HeartFavoriteToggleLive that accepts an organizationWeVoteId
   const heartToggleOn = true;
   const voterLikesOn = false;
-  let howLongAgoOrThisYear = '';
-  const todayAsInteger = getTodayAsInteger(0);
-  const currentYear = new Date().getFullYear();
-  // console.log('currentYear', currentYear, ', positionYear', positionYear);
-  // console.log('todayAsInteger', todayAsInteger, ', positionUltimateElectionDateAsInteger', positionUltimateElectionDateAsInteger);
-  if (todayAsInteger && currentYear) {
-    if (positionYear === currentYear) {
-      howLongAgoOrThisYear = 'this year';
-    } else if (positionUltimateElectionDateAsInteger && (todayAsInteger <= positionUltimateElectionDateAsInteger)) {
-      howLongAgoOrThisYear = 'this year';
-    } else if (positionUltimateElectionDateAsInteger && (todayAsInteger > positionUltimateElectionDateAsInteger)) {
-      const positionUltimateElectionDate = getDateFromUltimateElectionDate(positionUltimateElectionDateAsInteger);
-      howLongAgoOrThisYear = timeFromDate(positionUltimateElectionDate);
-    }
-  }
   let organizationWeVoteId = organizationWeVoteIdRaw;
   // Is speakerWeVoteId an organizationWeVoteId?
   if (!organizationWeVoteId && speakerWeVoteId && stringContains('org', speakerWeVoteId)) {
@@ -141,37 +120,7 @@ function PositionForBallotItem ({ classes, linksOpenExternalWebsite, position })
           </SpeakerStatementWrapper>
         )}
         <SpeakerPositionLikesSourceWrapper>
-          <SpeakerPositionWrapper>
-            {isSupportOrPositiveRating && (
-              <SpeakerPosition>
-                <CheckOutlinedStyled />
-                <PositionText>
-                  Endorsed
-                  {' '}
-                  {howLongAgoOrThisYear}
-                </PositionText>
-              </SpeakerPosition>
-            )}
-            {isOpposeOrNegativeRating && (
-              <SpeakerPosition>
-                <BlockOutlinedStyled />
-                <PositionText>
-                  Opposed
-                  {' '}
-                  {howLongAgoOrThisYear}
-                </PositionText>
-              </SpeakerPosition>
-            )}
-            {(!isOpposeOrNegativeRating && !isSupportOrPositiveRating) && (
-              <SpeakerPosition>
-                <PositionText>
-                  Commented
-                  {' '}
-                  {howLongAgoOrThisYear}
-                </PositionText>
-              </SpeakerPosition>
-            )}
-          </SpeakerPositionWrapper>
+          <SpeakerEndorsedOrOpposedSnippet position={position} />
           <ThumbsUpAndSourceWrapper>
             <FlexDiv>
               {voterLikesOn && (
@@ -247,14 +196,6 @@ const styles = () => ({
   },
 });
 
-const BlockOutlinedStyled = styled(BlockOutlined)`
-  color: ${DesignTokenColors.neutral900}
-`;
-
-const CheckOutlinedStyled = styled(CheckOutlined)`
-  color: ${DesignTokenColors.neutral900}
-`;
-
 const FlexDiv = styled('div')`
   display: flex;
 `;
@@ -291,14 +232,6 @@ const PositionForBallotItemWrapper = styled('div')`
   }
 `;
 
-const PositionText = styled('p')`
-  color: ${DesignTokenColors.neutral700};
-  font-weight: 400;
-  font-size: 14px;
-  margin-left: 5px;
-  white-space: nowrap;
-`;
-
 const SourceButton = styled('button')`
   width: 34px;
   height: 34px;
@@ -324,38 +257,9 @@ const SpeakerInfoNameFavoritesWrapper = styled('div')`
   align-items: center;
 `;
 
-const SpeakerInfoWrapper = styled('div')`
-  display: flex;
-  margin-bottom: 12px;
-  margin-left: 15px;
-  flex-direction: column;
-  // width: 500px;
-`;
-
-const SpeakerName = styled('h3')`
-  color: ${DesignTokenColors.neutral900};
-`;
-
-const SpeakerPosition = styled('div')`
-  display: flex;
-`;
-
 const SpeakerPositionLikesSourceWrapper = styled('div')`
   display: flex;
   justify-content: space-between;
-`;
-
-const SpeakerPositionWrapper = styled('div')`
-  display: flex;
-`;
-
-const SpeakerStatement = styled('div')`
-  color: ${DesignTokenColors.neutral900};
-  margin-bottom: 5px;
-`;
-
-const SpeakerStatementWrapper = styled('div')`
-  // max-width: 415px;
 `;
 
 const ThumbsUpAndSourceWrapper = styled('div')`

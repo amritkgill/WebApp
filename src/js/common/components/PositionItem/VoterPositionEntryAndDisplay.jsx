@@ -14,7 +14,7 @@ import VoterPositionEditModal from '../../../components/PositionItem/VoterPositi
 
 // THIS VERSION IS DEPRECATED. Use this instead: src/js/components/PositionItem/VoterPositionEntryAndDisplay.jsx
 function VoterPositionEntryAndDisplay ({ classes }) {
-  const [voterOpinion, setVoterOpinion] = useState(null);
+  const [voterOpinion, setVoterOpinion] = useState(true);
   const [anchorElEdit, setAnchorElEdit] = useState(null);
   const [anchorElLikes, setAnchorElLikes] = useState(null);
   const [anchorElDislikes, setAnchorElDislikes] = useState(null);

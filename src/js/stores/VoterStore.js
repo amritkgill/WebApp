@@ -94,6 +94,7 @@ class VoterStore extends ReduceStore {
   getAnalyticsUserDetails () {
     return {
       linkedPoliticianWeVoteId: this.getLinkedPoliticianWeVoteId(),
+      // signedInWithApple
       signedInEmail: this.getVoterIsSignedInWithEmail(),
       signedInPhone: this.getVoterIsSignedInWithPhone(),
       stateCode: this.getVoterStateCode(),

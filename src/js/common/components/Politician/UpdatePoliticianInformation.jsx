@@ -1,17 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { useState, Suspense } from 'react';
-import { Close } from '@mui/icons-material';
-import { Dialog, IconButton } from "@mui/material";
-import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import styled from 'styled-components';
+import { Close, EditOutlined, ExpandMoreRounded } from '@mui/icons-material';
+import { Button, Dialog, IconButton } from '@mui/material';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import Button from '@mui/material/Button';
-import CloseIcon from '@mui/icons-material/Close';
 import { styled as muiStyled } from '@mui/material/styles';
 import DesignTokenColors from '../Style/DesignTokenColors';
-import standardBoxShadow from "../Style/standardBoxShadow";
-import {StepTitle} from "../../../components/Style/ReadyIntroductionStyles";
+import standardBoxShadow from '../Style/standardBoxShadow';
+import { StepTitle } from '../../../components/Style/ReadyIntroductionStyles';
 
 
 const OpenExternalWebSite = React.lazy(() => import(/* webpackChunkName: 'OpenExternalWebSite' */ '../Widgets/OpenExternalWebSite'));
@@ -44,7 +40,7 @@ const UpdatePoliticianInformation =  (props) => {
   const voterCanEditCandidate = true; // This should be determined by the actual application logic
   const voterCanEditCandidateHighlight = false;
   const publicEmails = ['info@adamshiff.com', 'john.dough@lacounty.gov'];
-  const candidate = "Adam Schiff";
+  const candidate = 'Adam Schiff';
 
   const handleOpenVerifyWithEmailModal = () => {
     setShowVerifyWithEmailModal(true);
@@ -154,7 +150,7 @@ const UpdatePoliticianInformation =  (props) => {
   );
 
   const verifyOtherWaysModalOpen = () => {
-    const relationshipOptions = ["I'm the candidate", "Staff member", "Volunteer", "Other"];
+    const relationshipOptions = ["I'm the candidate", 'Staff member', 'Volunteer', 'Other'];
     return (
       <VerifyModal
         open={showVerifyOtherWaysModal}
@@ -217,7 +213,7 @@ const UpdatePoliticianInformation =  (props) => {
                   title={(
                     <TooltipContent>
                       <CloseButton size="small" onClick={() => setTooltipOpen(false)}>
-                        <CloseIcon fontSize="small" />
+                        <Close fontSize="small" />
                       </CloseButton>
                       Edit your candidate’s profile here
                       <GotItButton onClick={() => setTooltipOpen(false)}>
@@ -230,7 +226,7 @@ const UpdatePoliticianInformation =  (props) => {
                     onMouseEnter={() => setTooltipOpen(true)}
                     highlight={voterCanEditCandidateHighlight}
                   >
-                    <EditOutlinedIcon fontSize="small" style={{ marginRight: 4 }} />
+                    <EditOutlined fontSize="small" style={{ marginRight: 4 }} />
                     Edit profile
                   </EditProfileWrapper>
                 </CustomTooltip>
@@ -240,14 +236,14 @@ const UpdatePoliticianInformation =  (props) => {
                     onClick={handleOpenVerifyWithEmailModal}
                   >
                     Candidate staff access
-                    <ExpandMoreRoundedIcon />
+                    <ExpandMoreRounded />
                   </CandidateStaffAccessButton>
-                  {verifyWithEmailModalOpen()}
-                  {verifyOtherWaysModalOpen()}
                   <CandidateAccessWrapper>
                     Candidate staff access&nbsp;
                     <Caret>⌄</Caret>
                   </CandidateAccessWrapper>
+                  {verifyWithEmailModalOpen()}
+                  {verifyOtherWaysModalOpen()}
                 </>
               )}
             </>

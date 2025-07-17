@@ -15,16 +15,19 @@ import VoterStore from '../../stores/VoterStore';
 import { avatarGeneric } from '../../utils/applicationUtils';
 import ModalDisplayTemplateB, {
   templateBStyles, TextFieldDiv,
-  TextFieldForm, TextFieldWrapper, VoterAvatarImg,
-  UserInfoWrapper, UserInfoText, UserName, PositionBlockWrapper, CommentContainer, InputBox,
+  TextFieldForm, TextFieldWrapper,
+  UserInfoText, UserName, CommentContainer, InputBox,
 } from '../Widgets/ModalDisplayTemplateB';
 import ActivityPostPublicDropdown from '../Activity/ActivityPostPublicDropdown';
 import VoterPositionEditNameAndPhotoModal from './VoterPositionEditNameAndPhotoModal';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import { SpeakerInfoWrapper, SpeakerName, SpeakerStatement, SpeakerStatementWrapper } from '../../common/components/Style/PositionDisplayStyles';
+import SpeakerEndorsedOrOpposedSnippet from '../../common/components/Position/SpeakerEndorsedOrOpposedSnippet';
 
 const ItemActionBar = React.lazy(() => import(/* webpackChunkName: 'ItemActionBar' */ '../Widgets/ItemActionBar/ItemActionBar'));
+const ReadMore = React.lazy(() => import(/* webpackChunkName: 'ReadMore' */ '../../common/components/Widgets/ReadMore'));
 
-const VoterPositionEntryAndDisplay = (props) => {
-  const { classes, externalUniqueId, politicianWeVoteId } = props;
+const VoterPositionEntryAndDisplay = ({ classes, externalUniqueId, politicianWeVoteId }) => {
   const supportStoreGetState = SupportStore.getState();
   const voterStoreGetState = VoterStore.getState();
   const { allCachedPoliticians } = PoliticianStore.getState();
@@ -32,11 +35,14 @@ const VoterPositionEntryAndDisplay = (props) => {
   const [initialFocusSet, setInitialFocusSet] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [politicianName, setPoliticianName] = useState('');
+  const [position, setPosition] = useState({});
   const [positionExists, setPositionExists] = useState(false);
   const [selectedStance, setSelectedStance] = useState('SUPPORT');
   const [showModal, setShowModal] = useState(false);
   const [statementText, setStatementText] = useState('');
   const [visibilityIsPublic, setVisibilityIsPublic] = useState(false);
+  const [voterFirstName, setVoterFirstName] = useState('');
+  const [voterLastName, setVoterLastName] = useState('');
   const [voterName, setVoterName] = useState('');
   const [voterPhotoUrlMedium, setVoterPhotoUrlMedium] = useState('');
 
@@ -80,9 +86,12 @@ const VoterPositionEntryAndDisplay = (props) => {
       } else if (voterOpposesBallotItem) {
         stanceTemp = 'OPPOSE';
       }
-      if (voterOpposesBallotItem || voterPositionIsPublic || voterSupportsBallotItem || voterTextStatement) {
+      const positionTemp = SupportStore.getPositionFromBallotItemWeVoteId(politicianWeVoteId);
+      const positionWeVoteId = positionTemp.position_we_vote_id || '';
+      if (positionWeVoteId || voterOpposesBallotItem || voterPositionIsPublic || voterSupportsBallotItem || voterTextStatement) {
         setPositionExists(true);
       }
+      setPosition(positionTemp);
       setSelectedStance(stanceTemp);
       setStatementText(voterTextStatement);
       setVisibilityIsPublic(voterPositionIsPublic);
@@ -92,6 +101,8 @@ const VoterPositionEntryAndDisplay = (props) => {
   const onVoterStoreChange = () => {
     const voter = VoterStore.getVoter();
     setVoterPhotoUrlMedium(voter.voter_photo_url_medium);
+    setVoterFirstName(voter.first_name || 'Anonymous');
+    setVoterLastName(voter.last_name || 'Anonymous');
     setVoterName(voter.full_name || 'Anonymous');
   };
 
@@ -154,28 +165,63 @@ const VoterPositionEntryAndDisplay = (props) => {
   const statementPlaceholderText = 'What\'s on your mind?';
   const rowsToShow = isAndroid() ? 4 : 6;
 
-  const OpinionBlock = ({ onClick }) => (
-    <PositionBlockWrapper>
-      <UserInfoWrapper>
-        <VoterAvatarImg
-          alt=""
+  const VoterAvatarBlock = () => (
+    <VoterAvatar>
+      {voterPhotoUrlMedium ? (
+        <VoterImage
+          alt="Voter"
           src={voterPhotoUrlMedium || avatarGeneric()}
         />
+      ) : (
+        <>
+          <VoterFirstName>
+            {voterFirstName[0]}
+          </VoterFirstName>
+          <VoterLastName>
+            {voterLastName[0]}
+          </VoterLastName>
+        </>
+      )}
+    </VoterAvatar>
+  );
+
+  const VoterPositionBlock = ({ onClick }) => (
+    <VoterPositionContainer>
+      <VoterAvatarDisplayContainer>
+        <VoterAvatarBlock />
         <EditIcon
           onClick={handleEditModalOpen}
           className={classes.styledEditIcon}
         />
-      </UserInfoWrapper>
+      </VoterAvatarDisplayContainer>
       <CommentContainerWrapper>
-        <CommentContainer>
-          {/* Open modal when input is clicked */}
-          <InputBox
-            type="text"
-            placeholder="What's your opinion?"
-            onClick={onClick}
-            readOnly
-          />
-        </CommentContainer>
+        {statementText ? (
+          <SpeakerInfoWrapper>
+            <SpeakerName>
+              {voterName}
+            </SpeakerName>
+            <SpeakerStatementWrapper>
+              <SpeakerStatement>
+                <Suspense fallback={<></>}>
+                  <ReadMore
+                    textToDisplay={statementText}
+                    numberOfLines={6}
+                  />
+                </Suspense>
+              </SpeakerStatement>
+            </SpeakerStatementWrapper>
+          </SpeakerInfoWrapper>
+        ) : (
+          <CommentContainer>
+            {/* Open modal when input is clicked */}
+            <InputBox
+              type="text"
+              placeholder="What's your opinion?"
+              onClick={onClick}
+              readOnly
+            />
+          </CommentContainer>
+        )}
         <ItemActionBarContainer>
           <Suspense fallback={<></>}>
             <ItemActionBar
@@ -193,10 +239,13 @@ const VoterPositionEntryAndDisplay = (props) => {
             />
           </Suspense>
         </ItemActionBarContainer>
+        <SpeakerPositionLikesSourceWrapper>
+          <SpeakerEndorsedOrOpposedSnippet position={position} viewerIsPositionOwner />
+        </SpeakerPositionLikesSourceWrapper>
       </CommentContainerWrapper>
-    </PositionBlockWrapper>
+    </VoterPositionContainer>
   );
-  OpinionBlock.propTypes = {
+  VoterPositionBlock.propTypes = {
     onClick: PropTypes.func.isRequired,
   };
 
@@ -214,7 +263,7 @@ const VoterPositionEntryAndDisplay = (props) => {
     </p>
   );
 
-  const textFieldJSX = (
+  const textFieldJSXForEditModal = (
     <TextFieldWrapper>
       <TextFieldForm
         className={classes.formStyles}
@@ -222,11 +271,8 @@ const VoterPositionEntryAndDisplay = (props) => {
         onFocus={onFocusInput}
         onSubmit={savePosition}
       >
-        <UserInfoWrapper>
-          <VoterAvatarImg
-            alt=""
-            src={voterPhotoUrlMedium || avatarGeneric()}
-          />
+        <VoterAvatarDisplayContainer>
+          <VoterAvatarBlock />
           <EditIcon
             onClick={handleEditModalOpen}
             className={classes.styledEditIcon}
@@ -251,7 +297,7 @@ const VoterPositionEntryAndDisplay = (props) => {
               </div>
             </Tooltip>
           </UserInfoText>
-        </UserInfoWrapper>
+        </VoterAvatarDisplayContainer>
         <RadioGroup
           row
           value={selectedStance}
@@ -310,7 +356,7 @@ const VoterPositionEntryAndDisplay = (props) => {
       <ModalDisplayTemplateB
         dialogTitleJSX={<>{dialogTitleText}</>}
         show={showModal}
-        textFieldJSX={textFieldJSX}
+        textFieldJSX={textFieldJSXForEditModal}
         toggleModal={toggleModalLocal}
       />
       {isEditModalOpen && (
@@ -319,7 +365,7 @@ const VoterPositionEntryAndDisplay = (props) => {
           toggleModal={handleEditModalClose}
         />
       )}
-      <OpinionBlock
+      <VoterPositionBlock
         onClick={openPositionModal}
         politicianWeVoteId={politicianWeVoteId}
         voterPhotoUrlMedium={voterPhotoUrlMedium}
@@ -338,9 +384,58 @@ const CommentContainerWrapper = styled('div')`
   width: 100%;
 `;
 
+const SpeakerPositionLikesSourceWrapper = styled('div')`
+  display: flex;
+  justify-content: space-between;
+`;
+
 const ItemActionBarContainer = styled('div')`
   display: inline-block;
   margin-top: 6px;
+`;
+
+const VoterAvatar = styled('div')`
+  height: 43px;
+  width: 43px;
+  border-radius: 50%;
+  background-color: ${DesignTokenColors.info600};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const VoterFirstName = styled('p')`
+  color: ${DesignTokenColors.whiteUI};
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+`;
+
+const VoterLastName = styled('p')`
+  color: ${DesignTokenColors.whiteUI};
+  margin-bottom: -4px;
+  padding: 0;
+  font-size: 11px;
+`;
+
+const VoterImage = styled('img')`
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+`;
+
+export const VoterAvatarDisplayContainer = styled('div')`
+  display: flex;
+`;
+
+export const VoterPositionContainer = styled.div`
+  align-items: flex-start;
+  background-color: ${DesignTokenColors.caution50};
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 26px 0;
+  padding: 6px;
 `;
 
 export default withStyles(templateBStyles)(VoterPositionEntryAndDisplay);
