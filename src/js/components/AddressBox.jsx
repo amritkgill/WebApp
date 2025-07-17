@@ -2,6 +2,7 @@ import { Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import parser from 'parse-address';
 import BallotActions from '../actions/BallotActions';
 import VoterActions from '../actions/VoterActions';
 import DelayedLoad from '../common/components/Widgets/DelayedLoad';
@@ -13,6 +14,8 @@ import { renderLog } from '../common/utils/logging';
 import BallotStore from '../stores/BallotStore';
 import VoterStore from '../stores/VoterStore';
 import GoogleAutoComplete from './Widgets/GoogleAutoComplete';
+import lookupPageNameAndPageTypeDict from './../utils/lookupPageNameAndPageTypeDict';
+import TagManager from 'react-gtm-module';
 
 class AddressBox extends Component {
   constructor (props) {
@@ -105,6 +108,8 @@ class AddressBox extends Component {
   }
 
   voterAddressSaveSubmit = (event) => {
+    console.log('Save button clicked');
+//     console.log('Passed buttonId:', buttonId);
     event.preventDefault();
     const { textForMapSearch } = this.state;
     // console.log('AddressBox voterAddressSaveSubmit, textForMapSearch:', textForMapSearch);
@@ -112,6 +117,52 @@ class AddressBox extends Component {
     if (textForMapSearch && textForMapSearch !== '') {
       ballotCaveat = `Saving new address '${textForMapSearch}'...`;
     }
+    const { location: { pathname: currentPathname } } = window;
+    const page = lookupPageNameAndPageTypeDict(currentPathname);
+    const address = textForMapSearch;
+
+    let city = '';
+    let region = '';
+    let zip = '';
+
+    if (address) {
+      const parsedAddress = parser.parseLocation(address);
+      if (parsedAddress) {
+        city = parsedAddress.city || '';
+        region = parsedAddress.state || '';
+        zip = parsedAddress.zip || '';
+      }
+    }
+
+    const { buttonId = 'addressBoxModalSaveButton' } = this.props;
+    console.log('Passed buttonId:', buttonId);
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'openModal',
+        buttonId,
+      },
+      event: 'action',
+      userDetails: {
+        stateCode: VoterStore.getVoterStateCode(),
+        userCohort: VoterStore.getAnalyticsUserCohort(),
+        voterWeVoteId: VoterStore.getVoterWeVoteId(),
+      },
+      pageDetails: {
+        pageName: page.pageName,
+        pageType: page.pageType,
+        pathname: currentPathname,
+      },
+      electionDetails: {
+        electionGeo: {
+          city,
+          region,
+          zip,
+        },
+      },
+    };
+    console.log('dataLayerObject:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
     BallotActions.setBallotCaveat(ballotCaveat);
     VoterActions.clearVoterElectionId();
     VoterActions.voterAddressSave(textForMapSearch);
