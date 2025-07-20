@@ -7,7 +7,7 @@ import { isCordova } from '../../common/utils/isCordovaOrWebApp';
 import { renderLog } from '../../common/utils/logging';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import VoterStore from '../../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 
 export default class FAQ extends Component {
   constructor (props) {
@@ -26,17 +26,10 @@ export default class FAQ extends Component {
     const { dataLayerFired } = this.state;
     const voter = VoterStore.getVoter();
     if (!dataLayerFired && voter && voter.we_vote_id) {
-      const { pathname: currentPathname } = window.location;
-      const currentPage = lookupPageNameAndPageTypeDict(currentPathname);
-
       TagManager.dataLayer({
         dataLayer: {
           event: 'landing',
-          pageDetails: {
-            pageName: currentPage.pageName,
-            pageType: currentPage.pageType,
-            pathname: currentPathname,
-          },
+          pageDetails: getPageDetails(),
           userDetails: VoterStore.getAnalyticsUserDetails(),
         },
       });
