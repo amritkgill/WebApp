@@ -13,8 +13,9 @@ import Cookies from '../common/utils/js-cookie/Cookies';
 import { renderLog } from '../common/utils/logging';
 import BallotStore from '../stores/BallotStore';
 import VoterStore from '../stores/VoterStore';
-import GoogleAutoComplete from './Widgets/GoogleAutoComplete';
 import lookupPageNameAndPageTypeDict from './../utils/lookupPageNameAndPageTypeDict';
+import { getPageDetails } from '../utils/lookupPageNameAndPageTypeDict';
+import GoogleAutoComplete from './Widgets/GoogleAutoComplete';
 import TagManager from 'react-gtm-module';
 
 class AddressBox extends Component {
@@ -141,16 +142,8 @@ class AddressBox extends Component {
         buttonId,
       },
       event: 'action',
-      userDetails: {
-        stateCode: VoterStore.getVoterStateCode(),
-        userCohort: VoterStore.getAnalyticsUserCohort(),
-        voterWeVoteId: VoterStore.getVoterWeVoteId(),
-      },
-      pageDetails: {
-        pageName: page.pageName,
-        pageType: page.pageType,
-        pathname: currentPathname,
-      },
+      pageDetails: getPageDetails(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
       electionDetails: {
         electionGeo: {
           city,
@@ -159,7 +152,7 @@ class AddressBox extends Component {
         },
       },
     };
-    // console.log('dataLayerObject:', dataLayerObject);
+    //console.log('dataLayerObject:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     BallotActions.setBallotCaveat(ballotCaveat);
