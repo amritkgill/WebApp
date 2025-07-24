@@ -213,7 +213,7 @@ class FilterBaseSearch extends Component {
     // if (opinionsAndBallotItemsSearchMode) {
     // Reach out to API server to get more Organizations or Ballot items.
     if (!searchTextAlreadyRetrieved.includes(searchText)) {
-      this.sendSearchEvent(searchText);
+      this.sendSearchDataLayer(searchText);
       OrganizationActions.organizationSearch(searchText);
       BallotActions.ballotItemOptionsRetrieve('', searchText);
       searchTextAlreadyRetrieved.push(searchText);
@@ -229,7 +229,7 @@ class FilterBaseSearch extends Component {
     }
   }
 
-  sendSearchEvent (searchText) {
+  sendSearchDataLayer (searchText) {
     const dataLayerObject = {
       actionDetails: {
         actionType: 'search',
