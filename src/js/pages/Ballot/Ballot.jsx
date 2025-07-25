@@ -1391,19 +1391,19 @@ class Ballot extends Component {
                       <BallotBottomWrapper scrolledDown={scrolledDown}>
                         { textForMapSearch || ballotWithItemsFromCompletionFilterType.length > 0 ? (
                           <div className="ballot__filter__container">
-                            {/* { showBallotDecisionsTabs() && ( */}
-                            {/*  <> */}
-                            {/*    <div className="ballot__filter d-print-none"> */}
-                            {/*      <BallotDecisionsTabs */}
-                            {/*        completionLevelFilterType={BallotStore.cleanCompletionLevelFilterType(completionLevelFilterType)} */}
-                            {/*        ballotLength={BallotStore.ballotLength} */}
-                            {/*        ballotLengthRemaining={BallotStore.ballotRemainingChoicesLength} */}
-                            {/*        setBallotItemFilterTypeToAll={this.setBallotItemFilterTypeToAll} */}
-                            {/*      /> */}
-                            {/*    </div> */}
-                            {/*    <hr className="ballot-header-divider" /> */}
-                            {/*  </> */}
-                            {/* )} */}
+                            { showBallotDecisionsTabs() && (
+                              <>
+                                <div className="ballot__filter d-print-none">
+                                  <BallotDecisionsTabs
+                                    completionLevelFilterType={BallotStore.cleanCompletionLevelFilterType(completionLevelFilterType)}
+                                    ballotLength={BallotStore.ballotLength}
+                                    ballotLengthRemaining={BallotStore.ballotRemainingChoicesLength}
+                                    setBallotItemFilterTypeToAll={this.setBallotItemFilterTypeToAll}
+                                  />
+                                </div>
+                                <hr className="ballot-header-divider" />
+                              </>
+                            )}
                             <BallotFilterRow id="BallotFilterRow"/* showFilterTabs={showFilterTabs} */>
                               <BallotFilterTabs ref={(chips) => { this.chipContainer = chips; }}>
                                 { ballotWithItemsFromCompletionFilterType.length ? (
