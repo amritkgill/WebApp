@@ -146,17 +146,12 @@ export default class OrganizationVoterGuide extends Component {
       
       TagManager.dataLayer({
         dataLayer: {
+          actionDetails: {
+            actionType: 'landing',
+          },
           event: 'landing',
-          pageDetails: {
-            pageName: currentPage.pageName,
-            pageType: currentPage.pageType,
-            pathname,
-          },
-          userDetails: {
-            stateCode: VoterStore.getVoterStateCode(),
-            userCohort: VoterStore.getAnalyticsUserCohort(),
-            voterWeVoteId: VoterStore.getVoterWeVoteId(),
-          },
+          pageDetails: getPageDetails(),
+          userDetails: VoterStore.getAnalyticsUserDetails(),
         },
       });
       
