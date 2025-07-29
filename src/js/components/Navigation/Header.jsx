@@ -227,7 +227,8 @@ export default class Header extends Component {
       <EditBanner>
         <BannerText>
           Review your candidate’s profile for accuracy or add more info.
-          <TipsLink href="/more/tips-for-strong-profiles" target="_blank" rel="noopener noreferrer">
+          <TipsLink href="tips-for-strong-profiles" target="_blank" rel="noopener noreferrer">
+            {/* TODO link for Tips for strong profiles */}
             Tips for strong profiles
           </TipsLink>
           <EditButton onClick={() => window.open(updateCandidateInformationLink, '_blank')}>
