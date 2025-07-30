@@ -18,6 +18,7 @@ import { SearchTitle } from '../../common/components/Style/FilterStyles';
 import LoadingWheelComp from '../../common/components/Widgets/LoadingWheelComp';
 import SnackNotifier, { openSnackbar } from '../../common/components/Widgets/SnackNotifier';
 import AppObservableStore, { messageService } from '../../common/stores/AppObservableStore';
+import CampaignStore from '../../common/stores/CampaignStore';
 import apiCalming from '../../common/utils/apiCalming';
 import { chipLabelText, isAndroidSizeWide, isIOSAppOnMac, isIPad11in, isIPadGiantSize, isIPadMini, isIPhone6p1in } from '../../common/utils/cordovaUtils';
 import getBooleanValue from '../../common/utils/getBooleanValue';
@@ -31,10 +32,11 @@ import BallotStatusMessage from '../../components/Ballot/BallotStatusMessage';
 import BallotTitleHeader from '../../components/Ballot/BallotTitleHeader';
 import BallotDecisionsTabs from '../../components/Navigation/BallotDecisionsTabs';
 import BallotShowAllItemsFooter from '../../components/Navigation/BallotShowAllItemsFooter';
+import { ballotWrapperBodyStyles } from '../../components/Style/BallotTitleHeaderStyles';
 import { DualHeaderContainer, HeaderContentContainer, HeaderContentOuterContainer, PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
+import CordovaPageConstants from '../../constants/CordovaPageConstants';
 import BallotStore from '../../stores/BallotStore';
-import CampaignStore from '../../common/stores/CampaignStore';
 import ElectionStore from '../../stores/ElectionStore';
 import IssueStore from '../../stores/IssueStore';
 import SupportStore from '../../stores/SupportStore';
@@ -44,6 +46,7 @@ import VoterStore from '../../stores/VoterStore';
 import { dumpCssFromId } from '../../utils/appleSiliconUtils';
 import { headroomWrapperOffset, setBallotDualHeaderContentContainerTopOffset } from '../../utils/cordovaCalculatedOffsets';
 import { getPageKey } from '../../utils/cordovaPageUtils';
+import { pageEnumeration } from '../../utils/cordovaUtilsPageEnumeration';
 import isMobile from '../../utils/isMobile';
 // Lint is not smart enough to know that lazyPreloadPages will not attempt to preload/reload this page
 // eslint-disable-next-line import/no-cycle
@@ -1110,25 +1113,8 @@ class Ballot extends Component {
   }
 
   marginTopOffset () {
-    const { scrolledDown } = this.state;
-    // if (isIOSAppOnMac()) {
-    //   return '44px';
-    // } else if (isIPad()) {
-    //   return '12px';
-    // } else if (isIOS()) {
-    //   return '85px';
-    // } else if (isWebApp() && isMobileScreenSize()) {
-    //   if (scrolledDown) {
-    //     return '54px';
-    //   } else {
-    //     return '64px';
-    //   }
     if (isWebApp()) {
-      if (scrolledDown) {
-        return '64px';
-      } else {
-        return '110px';
-      }
+      return '50px';
     } else if (isCordova()) {
       // Calculated approach Nov 2022
       const offset = `${headroomWrapperOffset(true)}px`;
@@ -1214,27 +1200,6 @@ class Ballot extends Component {
     }
 
     const twoColumnDisplay = isIOSAppOnMac() || isIPadGiantSize();
-    // Undo the breakpoints/media queries
-    // const leftTwoColumnDisplay = twoColumnDisplay ? {
-    //   flex: '0 0 75%',
-    //   maxWidth: '75%',
-    //   position: 'relative',
-    //   // width: '100%',
-    //   paddingRight: '15px',
-    //   paddingLeft: '15px',
-    // } : {};
-
-    // Undo the breakpoints/media queries
-    // const rightTwoColumnDisplay = twoColumnDisplay ? {
-    //   display: 'block !important',
-    //   flex: '0 0 25%',
-    //   maxWidth: '25%',
-    //   position: 'relative',
-    //   // width: '100%',
-    //   paddingRight: '15px',
-    //   paddingLeft: '15px',
-    // } : {};
-
     if (!ballotWithItemsFromCompletionFilterType) {
       return (
         <Suspense fallback={<></>}>
@@ -1267,8 +1232,6 @@ class Ballot extends Component {
 
     // const voterAddressMissing = this.state.location === null;
 
-    // const ballot_caveat = BallotStore.ballotProperties.ballot_caveat; // ballotProperties might be undefined
-    // const ballotCaveat = BallotStore.getBallotCaveat() || '';
     const sourcePollingLocationWeVoteId = BallotStore.currentBallotPollingLocationSource;
     const ballotReturnedAdminEditUrl = `${webAppConfig.WE_VOTE_SERVER_ROOT_URL}b/${sourcePollingLocationWeVoteId}/list_edit_by_polling_location/?google_civic_election_id=${VoterStore.electionId()}&state_code=`;
     // console.log('electionName: ', electionName, ', electionDayText: ', electionDayText);
@@ -1421,7 +1384,6 @@ class Ballot extends Component {
                       <header className="ballot__header__group">
                         <BallotTitleHeaderContainer marginTopOffset={this.marginTopOffset()}>
                           <BallotTitleHeader
-                            electionDateBelow
                             showShareButton
                             toggleSelectBallotModal={this.toggleSelectBallotModal}
                           />
@@ -1560,7 +1522,7 @@ class Ballot extends Component {
             <div className="container-fluid">
               <BallotWrapper padTop={paddingTop} padBottom={padBallotWindowBottomForCordova} id="ballotWrapper">
                 {/* eslint-disable-next-line no-nested-ternary */}
-                <div className={showBallotDecisionsTabs() ? 'row ballot__body' : isWebApp() || twoColumnDisplay ? 'row ballot__body__no-decision-tabs' : undefined}>
+                <BallotWrapperBody id="BallotWrapperBody" style={ballotWrapperBodyStyles()}>
                   <div className="col-12">
                     {showCompleteYourProfile && (
                       <CompleteYourProfileWrapper>
@@ -1655,6 +1617,7 @@ class Ballot extends Component {
                                         isMeasure={item.kind_of_ballot_item === TYPES.MEASURE}
                                         primaryParty={item.primary_party}
                                         totalNumberOfBallotItems={totalNumberOfBallotItems}
+                                        useHelpDefeatOrHelpWin
                                         weVoteId={item.we_vote_id}
                                         key={key}
                                       />
@@ -1713,7 +1676,7 @@ class Ballot extends Component {
                       </span>
                     ) : null}
                   </BallotOverflowWrapper>
-                </div>
+                </BallotWrapperBody>
               </BallotWrapper>
             </div>
           </PageContentContainer>
@@ -1803,18 +1766,21 @@ const styles = (theme) => ({
   },
 });
 
-/* eslint-disable no-nested-ternary */
+/* eslint-disable arrow-body-style, no-nested-ternary */
 const BallotBottomWrapper = styled('div', {
   shouldForwardProp: (prop) => !['scrolledDown'].includes(prop),
-})(({ scrolledDown, theme }) => (`
-  ${isWebApp() ? (scrolledDown || showBallotDecisionsTabs() ? 'margin-top: 4px;' : 'margin-top: 38px;') : ''}
-  ${showBallotDecisionsTabs() ? '' : ''}
-  ${isWebApp() ? 'transition: all 150ms ease-in;' : ''}
-  width: 100%;
-  ${theme.breakpoints.down('sm') && isWebApp()} {
-    ${isWebApp() ? (scrolledDown ? 'margin-top: 10px;' : 'margin-top: 20px;') : ''}
-  }
-`));
+})(({ scrolledDown, theme }) => {
+  return (`
+    ${isWebApp() ? (scrolledDown || showBallotDecisionsTabs() ? 'margin-top: 12px;' : 'margin-top: 38px;') : ''}
+    ${showBallotDecisionsTabs() ? '' : ''}
+    ${isWebApp() ? 'transition: all 150ms ease-in;' : ''}
+    width: 100%;
+    ${theme.breakpoints.down('sm') && isWebApp()} {
+      ${isWebApp() ? (scrolledDown ? 'margin-top: 10px;' : 'margin-top: 20px;') : ''}
+    }
+    ${(isCordova() && pageEnumeration() === CordovaPageConstants.ballotSmHdrWild) ? 'padding-top: 20px' : ''}
+  `);
+});
 
 const BallotOverflowWrapper = styled('div')`
   overflow-x: hidden;
@@ -1927,5 +1893,8 @@ const BallotWrapper = styled('div', {
   padding-top: ${padTop};
   padding-bottom: ${padBottom};
 `));
+
+export const BallotWrapperBody = styled('div')`
+`;
 
 export default withTheme(withStyles(styles)(Ballot));

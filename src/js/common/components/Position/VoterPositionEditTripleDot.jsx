@@ -8,7 +8,7 @@ import Popover from '@mui/material/Popover';
 import DesignTokenColors from '../Style/DesignTokenColors';
 
 
-const VoterPositionEditTripleDot = ({ triggerEditOpinion }) => {
+const VoterPositionEditTripleDot = ({ triggerDeleteOpinion, triggerEditOpinion }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const onDotButtonClick = (e) => {
@@ -19,7 +19,10 @@ const VoterPositionEditTripleDot = ({ triggerEditOpinion }) => {
     setAnchorEl(null);
   };
 
-  const openDeleteConfirmation = () => {
+  const triggerDeleteOpinionModeLocal = () => {
+    if (triggerDeleteOpinion) {
+      triggerDeleteOpinion();
+    }
   };
 
   const triggerEditOpinionModeLocal = () => {
@@ -29,7 +32,6 @@ const VoterPositionEditTripleDot = ({ triggerEditOpinion }) => {
   };
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
-  const hideDeleteOption = true; // Hide delete option for now until we can get a confirmation modal created
 
   return (
     <PrimaryDetails>
@@ -58,14 +60,12 @@ const VoterPositionEditTripleDot = ({ triggerEditOpinion }) => {
                 Edit opinion
               </StyledTypography>
             </PopoverNameAndMessageText>
-            {hideDeleteOption ? null : (
-              <PopoverViewDetailsText>
-                <StyledTypography onClick={openDeleteConfirmation}>
-                  <DeleteOutlined style={{ fontSize: '14px', cursor: 'pointer', marginRight: '4px' }} />
-                  Delete opinion
-                </StyledTypography>
-              </PopoverViewDetailsText>
-            )}
+            <PopoverViewDetailsText>
+              <StyledTypography onClick={triggerDeleteOpinionModeLocal}>
+                <DeleteOutlined style={{ fontSize: '14px', cursor: 'pointer', marginRight: '4px' }} />
+                Delete opinion
+              </StyledTypography>
+            </PopoverViewDetailsText>
           </PopoverWrapper>
         </Popover>
       </EditInviteeTripleDotWrapper>
@@ -74,6 +74,7 @@ const VoterPositionEditTripleDot = ({ triggerEditOpinion }) => {
 };
 
 VoterPositionEditTripleDot.propTypes = {
+  triggerDeleteOpinion: PropTypes.func,
   triggerEditOpinion: PropTypes.func,
 };
 

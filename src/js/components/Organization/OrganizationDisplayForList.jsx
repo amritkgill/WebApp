@@ -106,23 +106,22 @@ class OrganizationDisplayForList extends Component {
     });
   }
 
-  sendEndorserClickEvent (buttonId) {
-    const { twitterHandle } = this.state;
+  sendEndorserClickEvent (buttonId, destinationPathname, endorserName) {
     const { organizationWeVoteId } = this.props;
-    const destinationPathname = twitterHandle ? `/${twitterHandle}` : `/voterguide/${organizationWeVoteId}`;
     const { pageName: destinationPageName, pageType: destinationPageType } = lookupPageNameAndPageTypeDict(destinationPathname);
 
     const dataLayerObject = {
       actionDetails: {
         actionType: 'navigate',
         buttonId,
+        endorserName,
+        organizationWeVoteId,
       },
       event: 'action',
       destinationDetails: {
         destinationPageName,
         destinationPageType,
         destinationPathname,
-
       },
       pageDetails: getPageDetails(),
       userDetails: VoterStore.getAnalyticsUserDetails(),
@@ -214,19 +213,21 @@ class OrganizationDisplayForList extends Component {
       <OrganizationDisplayForListWrapper>
         <OrganizationDetailsWrapper>
           <OrganizationLogoWrapper>
-            <Link id="organizationDisplayLogo"
-            to={voterGuideLink}
-            className="u-no-underline"
-            onClick={() => this.sendEndorserClickEvent(organizationName)}
+            <Link
+              id="organizationDisplayLogo"
+              to={voterGuideLink}
+              className="u-no-underline"
+              onClick={() => this.sendEndorserClickEvent('organizationDisplayLogo', voterGuideLink, organizationName)}
             >
               {organizationLogo}
             </Link>
           </OrganizationLogoWrapper>
           <div>
             <NameAndTwitter>
-              <Link id="organizationDisplayName"
-              to={voterGuideLink}
-              onClick={() => this.sendEndorserClickEvent(organizationName)}
+              <Link
+                id="organizationDisplayName"
+                to={voterGuideLink}
+                onClick={() => this.sendEndorserClickEvent('organizationDisplayLogo', voterGuideLink, organizationName)}
               >
                 <OrganizationName>{organizationName}</OrganizationName>
               </Link>

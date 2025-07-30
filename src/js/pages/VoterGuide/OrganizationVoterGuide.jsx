@@ -141,23 +141,18 @@ export default class OrganizationVoterGuide extends Component {
   componentDidUpdate (prevProps) {
     const { dataLayerFired } = this.state;
     if (!dataLayerFired && VoterStore.voterFirstRetrieveCompleted()) {
-      const { location: { pathname } } = this.props;
-      const currentPage = getPageDetails();
-      
-      TagManager.dataLayer({
-        dataLayer: {
-          actionDetails: {
-            actionType: 'landing',
-          },
-          event: 'landing',
-          pageDetails: getPageDetails(),
-          userDetails: VoterStore.getAnalyticsUserDetails(),
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'landing',
         },
-      });
-      
+        event: 'landing',
+        pageDetails: getPageDetails(),
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
       this.setState({ dataLayerFired: true });
     }
-    
+
     // When a new organization is passed in, update this component to show the new data
     if (prevProps.match.params !== this.props.match.params) {
       const nextParams = this.props.match.params;

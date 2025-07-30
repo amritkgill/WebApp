@@ -136,7 +136,7 @@ class BallotScrollingContainer extends Component {
 
   // Add data-modal-trigger attribute to elements that should be triggered
   handleContainerClick = (e, weVoteId, buttonId) => {
-    const target = e.target;
+    const { target } = e;
     if (target.hasAttribute('data-modal-trigger')) {
       this.onClickShowOrganizationModalWithBallotItemInfoAndPositions(weVoteId, buttonId);
     }

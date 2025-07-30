@@ -8,6 +8,19 @@ import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import initializejQuery from '../../common/utils/initializejQuery';
 
+/*
+GoogleAutoComplete does not work on the iOS simulators, but does work on a usb tethered physical phone
+
+Google cloud console http referrers (Website)
+https://console.cloud.google.com/apis/credentials/key/db...45?inv=1&invt=Ab27OA&project=wevoteapps
+(If you turn them off temporarily, the list is erased, so here it is...)
+*/
+// app://localhost/index.html
+// file_url//android_asset/www/index.html#/
+// https://*.wevote.us/
+// https://wevotedeveloper.com:3000
+
+
 function GoogleAutoComplete (props) {
   renderLog('GoogleAutoComplete  functional component');
   // const [textForMapSearch, setTextForMapSearch] = useState('');

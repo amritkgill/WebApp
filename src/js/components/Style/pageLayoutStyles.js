@@ -54,7 +54,7 @@ function getPaddingTop () {
       return '';
     }
   }
-  return cordovaScrollablePaneTopPadding();  // 5/14/22 TODO: Refactor this...  Funny that this is no longer used for Cordova, only for the WebApp
+  return cordovaScrollablePaneTopPadding();  // 7/19/25 This is called elsewhere for cordova.  5/14/22 TODO: Refactor this...  Funny that this is no longer used for Cordova, only for the WebApp
 }
 
 function getPaddingBottom () {

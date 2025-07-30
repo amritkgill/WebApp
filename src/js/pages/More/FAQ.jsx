@@ -63,4 +63,3 @@ const ContainerFluidWrapper = styled('div')(({ theme }) => (`
     margin: 0 0 8px 0;
   }
 `));
-

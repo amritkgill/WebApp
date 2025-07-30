@@ -132,8 +132,8 @@ function calculatePageNameAndPageTypeDict (path) {
     settingsPageName = 'IssuePage';
     settingsPageType = 'issue';
   } else if (/^\/[^/\s]+$/.test(path)) {
-    settingsPageName = 'TwitterHandleLanding';
-    settingsPageType = 'endorser';  // Changed from 'twitterHandleLanding' to 'endorser'
+    settingsPageName = 'OrganizationVoterGuide';
+    settingsPageType = 'endorser';
   }
 
   return {

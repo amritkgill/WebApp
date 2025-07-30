@@ -19,6 +19,8 @@ import cordovaTopHeaderTopMargin from '../../utils/cordovaTopHeaderTopMargin';
 import { HeadroomWrapper } from '../Style/pageLayoutStyles';
 import IPhoneSpacer from '../Widgets/IPhoneSpacer';
 import HeaderBar from './HeaderBar';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+
 
 const ActivityTidbitDrawer = React.lazy(() => import(/* webpackChunkName: 'ActivityTidbitDrawer' */ '../Activity/ActivityTidbitDrawer'));
 const HeaderBackTo = React.lazy(() => import(/* webpackChunkName: 'HeaderBackTo' */ './HeaderBackTo'));
@@ -42,6 +44,7 @@ export default class Header extends Component {
       organizationModalHidePositions: false,
       sharedItemCode: '',
       showHowItWorksModal: false,
+      showEditCandidateBar: AppObservableStore.getShowEditCandidateBar(),
       showVoterPlanModal: false,
       showOrganizationModal: false,
       showPositionDrawer: false,
@@ -54,6 +57,7 @@ export default class Header extends Component {
     this.closeSharedItemModal = this.closeSharedItemModal.bind(this);
     this.handleResizeLocal = this.handleResizeLocal.bind(this);
     // this.storeSub = null;
+    this.closeEditBar = this.closeEditBar.bind(this);
   }
 
   componentDidMount () {
@@ -147,6 +151,7 @@ export default class Header extends Component {
       showOrganizationModal: AppObservableStore.showOrganizationModal(),
       showPositionDrawer: AppObservableStore.showPositionDrawer(),
       showSharedItemModal: AppObservableStore.showSharedItemModal(),
+      showEditCandidateBar: AppObservableStore.getShowEditCandidateBar(),
     });
   }
 
@@ -203,18 +208,38 @@ export default class Header extends Component {
     );
   }
 
+  closeEditBar () {
+    AppObservableStore.setShowEditCandidateBar(false);
+  }
 
   render () {
     renderLog('Header');  // Set LOG_RENDER_EVENTS to log all renders
+    const { showEditCandidateBar } = this.state;
 
     if (this.hideHeader()) {
       renderLog('Header hidden');
       return null;
     }
-
+    const updateCandidateInformationLink = 'https://docs.google.com/forms/d/e/1FAIpQLSePdeW32PClaSO1pUWBJnQ75wFGPOtviNaqOABBYps7NIH3hA/viewform?usp=sf_link';
+    const pathname = normalizedHref();
+    const isCandidatePage = /^\/[-a-z0-9]+\/-\/?$/.test(pathname);
+    const editBannerComponent = (showEditCandidateBar && isCandidatePage) && (
+      <EditBanner>
+        <BannerText>
+          Review your candidate’s profile for accuracy or add more info.
+          <TipsLink href="tips-for-strong-profiles" target="_blank" rel="noopener noreferrer">
+            {/* TODO link for Tips for strong profiles */}
+            Tips for strong profiles
+          </TipsLink>
+          <EditButton onClick={() => window.open(updateCandidateInformationLink, '_blank')}>
+            ✎ Make profile edits
+          </EditButton>
+        </BannerText>
+        <CloseButton onClick={this.closeEditBar}>✕</CloseButton>
+      </EditBanner>
+    );
     const { hideHeader, params } = this.props;
     // console.log('Header global.weVoteGlobalHistory', global.weVoteGlobalHistory);
-    const pathname = normalizedHref();
     const {
       activityTidbitWeVoteIdForDrawer, organizationModalHideBallotItemInfo, organizationModalHidePositions, organizationModalBallotItemWeVoteId,
       positionDrawerBallotItemWeVoteId, positionDrawerOrganizationWeVoteId,
@@ -505,6 +530,11 @@ export default class Header extends Component {
           <IPhoneSpacer />
           <HeadroomWrapper id="hw4">
             <div className={pageHeaderClasses} style={cordovaTopHeaderTopMargin()} id="header-container">
+              {showEditCandidateBar && (
+                <EditBannerWrapper>
+                  {editBannerComponent}
+                </EditBannerWrapper>
+              )}
               {(headerNotVisible || hideHeader) ? (
                 <>
                   <Suspense fallback={<></>}>
@@ -599,3 +629,67 @@ const BackToSettingsMobileDesktopSpan = styled('span')`
   ${() => (!isMobileScreenSize() || isTablet() ? '' : 'display: none;')};
 `;
 
+const BannerText = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  color: ${DesignTokenColors.whiteUI};
+  cursor: pointer;
+  font-size: 20px;
+  position: relative;
+
+  @media (max-width: 600px) {
+    order: 2;
+    margin-left: 8px;
+    top: auto;
+    right: auto;
+  }
+`;
+
+const EditBanner = styled.div`
+  align-items: center;
+  background: ${DesignTokenColors.secondary800};
+  color: ${DesignTokenColors.whiteUI};
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 14px;
+  justify-content: space-between;
+  padding: 12px 16px;
+`;
+const EditButton = styled.button`
+  background: ${DesignTokenColors.whiteUI};
+  border: none;
+  border-radius: 9999px;
+  color: ${DesignTokenColors.secondary800};
+  cursor: pointer;
+  font-weight: 500;
+  padding: 6px 14px;
+  white-space: nowrap;
+
+  @media (max-width: 800px) {
+    margin-top: 8px;
+  }
+    @media (max-width: 600px) {
+    width: auto;
+    order: 1;
+  }
+`;
+const EditBannerWrapper = styled.div`
+  position: relative;
+`;
+
+const TipsLink = styled.a`
+  color: #b0d9ff;
+  margin-left: 6px;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`;

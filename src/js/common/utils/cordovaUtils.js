@@ -1,7 +1,7 @@
 import React from 'react';
 import webAppConfig from '../../config';
 import { isAndroid, isAndroidTablet, isCordova, isWebApp } from './isCordovaOrWebApp';
-import { cordovaOffsetLog, oAuthLog } from './logging';
+import { cordovaKeyboardHidingLog, cordovaOffsetLog, oAuthLog } from './logging';
 
 /* global $  */
 
@@ -662,7 +662,7 @@ export function prepareForCordovaKeyboard (callerString) {
     } catch (e) {
       console.log('error in prepareForCordovaKeyboard', e);
     }
-    cordovaOffsetLog(`prepareForCordovaKeyboard ^^^^^^^^^^ ${fileName}`);
+    cordovaKeyboardHidingLog(`prepareForCordovaKeyboard ^^^^^^^^^^ ${fileName}`);
 
     $('#app').removeClass('app-wrapper').addClass('app-wrapper__cordova');
     $('body').css('height', '');
@@ -682,7 +682,7 @@ export function restoreStylesAfterCordovaKeyboard (callerString) {
     } catch (e) {
       console.log('error in restoreStylesAfterCordovaKeyboard', e);
     }
-    cordovaOffsetLog(`restoreStylesAfterCordovaKeyboard vvvvvvvvvv ${fileName}`);
+    cordovaKeyboardHidingLog(`restoreStylesAfterCordovaKeyboard vvvvvvvvvv ${fileName}`);
 
     $('#app').removeClass('app-wrapper__cordova').addClass('app-wrapper');
     $('body').css('height', getCordovaScreenHeight());

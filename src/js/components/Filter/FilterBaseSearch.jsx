@@ -2,6 +2,7 @@ import { Close, Search } from '@mui/icons-material';
 import { IconButton, InputBase } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import withTheme from '@mui/styles/withTheme';
+import TagManager from 'react-gtm-module';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
@@ -15,6 +16,8 @@ import ballotSearchPriority from '../../utils/ballotSearchPriority';
 import opinionsAndBallotItemsSearchPriority from '../../utils/opinionsAndBallotItemsSearchPriority';
 import positionSearchPriority from '../../utils/positionSearchPriority';
 import voterGuidePositionSearchPriority from '../../utils/voterGuidePositionSearchPriority';
+import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
+import VoterStore from '../../stores/VoterStore';
 
 const delayBeforeSearchExecution = 600;
 
@@ -204,18 +207,19 @@ class FilterBaseSearch extends Component {
   }
 
   searchNewItems = (searchText) => {
-    const { opinionsAndBallotItemsSearchMode } = this.props;
+    // const { opinionsAndBallotItemsSearchMode } = this.props;
     const { searchTextAlreadyRetrieved } = this.state;
     // console.log('searchNewItems searchText:', searchText, ', searchTextAlreadyRetrieved:', searchTextAlreadyRetrieved);
-    if (opinionsAndBallotItemsSearchMode) {
-      // Reach out to API server to get more Organizations or Ballot items.
-      if (!searchTextAlreadyRetrieved.includes(searchText)) {
-        OrganizationActions.organizationSearch(searchText);
-        BallotActions.ballotItemOptionsRetrieve('', searchText);
-        searchTextAlreadyRetrieved.push(searchText);
-        this.setState({ searchTextAlreadyRetrieved });
-      }
+    // if (opinionsAndBallotItemsSearchMode) {
+    // Reach out to API server to get more Organizations or Ballot items.
+    if (!searchTextAlreadyRetrieved.includes(searchText)) {
+      this.sendSearchDataLayer(searchText);
+      OrganizationActions.organizationSearch(searchText);
+      BallotActions.ballotItemOptionsRetrieve('', searchText);
+      searchTextAlreadyRetrieved.push(searchText);
+      this.setState({ searchTextAlreadyRetrieved });
     }
+    // }
   }
 
   bigAndroidClick = (isSearching, alwaysOpen) => {
@@ -223,6 +227,19 @@ class FilterBaseSearch extends Component {
     if (isAndroid() && !isSearching && !alwaysOpen) {
       this.toggleSearch();
     }
+  }
+
+  sendSearchDataLayer (searchText) {
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'search',
+        searchKeyword: searchText,
+      },
+      event: 'action',
+      pageDetails: getPageDetails(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
   }
 
   render () {

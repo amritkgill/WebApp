@@ -7,6 +7,7 @@ import React, { Component, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import ChallengeInviteFriendsTopNavigation from '../../components/Navigation/ChallengeInviteFriendsTopNavigation';
 import DesignTokenColors from '../../components/Style/DesignTokenColors';
 import { PageContentContainer } from '../../../components/Style/pageLayoutStyles';
@@ -46,7 +47,6 @@ import ThanksForViewingChallenge from '../../components/Challenge/ThanksForViewi
 import ShareStore from '../../stores/ShareStore';
 import ChallengeHeaderSimple from '../../components/Navigation/ChallengeHeaderSimple';
 import { getPageDetails } from '../../../utils/lookupPageNameAndPageTypeDict';
-import TagManager from 'react-gtm-module';
 
 const ChallengeCardForList = React.lazy(() => import(/* webpackChunkName: 'ChallengeCardForList' */ '../../components/ChallengeListRoot/ChallengeCardForList'));
 // const ChallengeCommentsList = React.lazy(() => import(/* webpackChunkName: 'ChallengeCommentsList' */ '../../components/Challenge/ChallengeCommentsList'));

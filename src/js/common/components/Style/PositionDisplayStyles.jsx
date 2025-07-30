@@ -35,7 +35,7 @@ export const SpeakerStatementWrapper = styled('div')`
 
 export const VisibilityText = styled('div')`
   align-items: center;
-  color: ${DesignTokenColors.neutral700};
+  color: ${DesignTokenColors.neutral300};
   display: flex;
   font-weight: 250;
   font-size: 14px;

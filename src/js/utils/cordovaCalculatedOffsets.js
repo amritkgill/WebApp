@@ -141,10 +141,10 @@ export function cordovaComplexHeaderPageContainerTopOffset () {
     hrHeight = headroomWrapper.height();
     if (isAndroidSizeMD() || isAndroidSizeXL() || isAndroidSizeWide()) {
       try {
-        const rowBallotBody = $('div[class*=\'row ballot__body\']');
-        if (rowBallotBody.length) {
-          const padDigits = rowBallotBody.css('padding-top').replace('px', '');
-          hrHeight -= parseInt(padDigits);
+        const ballotWrapperBody = $('#BallotWrapperBody');
+        if (ballotWrapperBody.length) {
+          const padDigits = ballotWrapperBody.css('padding-top').replace('px', '');
+          hrHeight -= parseInt(padDigits) + 50;  // 50 to get more payload content between the menus on mobile devices
         }
       } catch (e) {
         console.error('It looks like the layout of the ballot has changed');
@@ -200,6 +200,8 @@ export function headroomWrapperOffset (includePosition, pageNameOverride = null)
       } else {
         offset /= 2;
       }
+    } else if (page === 'ballotSmHdrWild' && isCordova()) {
+      offset -= 20;
     }
 
     cordovaOffsetLog(`headroomWrapperOffset HeadroomWrapper outerHeight+top: ${outerHeight + position}, new offset: ${offset}, page: ${getPageKey()}`);

@@ -23,6 +23,7 @@ import VoterStore from '../../stores/VoterStore';
 import { getPageDetails } from '../../utils/lookupPageNameAndPageTypeDict';
 import ValuesList from './ValuesList';
 
+
 const DelayedLoad = React.lazy(() => import(/* webpackChunkName: 'DelayedLoad' */ '../../common/components/Widgets/DelayedLoad'));
 const IssueCard = React.lazy(() => import(/* webpackChunkName: 'IssueCard' */ '../../components/Values/IssueCard'));
 const OrganizationList = React.lazy(() => import(/* webpackChunkName: 'OrganizationList' */ '../../components/Organization/OrganizationList'));
@@ -44,6 +45,19 @@ class OneValue extends Component {
   }
 
   componentDidMount () {
+    if (VoterStore.voterFirstRetrieveCompleted()) {
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'landing',
+        },
+        event: 'landing',
+        pageDetails: getPageDetails(),
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+    }
+
     const { match: { params: { value_slug: valueSlug } } } = this.props;
     const issue = IssueStore.getIssueBySlug(valueSlug);
     const issueWeVoteId = issue.issue_we_vote_id;
@@ -75,18 +89,28 @@ class OneValue extends Component {
   componentDidUpdate (prevProps) {
     const { match: { params: prevParams } } = prevProps;
     const { match: { params: nextParams } } = this.props;
-    // console.log('prevParams:', prevParams, 'nextParams:', nextParams);
     const issue = IssueStore.getIssueBySlug(nextParams.value_slug);
     const issueWeVoteId = issue.issue_we_vote_id;
     if (issueWeVoteId) {
-      if (apiCalming(`issueOrganizationsRetrieve${issueWeVoteId}`, 3600000)) { // Only once per 60 minutes
+      if (apiCalming(`issueOrganizationsRetrieve${issueWeVoteId}`, 3600000)) {
         IssueActions.issueOrganizationsRetrieve(issueWeVoteId);
       }
     }
     if (prevParams.value_slug !== nextParams.value_slug) {
       this.onIssueStoreChange();
-      // this.onOrganizationStoreChange();
       window.scrollTo(0, 0);
+    }
+    if (!this.state.isDataLayerFired && this.state.voterDataRetrieved) {
+      const currentPageDetails = getPageDetails();
+      const userDetails = VoterStore.getAnalyticsUserDetails();
+      const dataLayerObject = {
+        actionDetails: { actionType: 'landing' },
+        event: 'landing',
+        pageDetails: currentPageDetails,
+        userDetails,
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+      this.setState({ isDataLayerFired: true });
     }
   }
 

@@ -559,6 +559,7 @@ const ShareButtonFooterWrapper = styled('div', {
   shouldForwardProp: (prop) => !['shareBottomValue'].includes(prop),
 })(({ shareBottomValue }) => (`
   position: fixed;
+  left: 0;
   width: 100%;
   bottom: ${shareBottomValue || '57px'};
   display: block;

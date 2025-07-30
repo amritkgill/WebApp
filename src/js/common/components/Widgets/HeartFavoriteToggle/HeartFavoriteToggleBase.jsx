@@ -213,7 +213,6 @@ class HeartFavoriteToggleBase extends Component {
           TagManager.dataLayer({ dataLayer: dataLayerObject });
         }
       });
-
     } else {
       // console.log('handleActionClick support: ', support, ', oppose: ', oppose, ', stopSupporting: ', stopSupporting, ', stopOpposing: ', stopOpposing);
       this.setState({

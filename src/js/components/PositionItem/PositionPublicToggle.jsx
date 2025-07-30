@@ -210,7 +210,8 @@ class PositionPublicToggle extends Component {
             <SignInModal
               signedInContentHeader={(
                 <>
-                  Your endorsement is now visible to the public.<br />
+                  Your endorsement is now visible to the public.
+                  <br />
                   <br />
                   Click the &quot;Friends&quot; toggle to show to WeVote friends only.
                 </>

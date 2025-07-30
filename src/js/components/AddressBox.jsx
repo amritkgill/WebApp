@@ -1,8 +1,9 @@
 import { Button } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
+import parser from 'parse-address';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import parser from 'parse-address';
+import TagManager from 'react-gtm-module';
 import BallotActions from '../actions/BallotActions';
 import VoterActions from '../actions/VoterActions';
 import DelayedLoad from '../common/components/Widgets/DelayedLoad';
@@ -13,10 +14,8 @@ import Cookies from '../common/utils/js-cookie/Cookies';
 import { renderLog } from '../common/utils/logging';
 import BallotStore from '../stores/BallotStore';
 import VoterStore from '../stores/VoterStore';
-import lookupPageNameAndPageTypeDict from './../utils/lookupPageNameAndPageTypeDict';
 import { getPageDetails } from '../utils/lookupPageNameAndPageTypeDict';
 import GoogleAutoComplete from './Widgets/GoogleAutoComplete';
-import TagManager from 'react-gtm-module';
 
 class AddressBox extends Component {
   constructor (props) {
@@ -108,6 +107,25 @@ class AddressBox extends Component {
     }
   }
 
+  voterAddressCancel = (event, buttonId) => {
+    event.preventDefault();
+    const dataLayerObject = {
+      actionDetails: {
+        actionType: 'cancel',
+        buttonId,
+      },
+      event: 'action',
+      pageDetails: getPageDetails(),
+      userDetails: VoterStore.getAnalyticsUserDetails(),
+    };
+    // console.log('dataLayerObject:', dataLayerObject);
+    TagManager.dataLayer({ dataLayer: dataLayerObject });
+
+    if (this.props.toggleEditingAddress) {
+      this.props.toggleEditingAddress();
+    }
+  }
+
   voterAddressSaveSubmit = (event, buttonId) => {
     // console.log('Save button clicked');
     // console.log('Passed buttonId:', buttonId);
@@ -118,8 +136,6 @@ class AddressBox extends Component {
     if (textForMapSearch && textForMapSearch !== '') {
       ballotCaveat = `Saving new address '${textForMapSearch}'...`;
     }
-    const { location: { pathname: currentPathname } } = window;
-    const page = lookupPageNameAndPageTypeDict(currentPathname);
     const address = textForMapSearch;
 
     let city = '';
@@ -138,7 +154,7 @@ class AddressBox extends Component {
     // console.log('Passed buttonId:', buttonId);
     const dataLayerObject = {
       actionDetails: {
-        actionType: 'openModal',
+        actionType: 'save',
         buttonId,
       },
       event: 'action',
@@ -152,7 +168,7 @@ class AddressBox extends Component {
         },
       },
     };
-    //console.log('dataLayerObject:', dataLayerObject);
+    // console.log('dataLayerObject:', dataLayerObject);
     TagManager.dataLayer({ dataLayer: dataLayerObject });
 
     BallotActions.setBallotCaveat(ballotCaveat);
@@ -248,7 +264,7 @@ class AddressBox extends Component {
             <Button
               color="primary"
               id={externalUniqueId ? `addressBoxModalCancelButton-${externalUniqueId}` : 'addressBoxModalCancelButton'}
-              onClick={toggleEditingAddress}
+              onClick={(event) => this.voterAddressCancel(event, externalUniqueId ? `addressBoxModalCancelButton-${externalUniqueId}` : 'addressBoxModalCancelButton')}
               classes={{ root: classes.cancelButton }}
             >
               Cancel

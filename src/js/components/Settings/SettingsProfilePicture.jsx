@@ -1,12 +1,13 @@
 import { Button, FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import styled from 'styled-components';
+import TagManager from 'react-gtm-module';
 import withStyles from '@mui/styles/withStyles';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import styled from 'styled-components';
 import VoterActions from '../../actions/VoterActions';
 import VoterPhotoUpload from '../../common/components/Settings/VoterPhotoUpload';
 import VoterStore from '../../stores/VoterStore';
-
+import lookupPageNameAndPageTypeDict from '../../utils/lookupPageNameAndPageTypeDict';
 
 class SettingsProfilePicture extends Component {
   constructor (props) {
@@ -45,14 +46,32 @@ class SettingsProfilePicture extends Component {
     });
   };
 
-  submitVoterPhotoSave = () => {
+  submitVoterPhotoSave = (buttonId) => {
     const { profileImageTypeCurrentlyActive } = this.state;
     const voterPhotoQueuedToSave = VoterStore.getVoterPhotoQueuedToSave();
     const voterPhotoQueuedToSaveSet = VoterStore.getVoterPhotoQueuedToSaveSet();
     if (voterPhotoQueuedToSaveSet || profileImageTypeCurrentlyActive) {
       VoterActions.voterPhotoSave(voterPhotoQueuedToSave, voterPhotoQueuedToSaveSet, profileImageTypeCurrentlyActive);
       VoterActions.voterPhotoQueuedToSave(undefined);
+
+      // Adding event data to dataLayer for Google Tag Manager
+      const page = lookupPageNameAndPageTypeDict(window.location.pathname);
+      const dataLayerObject = {
+        event: 'action',
+        actionDetails: {
+          actionType: 'upload',
+          buttonId,
+        },
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+        pageDetails: {
+          pageName: page.pageName,
+          pageType: page.pageType,
+          pathname: currentPathname,
+        },
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
     }
+
     this.setState({
       voterPhotoQueuedToSaveSet: false,
       profileImageTypeCurrentlyActiveSet: false,
@@ -80,7 +99,7 @@ class SettingsProfilePicture extends Component {
 
   facebookClicked () {
     this.setState({
-      profileImageTypeCurrentlyActive: "FACEBOOK",
+      profileImageTypeCurrentlyActive: 'FACEBOOK',
       profileImageTypeCurrentlyActiveSet: true,
       uploadedFileStaged: false,
     });
@@ -150,7 +169,7 @@ class SettingsProfilePicture extends Component {
               color="primary"
               disabled={!voterPhotoQueuedToSaveSet && !profileImageTypeCurrentlyActiveSet}
               id="saveEditYourPhotoBottom"
-              onClick={this.submitVoterPhotoSave}
+              onClick={() => this.submitVoterPhotoSave('saveEditYourPhotoBottom')}
               variant="contained"
             >
               {(!voterPhotoQueuedToSaveSet && !profileImageTypeCurrentlyActiveSet) ? 'Photo saved' : 'Save photo'}

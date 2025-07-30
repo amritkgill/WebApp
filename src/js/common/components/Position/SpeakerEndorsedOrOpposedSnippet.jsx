@@ -8,6 +8,7 @@ import { PositionText, VisibilityText } from '../Style/PositionDisplayStyles';
 import { getDateFromUltimateElectionDate, getTodayAsInteger, timeFromDate } from '../../utils/dateFormat';
 
 function SpeakerEndorsedOrOpposedSnippet ({ position, viewerIsPositionOwner }) {
+  // console.log('SpeakerEndorsedOrOpposedSnippet position', position);
   if (!position || Object.keys(position).length === 0) {
     // The incoming position object is empty or not provided
     return null;
@@ -87,9 +88,11 @@ function SpeakerEndorsedOrOpposedSnippet ({ position, viewerIsPositionOwner }) {
           </PositionText>
         </SpeakerPosition>
       )}
-      <VisibilityText>
-        {isPublicPosition ? '(visible to public)' : '(only visible to WeVote friends)'}
-      </VisibilityText>
+      {(isOpposeOrNegativeRating || isSupportOrPositiveRating || statementText) && (
+        <VisibilityText>
+          {isPublicPosition ? '(visible to public)' : '(only visible to WeVote friends)'}
+        </VisibilityText>
+      )}
     </SpeakerPositionWrapper>
   );
 }

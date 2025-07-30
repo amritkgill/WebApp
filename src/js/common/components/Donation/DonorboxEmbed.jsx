@@ -26,7 +26,8 @@ export default function DonorboxEmbed () {
           alignItems: 'flex-start',
           backgroundColor: 'white',
           zIndex: 1,
-        }}>
+        }}
+        >
           Loading...
         </div>
       )}

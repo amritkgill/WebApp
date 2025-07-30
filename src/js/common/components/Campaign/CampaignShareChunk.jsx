@@ -146,7 +146,7 @@ class CampaignShareChunk extends Component {
             )}
             <CampaignSupportDesktopButtonWrapper className="u-show-desktop-tablet">
               <CampaignSupportDesktopButtonPanel>
-                <ShareOnTwitterButton campaignXNewsItemWeVoteId={campaignXNewsItemWeVoteId} campaignXWeVoteId={campaignXWeVoteId} shareType={this.state.shareType}/>
+                <ShareOnTwitterButton campaignXNewsItemWeVoteId={campaignXNewsItemWeVoteId} campaignXWeVoteId={campaignXWeVoteId} shareType={this.state.shareType} />
               </CampaignSupportDesktopButtonPanel>
             </CampaignSupportDesktopButtonWrapper>
             <CampaignSupportMobileButtonWrapper className="u-show-mobile">

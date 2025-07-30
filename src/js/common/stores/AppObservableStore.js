@@ -62,6 +62,7 @@ const nonFluxState = {
   showAskFriendsModal: false,
   showChooseOrOpposeIntroModal: false,
   showCompleteYourProfileModal: false,
+  showEditCandidateBar: true,
   showEditAddressButton: false,
   showElectionsWithOrganizationVoterGuidesModal: false,
   showHeader: 0,
@@ -249,6 +250,14 @@ export default {
   getShareModalStep () {
     // console.log('AppObservableStore shareModalStep:', nonFluxState.shareModalStep);
     return nonFluxState.shareModalStep;
+  },
+  getShowEditCandidateBar () {
+    return nonFluxState.showEditCandidateBar;
+  },
+
+  setShowEditCandidateBar (show) {
+    nonFluxState.showEditCandidateBar = show;
+    messageService.sendMessage('state updated showEditCandidateBar');
   },
 
   getWeVoteRootURL () {

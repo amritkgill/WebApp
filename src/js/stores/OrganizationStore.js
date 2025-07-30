@@ -430,10 +430,8 @@ class OrganizationStore extends ReduceStore {
     let featuresProvidedBitmap;
     let googleCivicElectionId;
     let hostname;
-    let isPublicPosition;
     let issueList;
     let mergedPosition = {};
-    let modifiedPosition;
     let modifiedPositionChangeFound = false;
     let newPositionList;
     let numberOfSearchResults = 0;
@@ -445,9 +443,9 @@ class OrganizationStore extends ReduceStore {
     let politicianWeVoteId;
     let positionWeVoteId;
     let priorCopyOfOrganization;
+    let revisedPosition;
     let revisedOrganization;
     let revisedState;
-    let statementText;
     let voterGuides;
     let voterLinkedOrganizationWeVoteId;
     let voterOrganizationFeaturesProvided;
@@ -1344,34 +1342,23 @@ class OrganizationStore extends ReduceStore {
         revisedState = state;
         // Voter has done action that modifies one of their positions. Update the position where it is cached.
         ballotItemWeVoteId = action.res.ballot_item_we_vote_id;
-        isPublicPosition = action.res.is_public_position;
         politicianWeVoteId = action.res.politician_we_vote_id;
         positionWeVoteId = action.res.position_we_vote_id;
-        statementText = action.res.statement_text;
         voterLinkedOrganizationWeVoteId = VoterStore.getLinkedOrganizationWeVoteId();
+        if (action.res && action.res.position) {
+          if (action.res.position.position_we_vote_id) {
+            revisedPosition = action.res.position;
+            // console.log('voterSupportingSave action.res.position after adding position:', action.res.position);
+          }
+        }
         if (positionWeVoteId && voterLinkedOrganizationWeVoteId) {
           if (allCachedPositionsByOrganization[voterLinkedOrganizationWeVoteId]) {
             allCachedPositionsByOrganization[voterLinkedOrganizationWeVoteId].forEach((onePosition) => {
-              modifiedPosition = onePosition;
-              if (modifiedPosition) {
-                if (onePosition.position_we_vote_id === positionWeVoteId) {
-                  if (action.type === 'voterOpposingSave') {
-                    modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, false, true, true, false);
-                  } else if (action.type === 'voterSupportingSave') {
-                    modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, true, false, false, true);
-                  } else if (action.type === 'voterStopOpposingSave') {
-                    modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, true, false, false, false);
-                  } else if (action.type === 'voterStopSupportingSave') {
-                    modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, false, false, true, false);
-                  } else if (action.type === 'voterPositionCommentSave') {
-                    modifiedPosition.is_public_position = isPublicPosition;
-                    modifiedPosition.statement_text = statementText;
-                  } else if (action.type === 'voterPositionVisibilitySave') {
-                    modifiedPosition.is_public_position = isPublicPosition;
-                  }
-                  modifiedPositionChangeFound = true;
-                }
-                allCachedPositionsForOneOrganization.push(modifiedPosition);
+              if (revisedPosition && revisedPosition.position_we_vote_id === onePosition.position_we_vote_id) {
+                allCachedPositionsForOneOrganization.push(revisedPosition);
+                modifiedPositionChangeFound = true;
+              } else {
+                allCachedPositionsForOneOrganization.push(onePosition);
               }
             });
             if (modifiedPositionChangeFound) {
@@ -1381,50 +1368,24 @@ class OrganizationStore extends ReduceStore {
           }
         }
         if (positionWeVoteId) {
-          modifiedPosition = allCachedPositionsByPositionWeVoteId[positionWeVoteId];
-          if (modifiedPosition) {
-            if (action.type === 'voterOpposingSave') {
-              modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, false, true, true, false);
-            } else if (action.type === 'voterSupportingSave') {
-              modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, true, false, false, true);
-            } else if (action.type === 'voterStopOpposingSave') {
-              modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, true, false, false, false);
-            } else if (action.type === 'voterStopSupportingSave') {
-              modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, false, false, true, false);
-            } else if (action.type === 'voterPositionCommentSave') {
-              modifiedPosition.is_public_position = isPublicPosition;
-              modifiedPosition.statement_text = statementText;
-            } else if (action.type === 'voterPositionVisibilitySave') {
-              modifiedPosition.is_public_position = isPublicPosition;
-            }
-            allCachedPositionsByPositionWeVoteId[positionWeVoteId] = modifiedPosition;
+          if (revisedPosition && revisedPosition.position_we_vote_id === positionWeVoteId) {
+            allCachedPositionsByPositionWeVoteId[positionWeVoteId] = revisedPosition;
             revisedState = { ...revisedState, allCachedPositionsByPositionWeVoteId };
           }
         }
         if (ballotItemWeVoteId && voterLinkedOrganizationWeVoteId) {
-          if (allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId] && allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId][ballotItemWeVoteId]) {
-            modifiedPosition = allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId][ballotItemWeVoteId];
-            if (modifiedPosition) {
-              if (action.type === 'voterOpposingSave') {
-                modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, false, true, true, false);
-              } else if (action.type === 'voterSupportingSave') {
-                modifiedPosition = this.modifyPositionObject(modifiedPosition, true, false, true, false, false, true);
-              } else if (action.type === 'voterStopOpposingSave') {
-                modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, true, false, false, false);
-              } else if (action.type === 'voterStopSupportingSave') {
-                modifiedPosition = this.modifyPositionObject(modifiedPosition, false, true, false, false, true, false);
-              } else if (action.type === 'voterPositionCommentSave') {
-                modifiedPosition.is_public_position = isPublicPosition;
-                modifiedPosition.statement_text = statementText;
-              } else if (action.type === 'voterPositionVisibilitySave') {
-                modifiedPosition.is_public_position = isPublicPosition;
-              }
-              allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId][ballotItemWeVoteId] = modifiedPosition;
-              revisedState = { ...revisedState, allCachedPositionsByOrganizationDict };
-            }
+          allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId] ??= {};
+          if (revisedPosition && revisedPosition.position_we_vote_id) {
+            // console.log('OrganizationStore voterLinkedOrganizationWeVoteId:', voterLinkedOrganizationWeVoteId, ', ballotItemWeVoteId: ', ballotItemWeVoteId);
+            allCachedPositionsByOrganizationDict[voterLinkedOrganizationWeVoteId][ballotItemWeVoteId] = revisedPosition;
+            revisedState = {
+              ...revisedState,
+              allCachedPositionsByOrganizationDict,
+            };
           }
         }
         if (politicianWeVoteId) {
+          // console.log('OrganizationStore politicianWeVoteId:', politicianWeVoteId, ', action.type: ', action.type);
           if (action.type === 'voterOpposingSave') {
             if (!arrayContains(politicianWeVoteId, politicianWeVoteIdsVoterIsDisliking)) {
               politicianWeVoteIdsVoterIsDisliking.push(politicianWeVoteId);

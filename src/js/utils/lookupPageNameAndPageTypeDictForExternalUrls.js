@@ -118,7 +118,7 @@ function calculatePageNameAndPageTypeDictForExternalUrls (pathOrURL) {
     pageType = 'endorser';  // Changed from 'twitterHandleLanding' to 'endorser'
   }
 
-  if (pathOrURL.startsWith('https//') || pathOrURL.startsWith('http://')) {
+  if (pathOrURL.startsWith('https://') || pathOrURL.startsWith('http://')) {
     if (pathOrURL.startsWith('https://instagram.com')) {
       pageName = 'Instagram';
       pageType = 'socialMedia';

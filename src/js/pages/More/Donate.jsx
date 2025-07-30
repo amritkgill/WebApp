@@ -65,6 +65,7 @@ class Donate extends Component {
   }
 
   componentDidMount () {
+    const { dataLayerSent } = this.state;
     this.onDonateStoreChange();
     this.donateStoreListener = DonateStore.addListener(this.onDonateStoreChange);
     this.voterStoreListener = VoterStore.addListener(this.onVoterStoreChange);
@@ -72,6 +73,19 @@ class Donate extends Component {
     DonateActions.donationRefreshDonationList();
     window.scrollTo(0, 0);
     window.addEventListener('resize', this.handleResize);
+
+    if (!dataLayerSent && VoterStore.getVoterWeVoteId()) {
+      const dataLayerObject = {
+        actionDetails: {
+          actionType: 'landing',
+        },
+        event: 'landing',
+        pageDetails: getPageDetails(),
+        userDetails: VoterStore.getAnalyticsUserDetails(),
+      };
+      TagManager.dataLayer({ dataLayer: dataLayerObject });
+      this.setState({ dataLayerSent: true });
+    }
   }
 
   componentDidUpdate () {
@@ -86,11 +100,13 @@ class Donate extends Component {
 
     if (!dataLayerSent && VoterStore.getVoterWeVoteId()) {
       const dataLayerObject = {
+        actionDetails: {
+          actionType: 'landing',
+        },
         event: 'landing',
         pageDetails: getPageDetails(),
         userDetails: VoterStore.getAnalyticsUserDetails(),
       };
-      // console.log('WV-1462: dataLayerObject:', dataLayerObject);
       TagManager.dataLayer({ dataLayer: dataLayerObject });
       this.setState({ dataLayerSent: true });
     }
